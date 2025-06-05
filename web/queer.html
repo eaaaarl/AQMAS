@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Queer Number Receipt Generator</title>
+    <style>
+      body {
+        font-family: "Courier New", monospace;
+        background-color: #f5f5f5;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+      }
+      .generator {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        width: 300px;
+        text-align: center;
+      }
+      .receipt {
+        width: 80mm;
+        background-color: white;
+        padding: 10px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        page-break-after: always;
+      }
+      .header,
+      .footer {
+        text-align: center;
+        font-weight: bold;
+        margin: 5px 0;
+      }
+      .divider {
+        border-top: 1px dashed #000;
+        margin: 5px 0;
+      }
+      .queer-number {
+        font-size: 24px;
+        text-align: center;
+        margin: 10px 0;
+        font-weight: bold;
+      }
+      .barcode-container {
+        text-align: center;
+        margin: 10px 0;
+      }
+      .barcode {
+        font-family: "Libre Barcode 128", cursive;
+        font-size: 36px;
+      }
+      .small {
+        font-size: 12px;
+      }
+      .center {
+        text-align: center;
+      }
+      button {
+        background-color: #8e44ad;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+      button:hover {
+        background-color: #9b59b6;
+      }
+      .counter-display {
+        margin: 15px 0;
+        font-size: 18px;
+      }
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        .receipt,
+        .receipt * {
+          visibility: visible;
+        }
+        .receipt {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 80mm;
+          box-shadow: none;
+        }
+      }
+    </style>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Libre+Barcode+128&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="generator">
+      <div class="counter-display">
+        Next Number: <span id="currentNumberDisplay">000</span>
+      </div>
+      <button onclick="printReceipt()">Print Receipt</button>
+    </div>
+
+    <div class="receipt" id="receipt">
+      <div class="header">ABC CORPORATE</div>
+      <div class="divider"></div>
+
+      <div class="center small">
+        ABC Community Space<br />
+        123 Pride Avenue<br />
+        Butuan City, RC 99999
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="center" id="datetime">
+        <!-- Filled by JavaScript -->
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="queer-number">YOUR QUEUE NUMBER:</div>
+      <div class="queer-number" id="numberDisplay">#000</div>
+
+      <div class="barcode-container">
+        <div class="barcode" id="barcodeDisplay">000</div>
+        <div class="small">*<span id="humanReadable">QUEUE-000</span>*</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="center small">
+        This number identifies you in our<br />
+        community system today.<br />
+        Present it for discounts and access.
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="footer small">
+        Thank you for supporting<br />
+        ABC community spaces!
+      </div>
+
+      <div class="center small">(Replacement fee: $1.00)</div>
+    </div>
+
+    <script>
+      // Initialize counter from localStorage or start at 0
+      let counter = localStorage.getItem("queueCounter")
+        ? parseInt(localStorage.getItem("queueCounter"))
+        : 0;
+
+      // Update the current number display
+      function updateCurrentNumberDisplay() {
+        document.getElementById("currentNumberDisplay").textContent = String(
+          counter
+        ).padStart(3, "0");
+      }
+
+      // Generate the next number and print receipt
+      function printReceipt() {
+        counter++;
+        localStorage.setItem("queueCounter", counter);
+        updateCurrentNumberDisplay();
+
+        const paddedNum = String(counter).padStart(3, "0");
+
+        // Update receipt display
+        document.getElementById("numberDisplay").textContent = `#${paddedNum}`;
+        document.getElementById(
+          "barcodeDisplay"
+        ).textContent = `QR${paddedNum}`;
+        document.getElementById(
+          "humanReadable"
+        ).textContent = `QUEUE-${paddedNum}`;
+
+        // Update datetime
+        const now = new Date();
+        document.getElementById("datetime").innerHTML =
+          `Date: ${now.toLocaleDateString()}<br>` +
+          `Time: ${now.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}<br>` +
+          `Receipt: #PRD-${now.getFullYear()}-${paddedNum}`;
+
+        // Trigger print dialog
+        window.print();
+      }
+
+      // Initialize display on load
+      updateCurrentNumberDisplay();
+    </script>
+  </body>
+</html>

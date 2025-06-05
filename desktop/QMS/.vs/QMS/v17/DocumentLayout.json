@@ -1,0 +1,36 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Projects\\queuing\\desktop\\QMS\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{75BA0421-470A-419E-BDBA-24BF5294A478}|QMS\\QMS.vbproj|c:\\projects\\queuing\\desktop\\qms\\qms\\loginform.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form",
+      "RelativeMoniker": "D:0:0:{75BA0421-470A-419E-BDBA-24BF5294A478}|QMS\\QMS.vbproj|solutionrelative:qms\\loginform.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "LoginForm.vb [Design]",
+              "DocumentMoniker": "C:\\Projects\\queuing\\desktop\\QMS\\QMS\\LoginForm.vb",
+              "RelativeDocumentMoniker": "QMS\\LoginForm.vb",
+              "ToolTip": "C:\\Projects\\queuing\\desktop\\QMS\\QMS\\LoginForm.vb [Design]",
+              "RelativeToolTip": "QMS\\LoginForm.vb [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-06-03T06:16:48.419Z",
+              "EditorCaption": " [Design]"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
