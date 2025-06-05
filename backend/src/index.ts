@@ -11,8 +11,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "http://192.168.1.13:8081",
-    credentials: true,
+    origin: "*",
   })
 );
 app.use(express.json());
@@ -22,7 +21,6 @@ app.get("/", (req, res) => {
 });
 app.use("/api/queer", queerRoutes);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on http://192.168.1.13:${PORT}`);
+app.listen(3000, "0.0.0.0", () => {
+  console.log("Server running on http://192.168.1.13:3000");
 });
