@@ -91,6 +91,7 @@ export default function Transaction() {
     );
   }
 
+
   return (
     <SafeAreaView className='flex-1 bg-white'>
       <ScrollView

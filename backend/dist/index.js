@@ -13,15 +13,13 @@ dotenv_1.default.config();
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
 app.use((0, cors_1.default)({
-    origin: "http://192.168.1.13:8081",
-    credentials: true,
+    origin: "*",
 }));
 app.use(express_1.default.json());
 app.get("/", (req, res) => {
     res.send("Hello World!");
 });
 app.use("/api/queer", queer_route_1.queerRoutes);
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on http://192.168.1.13:${PORT}`);
+app.listen(3000, "0.0.0.0", () => {
+    console.log("Server running on http://192.168.1.13:3000");
 });
