@@ -1,9 +1,8 @@
-import { BACKEND_CONFIG } from "@/constant/config";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { ServiceResponse } from "./interface";
 
 const customBaseQuery = fetchBaseQuery({
-  baseUrl: `${BACKEND_CONFIG.API_URL}/api` + "/queer",
+  baseUrl: `http://192.168.1.13:3000/api` + "/queer",
 });
 
 export const serviceApi = createApi({
