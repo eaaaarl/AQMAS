@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { ServiceResponse } from "./interface";
 
 const customBaseQuery = fetchBaseQuery({
-  baseUrl: `http://192.168.1.13:3000/api` + "/queer",
+  baseUrl: `http://192.168.56.1:3000/api` + "/queer",
 });
 
 export const serviceApi = createApi({

@@ -21,5 +21,5 @@ app.get("/", (req, res) => {
 });
 app.use("/api/queer", queer_route_1.queerRoutes);
 app.listen(3000, "0.0.0.0", () => {
-    console.log("Server running on http://192.168.1.13:3000");
+    console.log("Server running on http://192.168.56.1:3000");
 });
