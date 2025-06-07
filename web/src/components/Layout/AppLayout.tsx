@@ -1,8 +1,12 @@
 import { Outlet } from 'react-router-dom'
+import FullScreenToggle from '../FullScreenToggle'
 
 function AppLayout() {
     return (
-        <><Outlet /></>
+        <div>
+            <FullScreenToggle />
+            <Outlet />
+        </div>
     )
 }
 
