@@ -5,9 +5,8 @@ import { Route, Routes } from "react-router-dom";
 function App() {
   return (
     <Routes>
-      <Route element={<AppLayout />}>
-        {/* Main dashboard/service page */}
-        <Route path="/" element={<ServicePage />} />
+      <Route path="/" element={<AppLayout />}>
+        <Route path="/services" element={<ServicePage />} />
 
         {/* You can add more service-related routes here */}
         {/* <Route path="/services/:serviceId" element={<ServiceDetailPage />} /> */}
