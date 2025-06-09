@@ -17,7 +17,7 @@ app.use((0, cors_1.default)({
 }));
 app.use(express_1.default.json());
 app.get("/", (req, res) => {
-    res.send("Hello World!");
+    res.send("Connected locally!");
 });
 app.use("/api/user", service_route_1.serviceRoutes);
 const PORT = process.env.PORT || 3002;

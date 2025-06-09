@@ -26,7 +26,7 @@ export default function ServicePage() {
                 transition-colors duration-200 w-full`}
             onClick={() => toggleTransaction(service.service_name)}
         >
-            <span className="text-2xl">{getServiceIcon(service.service_name)}</span>
+            <span className="text-4xl">{getServiceIcon(service.service_name)}</span>
             <span className="mt-2 font-bold">{service.button_caption}</span>
         </button>
     );
