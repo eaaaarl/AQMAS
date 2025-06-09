@@ -1,9 +1,26 @@
+import TapDetector from '@/components/TapsDetector';
 import { Stack } from 'expo-router';
-import React from 'react';
+import * as ScreenOrientation from 'expo-screen-orientation';
+import React, { useEffect } from 'react';
 
 export default function LayoutService() {
+    useEffect(() => {
+        async function setOrientation() {
+            await ScreenOrientation.lockAsync(
+                ScreenOrientation.OrientationLock.LANDSCAPE
+            );
+        }
+        setOrientation();
 
+        return () => {
+            ScreenOrientation.unlockAsync();
+        };
+    }, []);
     return (
-        <Stack screenOptions={{ headerShown: false }} />
+        <TapDetector>
+            <Stack>
+                <Stack.Screen name="index" options={{ headerShown: false }} />
+            </Stack>
+        </TapDetector>
     )
 }

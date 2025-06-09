@@ -1,10 +1,10 @@
 import { RootState } from "@/libs/redux/store";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { ServicesApiResponse } from "./interface";
+import { ConfigApiResponse } from "./interface";
 
-export const serviceApi = createApi({
-  reducerPath: "serviceApi",
-  tagTypes: ["Services"],
+export const configApi = createApi({
+  reducerPath: "configApi",
+  tagTypes: ["Configs"],
   baseQuery: async (args, api, extraOptions) => {
     const state = api.getState() as RootState;
 
@@ -34,11 +34,13 @@ export const serviceApi = createApi({
     return baseQuery(adjustedArgs, api, extraOptions);
   },
   endpoints: (builder) => ({
-    getServices: builder.query<ServicesApiResponse, void>({
-      query: () => "/service",
-      providesTags: ["Services"],
+    getConfigs: builder.query<ConfigApiResponse[], void>({
+      query: () => ({
+        url: "/config",
+        method: "GET",
+      }),
     }),
   }),
 });
 
-export const { useGetServicesQuery } = serviceApi;
+export const { useGetConfigsQuery } = configApi;
