@@ -9,23 +9,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.QueerController = void 0;
-class QueerController {
-    constructor(queerService) {
-        this.queerService = queerService;
-        this.getQueerService = this.getQueerService.bind(this);
+exports.ServiceService = void 0;
+class ServiceService {
+    constructor(serviceRepository) {
+        this.serviceRepository = serviceRepository;
     }
-    getQueerService(req, res, next) {
+    getService() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const service = yield this.queerService.getQueerService();
-                res.status(200).json(service);
+                const service = yield this.serviceRepository.getService();
+                return service;
             }
             catch (error) {
-                console.error("Error in QueerController.getQueerService:", error);
-                res.status(500).json({ error: "Internal Server Error" });
+                console.error("Error fetching queer service:", error);
+                throw error;
             }
         });
     }
 }
-exports.QueerController = QueerController;
+exports.ServiceService = ServiceService;

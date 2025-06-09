@@ -1,9 +1,9 @@
 import knex from "../database/database";
 
-export class QueerRepository {
+export class ServiceRepository {
   private db = knex;
 
-  async getQueerService() {
+  async getService() {
     try {
       const service = await this.db("ent_service").select("*");
       return service;

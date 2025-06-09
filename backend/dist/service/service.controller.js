@@ -8,27 +8,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.QueerRepository = void 0;
-const database_1 = __importDefault(require("../database/database"));
-class QueerRepository {
-    constructor() {
-        this.db = database_1.default;
+exports.ServiceController = void 0;
+class ServiceController {
+    constructor(serviceService) {
+        this.serviceService = serviceService;
+        this.getService = this.getService.bind(this);
     }
-    getQueerService() {
+    getService(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const service = yield this.db("ent_service").select("*");
-                return service;
+                const service = yield this.serviceService.getService();
+                res.status(200).json(service);
             }
             catch (error) {
-                console.error("Error fetching queer service:", error);
-                throw error;
+                console.error("Error in ServiceController GetService:", error);
+                res.status(500).json({ error: "Internal Server Error" });
             }
         });
     }
 }
-exports.QueerRepository = QueerRepository;
+exports.ServiceController = ServiceController;

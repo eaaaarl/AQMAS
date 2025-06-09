@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { ServiceResponse } from "./interface";
 
 const customBaseQuery = fetchBaseQuery({
-  baseUrl: `${import.meta.env.VITE_API_BASE_URL}/api` + "/queer",
+  baseUrl: `${import.meta.env.VITE_API_BASE_URL}/api` + "/user",
 });
 
 export const serviceApi = createApi({
