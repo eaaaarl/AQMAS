@@ -1,6 +1,5 @@
 
 import type { ServiceResponse } from '../api/interface';
-import { CardsConfig } from '../contants/CardsConfig';
 import { useService } from '../hooks/useService';
 
 
@@ -20,7 +19,7 @@ export default function ServicePage() {
     const renderServiceItem = (service: ServiceResponse) => (
         <button
             key={service.service_id}
-            className={`h-${CardsConfig.HEIGHT} rounded-lg flex flex-col items-center justify-center 
+            className={`h-42 rounded-lg flex flex-col items-center justify-center 
                 ${selectedTransactions.includes(service.service_name)
                     ? 'bg-blue-500 text-white'
                     : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}
@@ -51,6 +50,9 @@ export default function ServicePage() {
     return (
         <div className="min-h-screen bg-white p-4 flex flex-col items-center justify-center">
             <div className="w-full max-w-2xl">
+                <div className='mb-4'>
+                    {selectedTransactions.map((st) => st).join(' | ')}
+                </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                     {!showMore ? (
                         <>
@@ -61,7 +63,7 @@ export default function ServicePage() {
                             ))}
                             {additionalServices.length > 0 && (
                                 <button
-                                    className={`h-${CardsConfig.HEIGHT} rounded-lg flex flex-col items-center justify-center bg-gray-100 hover:bg-gray-200 transition-colors w-full`}
+                                    className={`h-42 rounded-lg flex flex-col items-center justify-center bg-gray-100 hover:bg-gray-200 transition-colors w-full`}
                                     onClick={() => setShowMore(true)}
                                 >
                                     <span className="text-2xl">➕</span>
@@ -98,6 +100,9 @@ export default function ServicePage() {
                         </button>
                     </div>
                 )}
+
+
+
             </div>
         </div>
     );
