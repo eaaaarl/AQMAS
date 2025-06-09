@@ -1,8 +1,21 @@
+import { useGetConfigsQuery } from "@/features/config/api/configApi";
 import { useState } from "react";
 import { useGetServicesQuery } from "../api/serviceApi";
 
 export const useService = () => {
-  const { data: response, isLoading, isError, refetch } = useGetServicesQuery();
+  const {
+    data: response,
+    isLoading: isServicesLoading,
+    isError: isServicesError,
+    refetch: refetchServices,
+  } = useGetServicesQuery();
+
+  const {
+    refetch: refetchConfigs,
+    isLoading: isConfigsLoading,
+    isError: isConfigsError,
+  } = useGetConfigsQuery();
+
   const [selectedTransactions, setSelectedTransactions] = useState<string[]>(
     []
   );
@@ -10,11 +23,10 @@ export const useService = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   const services = response?.results || [];
-
   const onRefresh = async () => {
     setRefreshing(true);
     try {
-      await refetch();
+      await Promise.all([refetchServices(), refetchConfigs()]);
     } finally {
       setRefreshing(false);
     }
@@ -39,9 +51,9 @@ export const useService = () => {
   return {
     selectedTransactions,
     toggleTransaction,
-    isLoading,
+    isLoading: isServicesLoading || isConfigsLoading,
+    isError: isServicesError || isConfigsError,
     services,
-    isError,
     refreshing,
     onRefresh,
     showMore,

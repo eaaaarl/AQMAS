@@ -1,8 +1,11 @@
 import { useGetConfigsQuery } from '@/features/config/api/configApi';
-import { Service } from '@/features/service/api/interface';
+import { PaginationControls } from '@/features/service/components/PaginationControl';
+import { ServiceItem } from '@/features/service/components/ServiceItem';
 import { useService } from '@/features/service/hooks/useService';
+import { renderError } from '@/features/service/utils/errorUtils';
+import { renderLoading, renderNoServices } from '@/features/service/utils/loadingUtils';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, Dimensions, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Transaction() {
@@ -41,85 +44,21 @@ export default function Transaction() {
     (currentPage + 1) * SERVICES_PER_PAGE
   );
 
-  const renderServiceItem = (service: Service) => (
-    <TouchableOpacity
-      key={service.service_id}
-      style={{ width: cardWidth }}
-      className={`h-32 m-1 rounded-full items-center justify-center shadow-lg border border-gray-300
-        ${selectedTransactions.includes(service.service_name) ? 'bg-blue-500' : 'bg-gray-100'}`}
-      onPress={() => toggleTransaction(service.service_name)}
-    >
-      <Text className={`mt-2 font-medium text-3xl text-center ${selectedTransactions.includes(service.service_name) ? 'text-white' : 'text-gray-800'}`}>
-        {service.button_caption}
-      </Text>
-    </TouchableOpacity>
-  );
-
-  const renderPaginationControls = () => (
-    <View className="flex-row justify-center items-center my-4 space-x-2 gap-4">
-      {/*  {currentPage > 0 && (
-        <TouchableOpacity
-          className="px-6 py-3 rounded-lg bg-blue-100"
-          onPress={() => setCurrentPage(0)}
-        >
-          <Text className="text-xl font-bold">⏮ First</Text>
-        </TouchableOpacity>
-      )} */}
-
-      <TouchableOpacity
-        className="px-6 py-3 rounded-lg bg-blue-100"
-        onPress={() => setCurrentPage(prev => Math.max(prev - 1, 0))}
-        disabled={currentPage === 0}
-      >
-        <Text className={`text-xl font-bold ${currentPage === 0 ? 'text-gray-400' : 'text-blue-800'}`}>◀ Prev</Text>
-      </TouchableOpacity>
-
-      <View className="px-4 py-2 bg-blue-500 rounded-full">
-        <Text className="text-xl font-bold text-white">
-          {currentPage + 1} / {totalPages}
-        </Text>
-      </View>
-
-      <TouchableOpacity
-        className="px-6 py-3 rounded-lg bg-blue-100"
-        onPress={() => setCurrentPage(prev => Math.min(prev + 1, totalPages - 1))}
-        disabled={currentPage === totalPages - 1}
-      >
-        <Text className={`text-xl font-bold ${currentPage === totalPages - 1 ? 'text-gray-400' : 'text-blue-800'}`}>Next ▶</Text>
-      </TouchableOpacity>
-
-      {/*    {currentPage < totalPages - 1 && (
-        <TouchableOpacity
-          className="px-6 py-3 rounded-lg bg-blue-100"
-          onPress={() => setCurrentPage(totalPages - 1)}
-        >
-          <Text className="text-xl font-bold">Last ⏭</Text>
-        </TouchableOpacity>
-      )} */}
-    </View>
-  );
-
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-white p-4 justify-center items-center">
-        <ActivityIndicator size="large" color="#0000FF" />
-      </SafeAreaView>
+      renderLoading()
     );
   }
 
   if (services.length === 0) {
     return (
-      <SafeAreaView className="flex-1 bg-white p-4 justify-center items-center">
-        <Text className="text-lg text-gray-500">No services available</Text>
-      </SafeAreaView>
+      renderNoServices()
     );
   }
 
   if (isError) {
     return (
-      <SafeAreaView className="flex-1 bg-white p-4 justify-center items-center">
-        <Text className="text-lg text-red-500">Error loading services</Text>
-      </SafeAreaView>
+      renderError()
     );
   }
 
@@ -152,7 +91,12 @@ export default function Transaction() {
               <>
                 {paginatedServices.map((service) => (
                   <View key={service.service_id} style={{ width: cardWidth, minWidth: isLandscape ? 180 : cardWidth }}>
-                    {renderServiceItem(service)}
+                    <ServiceItem
+                      service={service}
+                      cardWidth={cardWidth}
+                      isSelected={selectedTransactions.includes(service.service_name)}
+                      onPress={() => toggleTransaction(service.service_name)}
+                    />
                   </View>
                 ))}
               </>
@@ -162,7 +106,12 @@ export default function Transaction() {
                   <>
                     {mainServices.map((service) => (
                       <View key={service.service_id} style={{ width: cardWidth, minWidth: isLandscape ? 180 : cardWidth }}>
-                        {renderServiceItem(service)}
+                        <ServiceItem
+                          service={service}
+                          cardWidth={cardWidth}
+                          isSelected={selectedTransactions.includes(service.service_name)}
+                          onPress={() => toggleTransaction(service.service_name)}
+                        />
                       </View>
                     ))}
                     {additionalServices.length > 0 && (
@@ -180,12 +129,17 @@ export default function Transaction() {
                   <>
                     {additionalServices.map((service) => (
                       <View key={service.service_id} style={{ width: cardWidth, minWidth: isLandscape ? 180 : cardWidth }}>
-                        {renderServiceItem(service)}
+                        <ServiceItem
+                          service={service}
+                          cardWidth={cardWidth}
+                          isSelected={selectedTransactions.includes(service.service_name)}
+                          onPress={() => toggleTransaction(service.service_name)}
+                        />
                       </View>
                     ))}
                     <View style={{ width: cardWidth, minWidth: isLandscape ? 180 : cardWidth }}>
                       <TouchableOpacity
-                        className="h-32 m-1 rounded-full border border-gray-300 items-center justify-center bg-gray-100"
+                        className="h-32 m-1 rounded-full shadow-lg border border-gray-300 items-center justify-center bg-gray-100"
                         onPress={() => setShowMore(false)}
                       >
                         <Text className="mt-2 font-medium text-center text-3xl text-gray-800">Back</Text>
@@ -197,7 +151,13 @@ export default function Transaction() {
             )}
           </View>
 
-          {shouldShowAllServices && totalPages > 1 && renderPaginationControls()}
+          {shouldShowAllServices && totalPages > 1 &&
+            <PaginationControls
+              currentPage={currentPage}
+              onPrev={() => setCurrentPage(prev => Math.max(prev - 1, 0))}
+              onNext={() => setCurrentPage(prev => Math.min(prev + 1, totalPages - 1))}
+              totalPages={totalPages}
+            />}
 
           {selectedTransactions.length > 0 && (
             <View className="w-min px-5 mt-5">
