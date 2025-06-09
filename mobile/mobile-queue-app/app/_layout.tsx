@@ -7,8 +7,6 @@ import { store as reduxStore } from "../libs/redux/store";
 const persistor = persistStore(reduxStore);
 
 export default function RootLayout() {
-
-
   return <Provider store={reduxStore}>
     <PersistGate loading={null} persistor={persistor}>
       <Stack screenOptions={{ headerShown: false }} />

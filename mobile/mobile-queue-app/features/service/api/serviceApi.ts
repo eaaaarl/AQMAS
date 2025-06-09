@@ -1,19 +1,42 @@
+import { RootState } from "@/libs/redux/store";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { ServicesApiResponse } from "./interface";
 
-const customBaseQuery = fetchBaseQuery({
-  baseUrl: `http://192.168.1.22:4000`,
-});
-
 export const serviceApi = createApi({
   reducerPath: "serviceApi",
-  baseQuery: customBaseQuery,
+  tagTypes: ["Services"],
+  baseQuery: async (args, api, extraOptions) => {
+    const state = api.getState() as RootState;
+
+    console.log("State keys:", Object.keys(state));
+    console.log("Config exists:", !!state.config);
+
+    const ipAddress = state.config?.ipAddress || "192.168.1.22";
+    const port = state.config?.port || "4000";
+    const baseUrl = `http://${ipAddress}:${port}`;
+
+    console.log("Using IP:", ipAddress);
+    console.log("Using Port:", port);
+    console.log("Constructed baseUrl:", baseUrl);
+
+    let url: string;
+    let adjustedArgs: any;
+
+    if (typeof args === "string") {
+      url = `${baseUrl}${args}`;
+      adjustedArgs = url;
+    } else {
+      url = `${baseUrl}${args.url}`;
+      adjustedArgs = { ...args, url };
+    }
+
+    const baseQuery = fetchBaseQuery({ baseUrl });
+    return baseQuery(adjustedArgs, api, extraOptions);
+  },
   endpoints: (builder) => ({
     getServices: builder.query<ServicesApiResponse, void>({
-      query: () => ({
-        url: "/service",
-        method: "GET",
-      }),
+      query: () => "/service",
+      providesTags: ["Services"],
     }),
   }),
 });

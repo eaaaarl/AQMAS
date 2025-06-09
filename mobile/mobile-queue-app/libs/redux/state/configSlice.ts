@@ -1,31 +1,26 @@
-import { createSlice } from "@reduxjs/toolkit";
+// src/store/configSlice.ts
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-export interface ConfigState {
-  serverIp: string;
-  serverPort: string;
+export interface ApiConfig {
+  ipAddress: string;
+  port: string;
 }
 
-const initialState: ConfigState = {
-  serverIp: "",
-  serverPort: "",
+const initialState: ApiConfig = {
+  ipAddress: "192.168.1.22",
+  port: "4000",
 };
 
-const configSlice = createSlice({
+export const configSlice = createSlice({
   name: "config",
   initialState,
   reducers: {
-    setServerIp(state, action) {
-      state.serverIp = action.payload;
+    setConfig: (state, action: PayloadAction<ApiConfig>) => {
+      return { ...state, ...action.payload };
     },
-    setServerPort(state, action) {
-      state.serverPort = action.payload;
-    },
-    resetConfig(state) {
-      state.serverIp = "";
-      state.serverPort = "";
-    },
+    resetConfig: () => initialState,
   },
 });
 
-export const { setServerIp, setServerPort, resetConfig } = configSlice.actions;
+export const { setConfig, resetConfig } = configSlice.actions;
 export const configReducer = configSlice.reducer;

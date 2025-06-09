@@ -1,6 +1,6 @@
 import { Service } from '@/features/service/api/interface';
 import { useService } from '@/features/service/hooks/useService';
-import { Alert, Dimensions, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Dimensions, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Transaction() {
@@ -39,7 +39,7 @@ export default function Transaction() {
   if (isLoading) {
     return (
       <SafeAreaView className="flex-1 bg-white p-4 justify-center items-center">
-        <Text className="text-lg text-gray-500">Loading services...</Text>
+        <ActivityIndicator size="large" color="#0000FF" />
       </SafeAreaView>
     );
   }
