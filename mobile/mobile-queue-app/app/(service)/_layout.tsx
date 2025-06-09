@@ -7,7 +7,7 @@ export default function LayoutService() {
     useEffect(() => {
         async function setOrientation() {
             await ScreenOrientation.lockAsync(
-                ScreenOrientation.OrientationLock.PORTRAIT
+                ScreenOrientation.OrientationLock.LANDSCAPE
             );
         }
         setOrientation();
