@@ -1,4 +1,4 @@
-import { ConfigRepository } from "../../config.repository";
+import { ConfigRepository } from '../../config.repository';
 
 export class ConfigService {
   constructor(private readonly configRepository: ConfigRepository) {}

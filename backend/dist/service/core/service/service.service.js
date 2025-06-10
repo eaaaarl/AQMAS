@@ -21,7 +21,7 @@ class ServiceService {
                 return service;
             }
             catch (error) {
-                console.error("Error fetching queer service:", error);
+                console.error('Error fetching queer service:', error);
                 throw error;
             }
         });

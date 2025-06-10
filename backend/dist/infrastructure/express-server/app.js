@@ -13,7 +13,7 @@ const startApp = () => {
     const app = (0, express_1.default)();
     //Security Middleware
     app.use((0, cors_1.default)({
-        origin: "*",
+        origin: '*',
         credentials: true,
     }));
     //Body Parser Middleware
@@ -21,8 +21,8 @@ const startApp = () => {
     app.use(body_parser_1.default.urlencoded({ extended: true }));
     app.use(express_1.default.json());
     //Core Routes
-    app.use("/api/user", service_route_1.serviceRoutes);
-    app.use("/api", config_route_1.configRoute);
+    app.use('/api/user', service_route_1.serviceRoutes);
+    app.use('/api/system', config_route_1.configRoute);
     return app;
 };
 exports.startApp = startApp;

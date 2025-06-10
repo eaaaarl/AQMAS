@@ -1,8 +1,8 @@
-import bodyParser from "body-parser";
-import express from "express";
-import cors from "cors";
-import { serviceRoutes } from "../../service/service.route";
-import { configRoute } from "../../config/config.route";
+import bodyParser from 'body-parser';
+import express from 'express';
+import cors from 'cors';
+import { serviceRoutes } from '../../service/service.route';
+import { configRoute } from '../../config/config.route';
 
 export const startApp = () => {
   const app = express();
@@ -10,9 +10,9 @@ export const startApp = () => {
   //Security Middleware
   app.use(
     cors({
-      origin: "*",
+      origin: '*',
       credentials: true,
-    })
+    }),
   );
 
   //Body Parser Middleware
@@ -21,8 +21,8 @@ export const startApp = () => {
   app.use(express.json());
 
   //Core Routes
-  app.use("/api/user", serviceRoutes);
-  app.use("/api", configRoute);
+  app.use('/api/user', serviceRoutes);
+  app.use('/api/system', configRoute);
 
   return app;
 };

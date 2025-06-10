@@ -9,23 +9,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ServiceController = void 0;
-class ServiceController {
-    constructor(serviceService) {
-        this.serviceService = serviceService;
-        this.getService = this.getService.bind(this);
+exports.QueueRepository = void 0;
+const database_1 = require("../infrastructure/database/database");
+class QueueRepository {
+    constructor() {
+        this.database = database_1.db;
     }
-    getService(req, res, next) {
+    createQueue() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const service = yield this.serviceService.getService();
-                res.status(200).json(service);
             }
-            catch (error) {
-                console.error('Error in ServiceController GetService:', error);
-                res.status(500).json({ error: 'Internal Server Error' });
-            }
+            catch (error) { }
         });
     }
 }
-exports.ServiceController = ServiceController;
+exports.QueueRepository = QueueRepository;

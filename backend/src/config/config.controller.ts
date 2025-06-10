@@ -1,5 +1,5 @@
-import { NextFunction, Request, Response } from "express";
-import { ConfigService } from "./core/service/config.service";
+import { NextFunction, Request, Response } from 'express';
+import { ConfigService } from './core/service/config.service';
 
 export class ConfigController {
   constructor(private readonly configService: ConfigService) {

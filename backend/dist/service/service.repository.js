@@ -18,11 +18,11 @@ class ServiceRepository {
     getService() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const service = yield this.database("ent_service").select("*");
+                const service = yield this.database('ent_service').select('*');
                 return service;
             }
             catch (error) {
-                console.error("Error fetching service service:", error);
+                console.error('Error fetching service service:', error);
                 throw error;
             }
         });

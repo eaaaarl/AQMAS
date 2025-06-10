@@ -19,11 +19,11 @@ class ConfigRepository {
     getAllConfig() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const configs = yield this.database("config").select("*");
+                const configs = yield this.database('config').select('*');
                 return configs;
             }
             catch (error) {
-                throw new CustomErrors_1.DatabaseErrors("Failed to get all configs at getAllConfig method");
+                throw new CustomErrors_1.DatabaseErrors('Failed to get all configs at getAllConfig method');
             }
         });
     }
