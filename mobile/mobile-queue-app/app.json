@@ -3,7 +3,7 @@
     "name": "mobile-queue-app",
     "slug": "mobile-queue-app",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "mobilequeueapp",
     "userInterfaceStyle": "automatic",

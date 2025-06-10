@@ -11,8 +11,8 @@ export const serviceApi = createApi({
     console.log("State keys:", Object.keys(state));
     console.log("Config exists:", !!state.config);
 
-    const ipAddress = state.config?.ipAddress || "192.168.1.22";
-    const port = state.config?.port || "4000";
+    const ipAddress = state.config?.ipAddress;
+    const port = state.config?.port;
     const baseUrl = `http://${ipAddress}:${port}`;
 
     console.log("Using IP:", ipAddress);

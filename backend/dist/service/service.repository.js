@@ -8,24 +8,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ServiceRepository = void 0;
-const database_1 = __importDefault(require("../database/database"));
+const database_1 = require("../infrastructure/database/database");
 class ServiceRepository {
     constructor() {
-        this.db = database_1.default;
+        this.database = database_1.db;
     }
     getService() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const service = yield this.db("ent_service").select("*");
+                const service = yield this.database('ent_service').select('*');
                 return service;
             }
             catch (error) {
-                console.error("Error fetching queer service:", error);
+                console.error('Error fetching service service:', error);
                 throw error;
             }
         });

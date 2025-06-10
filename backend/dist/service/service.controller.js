@@ -22,8 +22,8 @@ class ServiceController {
                 res.status(200).json(service);
             }
             catch (error) {
-                console.error("Error in ServiceController GetService:", error);
-                res.status(500).json({ error: "Internal Server Error" });
+                console.error('Error in ServiceController GetService:', error);
+                res.status(500).json({ error: 'Internal Server Error' });
             }
         });
     }

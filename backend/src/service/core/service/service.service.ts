@@ -1,4 +1,4 @@
-import { ServiceRepository } from "../../service.repository";
+import { ServiceRepository } from '../../service.repository';
 
 export class ServiceService {
   constructor(private readonly serviceRepository: ServiceRepository) {}
@@ -8,7 +8,7 @@ export class ServiceService {
       const service = await this.serviceRepository.getService();
       return service;
     } catch (error) {
-      console.error("Error fetching queer service:", error);
+      console.error('Error fetching queer service:', error);
       throw error;
     }
   }

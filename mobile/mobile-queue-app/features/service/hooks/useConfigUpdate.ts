@@ -39,10 +39,8 @@ export const useConfigUpdate = () => {
 
       dispatch(serviceApi.util.resetApiState());
 
-      // Alternative: Invalidate specific tags (if you use tags)
       // dispatch(serviceApi.util.invalidateTags(['Services']));
 
-      // 3. Show success and navigate back
       Alert.alert(
         "Configuration Updated",
         "The configuration and cache have been updated successfully!",

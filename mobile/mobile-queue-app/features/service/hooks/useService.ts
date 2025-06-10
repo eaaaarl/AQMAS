@@ -1,24 +1,16 @@
-import { useGetConfigsQuery } from "@/features/config/api/configApi";
+import { configApi } from "@/features/config/api/configApi";
+import { useAppDispatch } from "@/libs/redux/hooks";
 import { useState } from "react";
-import { useGetServicesQuery } from "../api/serviceApi";
+import { serviceApi, useGetServicesQuery } from "../api/serviceApi";
 
 export const useService = () => {
+  const dispatch = useAppDispatch();
   const {
     data: response,
     isLoading: isServicesLoading,
     isError: isServicesError,
-    refetch: refetchServices,
   } = useGetServicesQuery();
 
-  const {
-    refetch: refetchConfigs,
-    isLoading: isConfigsLoading,
-    isError: isConfigsError,
-  } = useGetConfigsQuery();
-
-  const [selectedTransactions, setSelectedTransactions] = useState<string[]>(
-    []
-  );
   const [showMore, setShowMore] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -26,33 +18,23 @@ export const useService = () => {
   const onRefresh = async () => {
     setRefreshing(true);
     try {
-      await Promise.all([refetchServices(), refetchConfigs()]);
+      await Promise.all([
+        dispatch(serviceApi.util.invalidateTags(["Services"])),
+        dispatch(configApi.util.invalidateTags(["Configs"])),
+      ]);
     } finally {
       setRefreshing(false);
     }
   };
 
   const mainServices = services.filter((service) => service.header_id === 0);
-
   const additionalServices = services.filter(
     (service) => service.header_id === 1
   );
 
-  const toggleTransaction = (name: string) => {
-    setSelectedTransactions((prev) => {
-      if (prev.includes(name)) {
-        return prev.filter((item) => item !== name);
-      } else {
-        return [...prev, name];
-      }
-    });
-  };
-
   return {
-    selectedTransactions,
-    toggleTransaction,
-    isLoading: isServicesLoading || isConfigsLoading,
-    isError: isServicesError || isConfigsError,
+    isLoading: isServicesLoading,
+    isError: isServicesError,
     services,
     refreshing,
     onRefresh,

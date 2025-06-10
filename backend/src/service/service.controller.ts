@@ -1,5 +1,5 @@
-import { NextFunction, Request, Response } from "express";
-import { ServiceService } from "./core/service/service.service";
+import { NextFunction, Request, Response } from 'express';
+import { ServiceService } from './core/service/service.service';
 
 export class ServiceController {
   constructor(private readonly serviceService: ServiceService) {
@@ -11,8 +11,8 @@ export class ServiceController {
       const service = await this.serviceService.getService();
       res.status(200).json(service);
     } catch (error) {
-      console.error("Error in ServiceController GetService:", error);
-      res.status(500).json({ error: "Internal Server Error" });
+      console.error('Error in ServiceController GetService:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
   }
 }

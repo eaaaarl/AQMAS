@@ -1,31 +1,29 @@
-import express from "express";
-import dotenv from "dotenv";
-import bodyParser from "body-parser";
-import cors from "cors";
-import { serviceRoutes } from "./service/service.route";
+import dotenv from 'dotenv';
+import { startApp } from './infrastructure/express-server/app';
+import { db } from './infrastructure/database/database';
 
-const app = express();
 dotenv.config();
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+const initializeServer = async () => {
+  try {
+    try {
+      await db.raw('SELECT 1');
+      console.log('Database connected successfully!');
+    } catch (error) {
+      console.error('Failed to connect to the database \n', error);
+      process.exit(1);
+    }
 
-app.use(
-  cors({
-    origin: "*",
-  })
-);
+    const app = startApp();
+    const port = parseInt('3004');
 
-app.use(express.json());
+    app.listen(port, '0.0.0.0', () => {
+      console.log(`Server is running on port ${port}`);
+    });
+  } catch (error) {
+    console.error('Failed to start the server', error);
+    process.exit(1);
+  }
+};
 
-app.get("/", (req, res) => {
-  res.send("Connected locally!");
-});
-
-app.use("/api/user", serviceRoutes);
-
-const PORT = process.env.PORT || 3002;
-
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+initializeServer();
