@@ -2,7 +2,9 @@ import express from "express";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import cors from "cors";
+
 import { serviceRoutes } from "./service/service.route";
+import { configRoute } from "./config/config.route";
 
 const app = express();
 dotenv.config();
@@ -18,13 +20,10 @@ app.use(
 
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("Connected locally!");
-});
-
 app.use("/api/user", serviceRoutes);
+app.use("/api", configRoute);
 
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3003;
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

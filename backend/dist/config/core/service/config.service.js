@@ -9,23 +9,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ServiceRepository = void 0;
-const database_1 = require("../database/database");
-class ServiceRepository {
-    constructor() {
-        this.database = database_1.db;
+exports.ConfigService = void 0;
+class ConfigService {
+    constructor(configRepository) {
+        this.configRepository = configRepository;
     }
-    getService() {
+    getAllConfig() {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const service = yield this.database("ent_service").select("*");
-                return service;
-            }
-            catch (error) {
-                console.error("Error fetching service service:", error);
-                throw error;
-            }
+            const configs = yield this.configRepository.getAllConfig();
+            return configs;
         });
     }
 }
-exports.ServiceRepository = ServiceRepository;
+exports.ConfigService = ConfigService;

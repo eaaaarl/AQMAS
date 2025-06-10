@@ -9,23 +9,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ServiceRepository = void 0;
+exports.ConfigRepository = void 0;
 const database_1 = require("../database/database");
-class ServiceRepository {
+const CustomErrors_1 = require("../libs/CustomErrors");
+class ConfigRepository {
     constructor() {
         this.database = database_1.db;
     }
-    getService() {
+    getAllConfig() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const service = yield this.database("ent_service").select("*");
-                return service;
+                const configs = yield this.database("config").select("*");
+                return configs;
             }
             catch (error) {
-                console.error("Error fetching service service:", error);
-                throw error;
+                throw new CustomErrors_1.DatabaseErrors("Failed to get all configs at getAllConfig method");
             }
         });
     }
 }
-exports.ServiceRepository = ServiceRepository;
+exports.ConfigRepository = ConfigRepository;

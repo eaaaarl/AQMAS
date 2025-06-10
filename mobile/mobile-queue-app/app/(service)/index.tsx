@@ -1,4 +1,3 @@
-import { useGetConfigsQuery } from '@/features/config/api/configApi';
 import { PaginationControls } from '@/features/service/components/PaginationControl';
 import { ServiceItem } from '@/features/service/components/ServiceItem';
 import { useService } from '@/features/service/hooks/useService';
@@ -20,13 +19,12 @@ export default function Transaction() {
     services,
     setShowMore,
     showMore,
-    toggleTransaction
+    toggleTransaction,
+    configData
   } = useService()
 
-  const { data: configs } = useGetConfigsQuery()
   const [currentPage, setCurrentPage] = useState(0);
-
-  const screenType = configs?.find(
+  const screenType = configData?.find(
     config => config.SectionName === "Kiosk" && config.KeyName === "Screen_type"
   )?.Value;
 
@@ -151,13 +149,15 @@ export default function Transaction() {
             )}
           </View>
 
-          {shouldShowAllServices && totalPages > 1 &&
+          {
+            shouldShowAllServices && totalPages > 1 &&
             <PaginationControls
               currentPage={currentPage}
               onPrev={() => setCurrentPage(prev => Math.max(prev - 1, 0))}
               onNext={() => setCurrentPage(prev => Math.min(prev + 1, totalPages - 1))}
               totalPages={totalPages}
-            />}
+            />
+          }
 
           {selectedTransactions.length > 0 && (
             <View className="w-min px-5 mt-5">

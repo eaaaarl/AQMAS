@@ -7,8 +7,8 @@ export interface ApiConfig {
 }
 
 const initialState: ApiConfig = {
-  ipAddress: "192.168.1.22",
-  port: "4000",
+  ipAddress: "",
+  port: "",
 };
 
 export const configSlice = createSlice({
