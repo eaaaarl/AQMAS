@@ -1,4 +1,4 @@
-import { db } from "../database/database";
+import { db } from "../infrastructure/database/database";
 import { DatabaseErrors } from "../libs/CustomErrors";
 
 export class ConfigRepository {

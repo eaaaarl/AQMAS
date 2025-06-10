@@ -1,4 +1,4 @@
-import { db } from "../database/database";
+import { db } from "../infrastructure/database/database";
 
 export class ServiceRepository {
   private database = db;
