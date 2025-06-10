@@ -1,4 +1,4 @@
-import { configApi, useGetConfigsQuery } from "@/features/config/api/configApi";
+import { configApi } from "@/features/config/api/configApi";
 import { useAppDispatch } from "@/libs/redux/hooks";
 import { useState } from "react";
 import { serviceApi, useGetServicesQuery } from "../api/serviceApi";
@@ -11,19 +11,10 @@ export const useService = () => {
     isError: isServicesError,
   } = useGetServicesQuery();
 
-  const {
-    isLoading: isConfigsLoading,
-    isError: isConfigsError,
-    data: configData,
-  } = useGetConfigsQuery();
-
-  const [selectedTransactions, setSelectedTransactions] = useState<string[]>(
-    []
-  );
   const [showMore, setShowMore] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  const services = response || [];
+  const services = response?.results || [];
   const onRefresh = async () => {
     setRefreshing(true);
     try {
@@ -41,21 +32,9 @@ export const useService = () => {
     (service) => service.header_id === 1
   );
 
-  const toggleTransaction = (name: string) => {
-    setSelectedTransactions((prev) => {
-      if (prev.includes(name)) {
-        return prev.filter((item) => item !== name);
-      } else {
-        return [...prev, name];
-      }
-    });
-  };
-
   return {
-    selectedTransactions,
-    toggleTransaction,
-    isLoading: isServicesLoading || isConfigsLoading,
-    isError: isServicesError || isConfigsError,
+    isLoading: isServicesLoading,
+    isError: isServicesError,
     services,
     refreshing,
     onRefresh,
@@ -63,6 +42,5 @@ export const useService = () => {
     mainServices,
     additionalServices,
     setShowMore,
-    configData,
   };
 };

@@ -9,24 +9,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.QueueRepository = void 0;
-const database_1 = require("../infrastructure/database/database");
-const CustomErrors_1 = require("../libs/CustomErrors");
-class QueueRepository {
-    constructor() {
-        this.database = database_1.db;
+exports.QueueController = void 0;
+class QueueController {
+    constructor(queueService) {
+        this.queueService = queueService;
+        this.createQueue = this.createQueue.bind(this);
     }
-    createQueue(payload) {
+    createQueue(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const newQueue = yield this.database('queue').insert(Object.assign(Object.assign({}, payload), { trans_date: new Date(payload.trans_date) }));
-                return newQueue;
+                const payload = req.body;
+                const newQueue = yield this.queueService.createQueue(payload);
+                res.status(200).json({});
             }
             catch (error) {
-                console.error('Database error in createQueue:', error);
-                throw new CustomErrors_1.DatabaseErrors('Failed to create queue at createQueue method');
+                next(error);
             }
         });
     }
 }
-exports.QueueRepository = QueueRepository;
+exports.QueueController = QueueController;

@@ -3,6 +3,8 @@ import express from 'express';
 import cors from 'cors';
 import { serviceRoutes } from '../../service/service.route';
 import { configRoute } from '../../config/config.route';
+import { queueRoute } from '../../queue/queue.route';
+import { errorHandler } from '../middleware/errorHandler';
 
 export const startApp = () => {
   const app = express();
@@ -23,6 +25,9 @@ export const startApp = () => {
   //Core Routes
   app.use('/api/user', serviceRoutes);
   app.use('/api/system', configRoute);
+  app.use('/api/queue', queueRoute);
 
+  //Error Handler
+  app.use(errorHandler);
   return app;
 };

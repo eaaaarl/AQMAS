@@ -1,10 +1,10 @@
 import { RootState } from "@/libs/redux/store";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { ConfigApiResponse } from "./interface";
+import { CustomerTypeParams, CustomerTypeResponse } from "./interface";
 
-export const configApi = createApi({
-  reducerPath: "configApi",
-  tagTypes: ["Configs"],
+export const customerApi = createApi({
+  reducerPath: "customerApi",
+  tagTypes: ["Customer"],
   baseQuery: async (args, api, extraOptions) => {
     const state = api.getState() as RootState;
 
@@ -13,7 +13,7 @@ export const configApi = createApi({
 
     const ipAddress = state.config?.ipAddress;
     const port = state.config?.port;
-    const baseUrl = `http://${ipAddress}:${port}`;
+    const baseUrl = `http://${ipAddress}:${port}/customer`;
 
     console.log("Using IP:", ipAddress);
     console.log("Using Port:", port);
@@ -34,13 +34,13 @@ export const configApi = createApi({
     return baseQuery(adjustedArgs, api, extraOptions);
   },
   endpoints: (builder) => ({
-    getConfigs: builder.query<ConfigApiResponse[], void>({
-      query: () => ({
-        url: "/config",
+    getCustomerType: builder.query<CustomerTypeResponse[], CustomerTypeParams>({
+      query: ({ is_show }) => ({
+        url: `/alltype?is_show=${is_show}`,
         method: "GET",
       }),
     }),
   }),
 });
 
-export const { useGetConfigsQuery } = configApi;
+export const { useGetCustomerTypeQuery } = customerApi;

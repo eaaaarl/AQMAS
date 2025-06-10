@@ -1,10 +1,10 @@
 import { RootState } from "@/libs/redux/store";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { ConfigApiResponse } from "./interface";
+import { createQueuePayload } from "./interface";
 
-export const configApi = createApi({
-  reducerPath: "configApi",
-  tagTypes: ["Configs"],
+export const queueApi = createApi({
+  reducerPath: "queueApi",
+  tagTypes: ["Queue"],
   baseQuery: async (args, api, extraOptions) => {
     const state = api.getState() as RootState;
 
@@ -34,13 +34,14 @@ export const configApi = createApi({
     return baseQuery(adjustedArgs, api, extraOptions);
   },
   endpoints: (builder) => ({
-    getConfigs: builder.query<ConfigApiResponse[], void>({
-      query: () => ({
-        url: "/config",
-        method: "GET",
+    createQueue: builder.mutation<void, createQueuePayload>({
+      query: (data) => ({
+        url: "/queue",
+        method: "POST",
+        body: data,
       }),
     }),
   }),
 });
 
-export const { useGetConfigsQuery } = configApi;
+export const { useCreateQueueMutation } = queueApi;

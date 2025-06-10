@@ -1,10 +1,13 @@
+import { useConfig } from '@/features/config/hooks/useConfig';
+import { useQueue } from '@/features/queue/hooks/useQueue';
+import CustomerTypeModal from '@/features/service/components/CustomerTypeModal';
 import { PaginationControls } from '@/features/service/components/PaginationControl';
 import { ServiceItem } from '@/features/service/components/ServiceItem';
 import { useService } from '@/features/service/hooks/useService';
 import { renderError } from '@/features/service/utils/errorUtils';
 import { renderLoading, renderNoServices } from '@/features/service/utils/loadingUtils';
 import { useState } from 'react';
-import { Alert, Dimensions, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Transaction() {
@@ -15,20 +18,33 @@ export default function Transaction() {
     mainServices,
     onRefresh,
     refreshing,
-    selectedTransactions,
     services,
     setShowMore,
     showMore,
-    toggleTransaction,
-    configData
   } = useService()
 
-  const [currentPage, setCurrentPage] = useState(0);
-  const screenType = configData?.find(
-    config => config.SectionName === "Kiosk" && config.KeyName === "Screen_type"
-  )?.Value;
+  const {
+    isConfigsError,
+    isConfigsLoading,
+    shouldShowAllServices,
+  } = useConfig()
 
-  const shouldShowAllServices = screenType === "1";
+  const {
+    handleSubmit,
+    selectedTransactions,
+    toggleTransaction,
+    handleCancelName,
+    handleConfirmName,
+    handlePrintReceipt,
+    customerName,
+    setCustomerName,
+    showNameModal,
+
+    showCustomerTypeModal
+  } = useQueue()
+
+
+  const [currentPage, setCurrentPage] = useState(0);
 
   const { width, height } = Dimensions.get('window');
   const isLandscape = width > height;
@@ -42,7 +58,9 @@ export default function Transaction() {
     (currentPage + 1) * SERVICES_PER_PAGE
   );
 
-  if (isLoading) {
+
+
+  if (isLoading || isConfigsLoading) {
     return (
       renderLoading()
     );
@@ -54,7 +72,7 @@ export default function Transaction() {
     );
   }
 
-  if (isError) {
+  if (isError || isConfigsError) {
     return (
       renderError()
     );
@@ -92,8 +110,8 @@ export default function Transaction() {
                     <ServiceItem
                       service={service}
                       cardWidth={cardWidth}
-                      isSelected={selectedTransactions.includes(service.service_name)}
-                      onPress={() => toggleTransaction(service.service_name)}
+                      isSelected={selectedTransactions.some(item => item.service_id === service.service_id)}
+                      onPress={() => toggleTransaction(service)}
                     />
                   </View>
                 ))}
@@ -107,8 +125,8 @@ export default function Transaction() {
                         <ServiceItem
                           service={service}
                           cardWidth={cardWidth}
-                          isSelected={selectedTransactions.includes(service.service_name)}
-                          onPress={() => toggleTransaction(service.service_name)}
+                          isSelected={selectedTransactions.some(item => item.service_id === service.service_id)}
+                          onPress={() => toggleTransaction(service)}
                         />
                       </View>
                     ))}
@@ -130,8 +148,8 @@ export default function Transaction() {
                         <ServiceItem
                           service={service}
                           cardWidth={cardWidth}
-                          isSelected={selectedTransactions.includes(service.service_name)}
-                          onPress={() => toggleTransaction(service.service_name)}
+                          isSelected={selectedTransactions.some(item => item.service_id === service.service_id)}
+                          onPress={() => toggleTransaction(service)}
                         />
                       </View>
                     ))}
@@ -163,7 +181,7 @@ export default function Transaction() {
             <View className="w-min px-5 mt-5">
               <TouchableOpacity
                 className="bg-green-500 p-6 rounded-lg items-center"
-                onPress={() => Alert.alert('Selected Transactions', JSON.stringify(selectedTransactions))}
+                onPress={handlePrintReceipt}
               >
                 <Text className="text-white text-2xl font-bold">PRINT RECEIPT ({selectedTransactions.length})</Text>
               </TouchableOpacity>
@@ -171,8 +189,21 @@ export default function Transaction() {
           )}
         </View>
 
-        <Text className='text-center'>{selectedTransactions.map((st) => st).join(' | ')}</Text>
+        <Text className='text-center'>{selectedTransactions.map((st) => st.service_name).join(' | ')}</Text>
       </ScrollView>
+
+      {/*   <CustomerNameModal
+        isShowName={showNameModal}
+        customerName={customerName}
+        onCustomerNameChange={setCustomerName}
+        onConfirm={handleConfirmName}
+        onCancel={handleCancelName}
+      /> */}
+
+      <CustomerTypeModal
+        isVisible={showCustomerTypeModal}
+      />
+
     </SafeAreaView>
   );
 }

@@ -7,7 +7,7 @@ dotenv.config();
 const initializeServer = async () => {
   try {
     try {
-      db.raw('SELECT 1');
+      await db.raw('SELECT 1');
       console.log('Database connected successfully!');
     } catch (error) {
       console.error('Failed to connect to the database \n', error);
@@ -15,7 +15,7 @@ const initializeServer = async () => {
     }
 
     const app = startApp();
-    const port = parseInt(process.env.PORT || '3003');
+    const port = parseInt('3004');
 
     app.listen(port, '0.0.0.0', () => {
       console.log(`Server is running on port ${port}`);

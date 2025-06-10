@@ -9,6 +9,8 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const service_route_1 = require("../../service/service.route");
 const config_route_1 = require("../../config/config.route");
+const queue_route_1 = require("../../queue/queue.route");
+const errorHandler_1 = require("../middleware/errorHandler");
 const startApp = () => {
     const app = (0, express_1.default)();
     //Security Middleware
@@ -23,6 +25,9 @@ const startApp = () => {
     //Core Routes
     app.use('/api/user', service_route_1.serviceRoutes);
     app.use('/api/system', config_route_1.configRoute);
+    app.use('/api/queue', queue_route_1.queueRoute);
+    //Error Handler
+    app.use(errorHandler_1.errorHandler);
     return app;
 };
 exports.startApp = startApp;

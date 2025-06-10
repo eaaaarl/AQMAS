@@ -1,6 +1,6 @@
 import { RootState } from "@/libs/redux/store";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { Service } from "./interface";
+import { ServicesApiResponse } from "./interface";
 
 export const serviceApi = createApi({
   reducerPath: "serviceApi",
@@ -13,7 +13,7 @@ export const serviceApi = createApi({
 
     const ipAddress = state.config?.ipAddress;
     const port = state.config?.port;
-    const baseUrl = `http://${ipAddress}:${port}/api/user`;
+    const baseUrl = `http://${ipAddress}:${port}`;
 
     console.log("Using IP:", ipAddress);
     console.log("Using Port:", port);
@@ -34,7 +34,7 @@ export const serviceApi = createApi({
     return baseQuery(adjustedArgs, api, extraOptions);
   },
   endpoints: (builder) => ({
-    getServices: builder.query<Service[], void>({
+    getServices: builder.query<ServicesApiResponse, void>({
       query: () => "/service",
       providesTags: ["Services"],
     }),
