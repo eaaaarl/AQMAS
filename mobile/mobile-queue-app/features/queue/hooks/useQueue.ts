@@ -1,4 +1,5 @@
 import { useConfig } from "@/features/config/hooks/useConfig";
+import { CustomerTypeResponse } from "@/features/customer/api/interface";
 import { Service } from "@/features/service/api/interface";
 import { useState } from "react";
 import { Alert } from "react-native";
@@ -6,8 +7,11 @@ import { useCreateQueueMutation } from "../api/queueApi";
 
 export const useQueue = () => {
   const { showAskCustomerName, showAskCustomerType } = useConfig();
-  const [showNameModal, setShowNameModal] = useState(false);
   const [showCustomerTypeModal, setShowCustomerTypeModal] = useState(false);
+  const [customerType, setCustomerType] = useState<CustomerTypeResponse | null>(
+    null
+  );
+  const [showNameModal, setShowNameModal] = useState(false);
   const [customerName, setCustomerName] = useState("");
   const [selectedTransactions, setSelectedTransactions] = useState<Service[]>(
     []
@@ -54,6 +58,11 @@ export const useQueue = () => {
   const handleCancelName = () => {
     setShowNameModal(false);
     setCustomerName("");
+  };
+
+  const handleCancelType = () => {
+    setShowCustomerTypeModal(false);
+    setCustomerType(null);
   };
 
   const [createQueue, { isLoading }] = useCreateQueueMutation();
@@ -103,5 +112,10 @@ export const useQueue = () => {
     setCustomerName,
 
     showCustomerTypeModal,
+    handleCancelType,
+    customerType,
+    setCustomerType,
+
+    showAskCustomerName,
   };
 };

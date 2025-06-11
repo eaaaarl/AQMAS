@@ -9,23 +9,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ServiceController = void 0;
-class ServiceController {
-    constructor(serviceService) {
-        this.serviceService = serviceService;
-        this.getService = this.getService.bind(this);
+exports.CustomerService = void 0;
+class CustomerService {
+    constructor(customerRepository) {
+        this.customerRepository = customerRepository;
     }
-    getService(req, res, next) {
+    getAllCustomerType(is_show) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const service = yield this.serviceService.getService();
-                res.status(200).json({ results: service });
+            if (is_show !== undefined) {
+                return yield this.customerRepository.getAllCustomerType(is_show);
             }
-            catch (error) {
-                console.error('Error in ServiceController GetService:', error);
-                res.status(500).json({ error: 'Internal Server Error' });
-            }
+            return yield this.customerRepository.getAllCustomerTypes();
         });
     }
 }
-exports.ServiceController = ServiceController;
+exports.CustomerService = CustomerService;

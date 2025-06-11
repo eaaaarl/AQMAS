@@ -1,5 +1,7 @@
 import { useConfig } from '@/features/config/hooks/useConfig';
+import { useGetCustomerTypeQuery } from '@/features/customer/api/customerApi';
 import { useQueue } from '@/features/queue/hooks/useQueue';
+import CustomerNameModal from '@/features/service/components/CustomerNameModal';
 import CustomerTypeModal from '@/features/service/components/CustomerTypeModal';
 import { PaginationControls } from '@/features/service/components/PaginationControl';
 import { ServiceItem } from '@/features/service/components/ServiceItem';
@@ -39,10 +41,13 @@ export default function Transaction() {
     customerName,
     setCustomerName,
     showNameModal,
-
-    showCustomerTypeModal
+    showCustomerTypeModal,
+    handleCancelType,
+    customerType,
+    setCustomerType
   } = useQueue()
 
+  const { data: customerTypeData } = useGetCustomerTypeQuery({ is_show: '1' })
 
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -192,18 +197,22 @@ export default function Transaction() {
         <Text className='text-center'>{selectedTransactions.map((st) => st.service_name).join(' | ')}</Text>
       </ScrollView>
 
-      {/*   <CustomerNameModal
+      <CustomerNameModal
         isShowName={showNameModal}
         customerName={customerName}
         onCustomerNameChange={setCustomerName}
         onConfirm={handleConfirmName}
         onCancel={handleCancelName}
-      /> */}
+      />
+
 
       <CustomerTypeModal
         isVisible={showCustomerTypeModal}
+        customerTypes={customerTypeData ?? []}
+        onCancel={handleCancelType}
+        onSelectCustomerType={setCustomerType}
+        selectedCustomerType={customerType}
       />
-
     </SafeAreaView>
   );
 }

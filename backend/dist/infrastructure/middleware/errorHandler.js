@@ -8,12 +8,13 @@ const errorHandler = (err, req, res, next) => {
     console.error('ERROR HANDLER CONSTRUCTOR NAME', err.constructor.name);
     if (err instanceof CustomErrors_1.CustomErrors) {
         res.status(err.statusCode).json({
+            statusCode: err.statusCode,
             message: err.message,
         });
         return;
     }
     if (err instanceof zod_1.ZodError) {
-        console.log('Validation errors raw:', err.errors); // Add this
+        console.log('Validation errors raw:', err.errors);
         const formattedErrors = err.errors.map(error => ({
             path: error.path.join('.'),
             message: error.message,

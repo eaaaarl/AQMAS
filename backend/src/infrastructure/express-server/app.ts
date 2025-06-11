@@ -5,6 +5,7 @@ import { serviceRoutes } from '../../service/service.route';
 import { configRoute } from '../../config/config.route';
 import { queueRoute } from '../../queue/queue.route';
 import { errorHandler } from '../middleware/errorHandler';
+import { customerRoute } from '../../customer/customer.route';
 
 export const startApp = () => {
   const app = express();
@@ -26,6 +27,7 @@ export const startApp = () => {
   app.use('/api/user', serviceRoutes);
   app.use('/api/system', configRoute);
   app.use('/api/queue', queueRoute);
+  app.use('/api/customer', customerRoute);
 
   //Error Handler
   app.use(errorHandler);

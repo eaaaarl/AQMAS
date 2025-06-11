@@ -9,23 +9,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ServiceController = void 0;
-class ServiceController {
-    constructor(serviceService) {
-        this.serviceService = serviceService;
-        this.getService = this.getService.bind(this);
+exports.CustomerController = void 0;
+class CustomerController {
+    constructor(customerService) {
+        this.customerService = customerService;
+        this.getAllCustomerType = this.getAllCustomerType.bind(this);
     }
-    getService(req, res, next) {
+    getAllCustomerType(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const service = yield this.serviceService.getService();
-                res.status(200).json({ results: service });
+                const { is_show } = req.query;
+                const allCustomerTypes = yield this.customerService.getAllCustomerType(is_show !== undefined ? Number(is_show) : undefined);
+                res.status(200).json(allCustomerTypes);
             }
             catch (error) {
-                console.error('Error in ServiceController GetService:', error);
-                res.status(500).json({ error: 'Internal Server Error' });
+                next(error);
             }
         });
     }
 }
-exports.ServiceController = ServiceController;
+exports.CustomerController = CustomerController;
