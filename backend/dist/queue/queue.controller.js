@@ -27,5 +27,8 @@ class QueueController {
             }
         });
     }
+    countQueueForTodayAlt() {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
 }
 exports.QueueController = QueueController;

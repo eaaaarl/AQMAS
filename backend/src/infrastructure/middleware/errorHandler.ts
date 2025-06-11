@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { CustomErrors } from '../../libs/CustomErrors';
+import { CustomErrors, ValidationError } from '../../libs/CustomErrors';
 import { ZodError } from 'zod';
 
 export const errorHandler = (
@@ -13,13 +13,14 @@ export const errorHandler = (
 
   if (err instanceof CustomErrors) {
     res.status(err.statusCode).json({
+      statusCode: err.statusCode,
       message: err.message,
     });
     return;
   }
 
   if (err instanceof ZodError) {
-    console.log('Validation errors raw:', err.errors); // Add this
+    console.log('Validation errors raw:', err.errors);
     const formattedErrors = err.errors.map(error => ({
       path: error.path.join('.'),
       message: error.message,

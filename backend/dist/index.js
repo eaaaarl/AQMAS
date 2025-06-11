@@ -27,7 +27,7 @@ const initializeServer = () => __awaiter(void 0, void 0, void 0, function* () {
             process.exit(1);
         }
         const app = (0, app_1.startApp)();
-        const port = parseInt('3004');
+        const port = parseInt('3005');
         app.listen(port, '0.0.0.0', () => {
             console.log(`Server is running on port ${port}`);
         });

@@ -1,11 +1,13 @@
 export interface createQueuePayload {
-  trans_id: string;
-  trans_date: Date;
-  type_id?: number;
-  employee_id?: number;
-  time_served?: Date;
-  time_end?: Date;
+  transId: string;
+  typeId: number;
+  customerName: string;
   counter_no?: number;
-  trans_status?: number;
-  single_trans_only?: number;
+  transStatus?: number;
+  singleTransOnly?: number;
+}
+
+export interface createQueueDetailsPayload {
+  trans_id: string;
+  service_id: number;
 }

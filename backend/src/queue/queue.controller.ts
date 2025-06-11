@@ -11,11 +11,11 @@ export class QueueController {
       const payload = req.body;
       const newQueue = await this.queueService.createQueue(payload);
 
-      res.status(200).json({
-        
-      });
+      res.status(200).json({});
     } catch (error) {
       next(error);
     }
   }
+
+  async countQueueForTodayAlt() {}
 }

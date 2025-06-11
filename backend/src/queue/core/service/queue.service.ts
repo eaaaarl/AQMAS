@@ -9,4 +9,9 @@ export class QueueService {
     const newQueue = await this.queueRepository.createQueue(payload);
     return newQueue;
   }
+
+  async countQueueForTodayAlt() {
+    const getQueueForToday = this.queueRepository.countQueueForTodayAlt();
+    return getQueueForToday;
+  }
 }

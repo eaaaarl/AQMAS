@@ -1,4 +1,3 @@
-// src/store/configSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface ApiConfig {

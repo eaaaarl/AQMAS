@@ -1,20 +1,15 @@
+import { CustomerTypeResponse } from '@/features/customer/api/interface';
 import React from 'react';
 import { Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
-interface CustomerType {
-    id: string | number;
-    name: string;
-    description?: string;
-    discount?: number;
-}
-
 interface CustomerTypeModalProps {
     isVisible: boolean;
-    customerTypes?: CustomerType[];
-    selectedCustomerType?: CustomerType | null;
-    onSelectCustomerType?: (customerType: CustomerType) => void;
-    onCancel?: () => void;
+    customerTypes: CustomerTypeResponse[];
+    selectedCustomerType: CustomerTypeResponse | null;
+    onSelectCustomerType: (customerType: CustomerTypeResponse) => void;
+    onCancel: () => void;
     isLoading?: boolean;
+    onConfirm: () => void;
 }
 
 export default function CustomerTypeModal({
@@ -23,7 +18,8 @@ export default function CustomerTypeModal({
     selectedCustomerType,
     onSelectCustomerType,
     onCancel,
-    isLoading = false
+    isLoading = false,
+    onConfirm
 }: CustomerTypeModalProps) {
     return (
         <Modal
@@ -32,9 +28,9 @@ export default function CustomerTypeModal({
             animationType="fade"
             onRequestClose={onCancel}
         >
-            <View className="flex-1 justify-center items-center bg-black/50">
-                <View className="bg-white rounded-lg p-6 w-4/5 max-w-md max-h-96">
-                    <Text className="text-gray-600 text-center mb-4">
+            <View className="flex-1 justify-center items-center bg-black/50 p-4">
+                <View className="bg-white rounded-lg p-6 w-full h-4/5 max-w-screen-sm">
+                    <Text className="text-gray-600 text-center mb-4 text-lg">
                         Please select customer type for record keeping
                     </Text>
 
@@ -43,38 +39,28 @@ export default function CustomerTypeModal({
                             <Text className="text-center text-gray-500">Loading customer types...</Text>
                         </View>
                     ) : (
-                        <ScrollView className="max-h-48 mb-4">
+                        <ScrollView className="mb-4 flex-1">
                             {customerTypes.map((customerType) => (
                                 <TouchableOpacity
-                                    key={customerType.id}
-                                    className={`p-3 mb-2 rounded-lg border ${selectedCustomerType?.id === customerType.id
+                                    key={customerType.type_id}
+                                    className={`p-6 mb-3 rounded-lg border ${selectedCustomerType?.type_id === customerType.type_id
                                         ? 'bg-blue-100 border-blue-500'
                                         : 'bg-gray-50 border-gray-300'
                                         }`}
                                     onPress={() => onSelectCustomerType(customerType)}
                                 >
-                                    <Text className={`font-medium ${selectedCustomerType?.id === customerType.id
+                                    <Text className={`font-bold text-base ${selectedCustomerType?.type_id === customerType.type_id
                                         ? 'text-blue-700'
                                         : 'text-gray-800'
                                         }`}>
-                                        {customerType.name}
+                                        {customerType.type_name}
                                     </Text>
-                                    {customerType.description && (
-                                        <Text className="text-sm text-gray-600 mt-1">
-                                            {customerType.description}
-                                        </Text>
-                                    )}
-                                    {customerType.discount && (
-                                        <Text className="text-sm text-green-600 mt-1">
-                                            {customerType.discount}% discount
-                                        </Text>
-                                    )}
                                 </TouchableOpacity>
                             ))}
                         </ScrollView>
                     )}
 
-                    <View className="flex-row gap-3">
+                    <View className="flex-row gap-3 mt-4">
                         <TouchableOpacity
                             className="flex-1 bg-gray-500 p-3 rounded-lg"
                             onPress={onCancel}
@@ -86,8 +72,7 @@ export default function CustomerTypeModal({
                             <TouchableOpacity
                                 className="flex-1 bg-blue-500 p-3 rounded-lg"
                                 onPress={() => {
-                                    onSelectCustomerType(selectedCustomerType);
-                                    onCancel();
+                                    onConfirm()
                                 }}
                             >
                                 <Text className="text-white text-center font-bold">Confirm</Text>

@@ -9,7 +9,7 @@ export class ServiceController {
   async getService(req: Request, res: Response, next: NextFunction) {
     try {
       const service = await this.serviceService.getService();
-      res.status(200).json(service);
+      res.status(200).json({ results: service });
     } catch (error) {
       console.error('Error in ServiceController GetService:', error);
       res.status(500).json({ error: 'Internal Server Error' });

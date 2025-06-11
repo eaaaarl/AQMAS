@@ -39,6 +39,7 @@ export const customerApi = createApi({
         url: `/alltype?is_show=${is_show}`,
         method: "GET",
       }),
+      providesTags: ["Customer"],
     }),
   }),
 });

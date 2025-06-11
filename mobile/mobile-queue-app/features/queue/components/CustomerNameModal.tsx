@@ -27,7 +27,6 @@ export default function CustomerNameModal({
             <View className="flex-1 justify-center items-center bg-black/50">
                 <DismissKeyboard>
                     <View className="bg-white rounded-lg p-6 w-4/5 max-w-md">
-                        <Text className="text-xl font-bold text-center mb-4">Receipt Printed Successfully!</Text>
                         <Text className="text-gray-600 text-center mb-4">
                             Please enter customer name for record keeping
                         </Text>
