@@ -19,7 +19,9 @@ class QueueRepository {
     createQueue(payload) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const newQueue = yield this.database('queue').insert(Object.assign(Object.assign({}, payload), { trans_date: new Date(payload.trans_date) }));
+                const newQueue = yield this.database('queue')
+                    .insert(Object.assign(Object.assign({}, payload), { trans_date: new Date().toISOString() }))
+                    .returning(['trans_date']);
                 return newQueue;
             }
             catch (error) {
@@ -28,7 +30,7 @@ class QueueRepository {
             }
         });
     }
-    countQueueForTodayAlt() {
+    countQueue() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const result = yield this.database('queue')

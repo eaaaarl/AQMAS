@@ -14,21 +14,31 @@ class QueueController {
     constructor(queueService) {
         this.queueService = queueService;
         this.createQueue = this.createQueue.bind(this);
+        this.countQueue = this.countQueue.bind(this);
     }
     createQueue(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const payload = req.body;
+                console.log(payload);
                 const newQueue = yield this.queueService.createQueue(payload);
-                res.status(200).json({});
+                res.status(200).json(newQueue);
             }
             catch (error) {
                 next(error);
             }
         });
     }
-    countQueueForTodayAlt() {
-        return __awaiter(this, void 0, void 0, function* () { });
+    countQueue(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const countQueue = yield this.queueService.countQueue();
+                res.status(200).json({ count: countQueue });
+            }
+            catch (error) {
+                next(error);
+            }
+        });
     }
 }
 exports.QueueController = QueueController;

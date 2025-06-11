@@ -49,6 +49,7 @@ export const queueApi = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Queue"],
     }),
 
     countQueue: builder.query<{ count: number }[], void>({
