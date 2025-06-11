@@ -13,7 +13,7 @@ export const configApi = createApi({
 
     const ipAddress = state.config?.ipAddress;
     const port = state.config?.port;
-    const baseUrl = `http://${ipAddress}:${port}/api/system`;
+    const baseUrl = `http://${ipAddress}:${port}`;
 
     console.log("Using IP:", ipAddress);
     console.log("Using Port:", port);
@@ -36,7 +36,7 @@ export const configApi = createApi({
   endpoints: (builder) => ({
     getConfigs: builder.query<ConfigApiResponse[], void>({
       query: () => ({
-        url: "/configs",
+        url: "/config",
         method: "GET",
       }),
       providesTags: ["Configs"],

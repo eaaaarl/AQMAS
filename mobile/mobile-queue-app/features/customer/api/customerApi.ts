@@ -13,7 +13,7 @@ export const customerApi = createApi({
 
     const ipAddress = state.config?.ipAddress;
     const port = state.config?.port;
-    const baseUrl = `http://${ipAddress}:${port}/api/customer`;
+    const baseUrl = `http://${ipAddress}:${port}/customer`;
 
     console.log("Using IP:", ipAddress);
     console.log("Using Port:", port);
@@ -36,7 +36,7 @@ export const customerApi = createApi({
   endpoints: (builder) => ({
     getCustomerType: builder.query<CustomerTypeResponse[], CustomerTypeParams>({
       query: ({ is_show }) => ({
-        url: `/allType?is_show=${is_show}`,
+        url: `/alltype?is_show=${is_show}`,
         method: "GET",
       }),
       providesTags: ["Customer"],

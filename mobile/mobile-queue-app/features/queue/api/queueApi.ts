@@ -1,6 +1,6 @@
 import { RootState } from "@/libs/redux/store";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { createQueuePayload } from "./interface";
+import { createQueueDetailsPayload, createQueuePayload } from "./interface";
 
 export const queueApi = createApi({
   reducerPath: "queueApi",
@@ -42,7 +42,27 @@ export const queueApi = createApi({
       }),
       invalidatesTags: ["Queue"],
     }),
+
+    createQueueDetails: builder.mutation<void, createQueueDetailsPayload[]>({
+      query: (data) => ({
+        url: "/queue/detail",
+        method: "POST",
+        body: data,
+      }),
+    }),
+
+    countQueue: builder.query<{ count: number }[], void>({
+      query: () => ({
+        url: "/queue/count",
+        method: "GET",
+      }),
+      providesTags: ["Queue"],
+    }),
   }),
 });
 
-export const { useCreateQueueMutation } = queueApi;
+export const {
+  useCreateQueueMutation,
+  useCreateQueueDetailsMutation,
+  useCountQueueQuery,
+} = queueApi;
