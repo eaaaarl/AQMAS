@@ -7,10 +7,12 @@ export class QueueRepository {
 
   async createQueue(payload: queueDTO) {
     try {
-      const newQueue = await this.database('queue').insert({
-        ...payload,
-        trans_date: new Date(payload.trans_date),
-      });
+      const newQueue = await this.database('queue')
+        .insert({
+          ...payload,
+          trans_date: new Date().toISOString(),
+        })
+        .returning(['trans_date']);
 
       return newQueue;
     } catch (error) {
@@ -19,7 +21,7 @@ export class QueueRepository {
     }
   }
 
-  async countQueueForTodayAlt(): Promise<number> {
+  async countQueue(): Promise<number> {
     try {
       const result = await this.database('queue')
         .count('* as count')

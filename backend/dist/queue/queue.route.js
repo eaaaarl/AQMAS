@@ -7,5 +7,6 @@ exports.queueRoute = void 0;
 const express_1 = __importDefault(require("express"));
 const queue_config_1 = require("./queue.config");
 const router = express_1.default.Router();
-router.post('/create', queue_config_1.queueController.createQueue);
+router.post('/', queue_config_1.queueController.createQueue);
+router.get('/count', queue_config_1.queueController.countQueue);
 exports.queueRoute = router;

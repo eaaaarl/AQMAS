@@ -10,8 +10,8 @@ export class QueueService {
     return newQueue;
   }
 
-  async countQueueForTodayAlt() {
-    const getQueueForToday = this.queueRepository.countQueueForTodayAlt();
+  async countQueue() {
+    const getQueueForToday = this.queueRepository.countQueue();
     return getQueueForToday;
   }
 }

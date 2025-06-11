@@ -22,9 +22,9 @@ class QueueService {
             return newQueue;
         });
     }
-    countQueueForTodayAlt() {
+    countQueue() {
         return __awaiter(this, void 0, void 0, function* () {
-            const getQueueForToday = this.queueRepository.countQueueForTodayAlt();
+            const getQueueForToday = this.queueRepository.countQueue();
             return getQueueForToday;
         });
     }
