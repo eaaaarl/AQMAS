@@ -18,4 +18,20 @@ export class QueueRepository {
       throw new DatabaseErrors('Failed to create queue at createQueue method');
     }
   }
+
+  async countQueueForTodayAlt(): Promise<number> {
+    try {
+      const result = await this.database('queue')
+        .count('* as count')
+        .whereRaw('DATE(trans_date) = CURDATE()') // For MySQL
+        // .whereRaw('DATE(trans_date) = DATE(\'now\')') // For SQLite
+        // .whereRaw('trans_date::date = CURRENT_DATE') // For PostgreSQL
+        .first();
+
+      return parseInt(result?.count as string) || 0;
+    } catch (error) {
+      console.error('Database error in countQueueForTodayAlt:', error);
+      throw new DatabaseErrors('Failed to count queue for today at countQueueForTodayAlt method');
+    }
+  }
 }

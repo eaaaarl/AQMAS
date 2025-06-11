@@ -39,6 +39,7 @@ export const configApi = createApi({
         url: "/configs",
         method: "GET",
       }),
+      providesTags: ["Configs"],
     }),
   }),
 });

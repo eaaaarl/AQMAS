@@ -28,5 +28,22 @@ class QueueRepository {
             }
         });
     }
+    countQueueForTodayAlt() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield this.database('queue')
+                    .count('* as count')
+                    .whereRaw('DATE(trans_date) = CURDATE()') // For MySQL
+                    // .whereRaw('DATE(trans_date) = DATE(\'now\')') // For SQLite
+                    // .whereRaw('trans_date::date = CURRENT_DATE') // For PostgreSQL
+                    .first();
+                return parseInt(result === null || result === void 0 ? void 0 : result.count) || 0;
+            }
+            catch (error) {
+                console.error('Database error in countQueueForTodayAlt:', error);
+                throw new CustomErrors_1.DatabaseErrors('Failed to count queue for today at countQueueForTodayAlt method');
+            }
+        });
+    }
 }
 exports.QueueRepository = QueueRepository;

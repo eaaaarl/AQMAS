@@ -1,8 +1,8 @@
 import { useConfig } from '@/features/config/hooks/useConfig';
 import { useGetCustomerTypeQuery } from '@/features/customer/api/customerApi';
+import CustomerNameModal from '@/features/queue/components/CustomerNameModal';
+import CustomerTypeModal from '@/features/queue/components/CustomerTypeModal';
 import { useQueue } from '@/features/queue/hooks/useQueue';
-import CustomerNameModal from '@/features/service/components/CustomerNameModal';
-import CustomerTypeModal from '@/features/service/components/CustomerTypeModal';
 import { PaginationControls } from '@/features/service/components/PaginationControl';
 import { ServiceItem } from '@/features/service/components/ServiceItem';
 import { useService } from '@/features/service/hooks/useService';
@@ -32,23 +32,23 @@ export default function Transaction() {
   } = useConfig()
 
   const {
-    handleSubmit,
+    toggleTransactions,
     selectedTransactions,
-    toggleTransaction,
-    handleCancelName,
-    handleConfirmName,
-    handlePrintReceipt,
-    customerName,
-    setCustomerName,
-    showNameModal,
-    showCustomerTypeModal,
+    handleSubmitReceipt,
+    showCustomerType,
     handleCancelType,
     customerType,
-    setCustomerType
+    handleSetCustomerType,
+    handleCustomerTypeConfirm,
+
+    handleCustomerNameConfirm,
+    handleSetCustomerName,
+    handleCancelName,
+    customerName,
+    showCustomerName
   } = useQueue()
 
   const { data: customerTypeData } = useGetCustomerTypeQuery({ is_show: '1' })
-
   const [currentPage, setCurrentPage] = useState(0);
 
   const { width, height } = Dimensions.get('window');
@@ -62,8 +62,6 @@ export default function Transaction() {
     currentPage * SERVICES_PER_PAGE,
     (currentPage + 1) * SERVICES_PER_PAGE
   );
-
-
 
   if (isLoading || isConfigsLoading) {
     return (
@@ -116,7 +114,7 @@ export default function Transaction() {
                       service={service}
                       cardWidth={cardWidth}
                       isSelected={selectedTransactions.some(item => item.service_id === service.service_id)}
-                      onPress={() => toggleTransaction(service)}
+                      onPress={() => toggleTransactions(service)}
                     />
                   </View>
                 ))}
@@ -131,7 +129,7 @@ export default function Transaction() {
                           service={service}
                           cardWidth={cardWidth}
                           isSelected={selectedTransactions.some(item => item.service_id === service.service_id)}
-                          onPress={() => toggleTransaction(service)}
+                          onPress={() => toggleTransactions(service)}
                         />
                       </View>
                     ))}
@@ -154,7 +152,7 @@ export default function Transaction() {
                           service={service}
                           cardWidth={cardWidth}
                           isSelected={selectedTransactions.some(item => item.service_id === service.service_id)}
-                          onPress={() => toggleTransaction(service)}
+                          onPress={() => toggleTransactions(service)}
                         />
                       </View>
                     ))}
@@ -186,7 +184,7 @@ export default function Transaction() {
             <View className="w-min px-5 mt-5">
               <TouchableOpacity
                 className="bg-green-500 p-6 rounded-lg items-center"
-                onPress={handlePrintReceipt}
+                onPress={() => handleSubmitReceipt()}
               >
                 <Text className="text-white text-2xl font-bold">PRINT RECEIPT ({selectedTransactions.length})</Text>
               </TouchableOpacity>
@@ -198,20 +196,20 @@ export default function Transaction() {
       </ScrollView>
 
       <CustomerNameModal
-        isShowName={showNameModal}
+        isShowName={showCustomerName}
         customerName={customerName}
-        onCustomerNameChange={setCustomerName}
-        onConfirm={handleConfirmName}
+        onCustomerNameChange={handleSetCustomerName}
         onCancel={handleCancelName}
+        onConfirm={handleCustomerNameConfirm}
       />
 
-
       <CustomerTypeModal
-        isVisible={showCustomerTypeModal}
+        isVisible={showCustomerType}
         customerTypes={customerTypeData ?? []}
         onCancel={handleCancelType}
-        onSelectCustomerType={setCustomerType}
+        onSelectCustomerType={handleSetCustomerType}
         selectedCustomerType={customerType}
+        onConfirm={handleCustomerTypeConfirm}
       />
     </SafeAreaView>
   );

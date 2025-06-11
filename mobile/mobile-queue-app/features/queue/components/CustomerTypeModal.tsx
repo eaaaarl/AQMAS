@@ -9,6 +9,7 @@ interface CustomerTypeModalProps {
     onSelectCustomerType: (customerType: CustomerTypeResponse) => void;
     onCancel: () => void;
     isLoading?: boolean;
+    onConfirm: () => void;
 }
 
 export default function CustomerTypeModal({
@@ -17,7 +18,8 @@ export default function CustomerTypeModal({
     selectedCustomerType,
     onSelectCustomerType,
     onCancel,
-    isLoading = false
+    isLoading = false,
+    onConfirm
 }: CustomerTypeModalProps) {
     return (
         <Modal
@@ -70,8 +72,7 @@ export default function CustomerTypeModal({
                             <TouchableOpacity
                                 className="flex-1 bg-blue-500 p-3 rounded-lg"
                                 onPress={() => {
-                                    onSelectCustomerType(selectedCustomerType);
-                                    onCancel();
+                                    onConfirm()
                                 }}
                             >
                                 <Text className="text-white text-center font-bold">Confirm</Text>

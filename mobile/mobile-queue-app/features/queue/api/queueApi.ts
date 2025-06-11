@@ -40,6 +40,7 @@ export const queueApi = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Queue"],
     }),
   }),
 });
