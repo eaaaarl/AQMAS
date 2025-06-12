@@ -3,6 +3,7 @@ import { CustomerTypeResponse } from "@/features/customer/api/interface";
 import { Service } from "@/features/service/api/interface";
 import { useAppDispatch } from "@/libs/redux/hooks";
 import { useState } from "react";
+import Toast from "react-native-toast-message";
 import {
     createQueueDetailsPayload,
     createQueuePayload2,
@@ -145,16 +146,24 @@ export const useQueue = () => {
           trans_id: transId,
           service_id: service.service_id,
         }));
-      console.log(queueDetailsPayload.map((qd) => qd.service_id));
 
       const queueDetailsResult = await createQueueDetails(
         queueDetailsPayload
       ).unwrap();
 
       dispatch(queueApi.util.invalidateTags(["Queue"]));
-
       resetForm();
 
+      Toast.show({
+        type: "success",
+        text1: "Queue Created!",
+        // text2: queueName
+        //   ? `"${queueName}" has been created successfully`
+        //   : "Your queue has been created successfully",
+        visibilityTime: 3000,
+        autoHide: true,
+        topOffset: 50,
+      });
       return {
         mainQueue,
         queueDetails: queueDetailsResult,
@@ -162,6 +171,7 @@ export const useQueue = () => {
       };
     } catch (error) {
       console.error("❌ Queue creation process failed:", error);
+      resetForm();
       throw error;
     }
   };
@@ -174,6 +184,7 @@ export const useQueue = () => {
     showCustomerType,
     showCustomerName,
     isLoading: isLoadingQueue || isLoadingDetails,
+
     // HANDLERS
     toggleTransactions,
     handleSubmitReceipt,
