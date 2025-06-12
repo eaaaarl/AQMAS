@@ -1,23 +1,50 @@
+import { Knex } from 'knex';
 import { db } from '../infrastructure/database/database';
 import { DatabaseErrors } from '../libs/CustomErrors';
-import { queueDTO } from './core/schema/queu.schema';
+import { queueDetailsDTO, queueDTO } from './core/schema/queu.schema';
 
 export class QueueRepository {
-  private database = db;
+  constructor(private database = db) {}
 
-  async createQueue(payload: queueDTO) {
+  async beginTransaction() {
+    return this.database.transaction();
+  }
+
+  async createQueue(payload: queueDTO, trx?: Knex.Transaction) {
+    const db = trx || this.database;
     try {
-      const newQueue = await this.database('queue')
-        .insert({
-          ...payload,
-          trans_date: new Date().toISOString(),
-        })
-        .returning(['trans_date']);
+      const [transId] = await db('queue').insert({
+        ...payload,
+        trans_date: new Date().toISOString(),
+      });
+
+      const newQueue = await db('queue').where('trans_id', transId).first();
 
       return newQueue;
     } catch (error) {
       console.error('Database error in createQueue:', error);
-      throw new DatabaseErrors('Failed to create queue at createQueue method');
+      throw new DatabaseErrors('Failed to create queue at createQueue method at Repository Layer');
+    }
+  }
+
+  async createQueueDetails(payload: queueDetailsDTO[], trx?: Knex.Transaction) {
+    const db = trx || this.database;
+    try {
+      const dataToInsert = payload.map(p => ({
+        trans_id: p.trans_id,
+        trans_date: new Date().toISOString(),
+        service_id: p.service_id,
+      }));
+
+      const insertedIds = await db('queue_detail').insert(dataToInsert);
+
+      const newQueueDetails = await db('queue_detail').whereIn('trans_id', insertedIds);
+      return newQueueDetails;
+    } catch (error) {
+      console.error('Database error in createQueueDetails:', error);
+      throw new DatabaseErrors(
+        'Failed to create queue detail at createQueueDetails method at Repository Layer',
+      );
     }
   }
 
@@ -33,7 +60,7 @@ export class QueueRepository {
       return parseInt(result?.count as string) || 0;
     } catch (error) {
       console.error('Database error in countQueueForTodayAlt:', error);
-      throw new DatabaseErrors('Failed to count queue for today at countQueueForTodayAlt method');
+      throw new DatabaseErrors('Failed to count queue countQueue method at Repository Layer');
     }
   }
 }

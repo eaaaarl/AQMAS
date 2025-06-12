@@ -13,7 +13,7 @@ export const serviceApi = createApi({
 
     const ipAddress = state.config?.ipAddress;
     const port = state.config?.port;
-    const baseUrl = `http://${ipAddress}:${port}`;
+    const baseUrl = `http://${ipAddress}:${port}/api/user`;
 
     console.log("Using IP:", ipAddress);
     console.log("Using Port:", port);

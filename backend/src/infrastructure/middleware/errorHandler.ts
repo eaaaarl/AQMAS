@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { CustomErrors, ValidationError } from '../../libs/CustomErrors';
-import { ZodError } from 'zod';
+import { z, ZodError } from 'zod';
 
 export const errorHandler = (
   err: Error | CustomErrors,
@@ -19,16 +19,24 @@ export const errorHandler = (
     return;
   }
 
-  if (err instanceof ZodError) {
-    console.log('Validation errors raw:', err.errors);
-    const formattedErrors = err.errors.map(error => ({
-      path: error.path.join('.'),
-      message: error.message,
-    }));
-
+  if (err instanceof z.ZodError) {
     res.status(400).json({
-      message: 'Validation Error',
-      errors: formattedErrors,
+      success: false,
+      message: 'Validation failed',
+      errors: err.errors.map(err => ({
+        field: err.path.join('.'),
+        message: err.message,
+        code: err.code,
+      })),
+    });
+    return;
+  }
+
+  if (err instanceof ValidationError) {
+    res.status(400).json({
+      success: false,
+      message: err.message,
+      errors: err,
     });
     return;
   }

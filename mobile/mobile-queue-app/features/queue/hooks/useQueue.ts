@@ -5,7 +5,7 @@ import { useAppDispatch } from "@/libs/redux/hooks";
 import { useState } from "react";
 import {
     createQueueDetailsPayload,
-    createQueuePayload,
+    createQueuePayload2,
 } from "../api/interface";
 import {
     queueApi,
@@ -103,7 +103,6 @@ export const useQueue = () => {
   };
 
   const resetForm = () => {
-    console.log("🔄 Resetting form");
     setCustomerType(null);
     setCustomerName("");
     setSelectedTransactions([]);
@@ -113,8 +112,8 @@ export const useQueue = () => {
   const dispatch = useAppDispatch();
   const callCreateQueue = async () => {
     try {
-      let currentCount = countQueue?.[0]?.count ?? 0;
-      const newCount = currentCount + 1; // Calculate new count
+      let currentCount = countQueue?.count ?? 0;
+      const newCount = currentCount + 1;
 
       let transId: string;
       if (selectedTransactions.length === 1) {
@@ -123,41 +122,35 @@ export const useQueue = () => {
         transId = `${newCount}${customerType?.suffix}`;
       }
 
-      console.log("🔧 Generated transId:", transId);
-      console.log("📊 Current count:", currentCount, "-> New count:", newCount);
+      // const mainQueueData: createQueuePayload = {
+      //   transId: transId,
+      //   customerName: customerName,
+      //   typeId: customerType?.type_id ?? 0,
+      //   singleTransOnly: selectedTransactions.length === 1 ? 1 : 0,
+      //   transStatus: 0,
+      // };
 
-      const mainQueueData: createQueuePayload = {
-        transId: transId,
-        customerName: customerName,
-        typeId: customerType?.type_id ?? 0,
-        singleTransOnly: selectedTransactions.length === 1 ? 1 : 0,
-        transStatus: 0,
+      const mainQueueData: createQueuePayload2 = {
+        customer_name: customerName,
+        trans_id: transId,
+        type_id: customerType?.type_id ?? 0,
+        single_trans_only: selectedTransactions.length === 1 ? 1 : 0,
+        trans_status: 0,
       };
 
-      console.log("📝 Creating main queue:", mainQueueData);
       const mainQueue = await createQueue(mainQueueData).unwrap();
-      console.log("✅ Main queue created:", mainQueue);
 
       const queueDetailsPayload: createQueueDetailsPayload[] =
         selectedTransactions.map((service) => ({
           trans_id: transId,
           service_id: service.service_id,
         }));
+      console.log(queueDetailsPayload.map((qd) => qd.service_id));
 
-      console.log("📦 Queue details payload:", queueDetailsPayload);
       const queueDetailsResult = await createQueueDetails(
         queueDetailsPayload
       ).unwrap();
-      console.log("✅ Queue details created:", queueDetailsResult);
 
-      // ⭐ IMPORTANT: Update the count in your state/database
-      // Option 1: If you have an updateCount API
-      // await updateCount({ count: newCount }).unwrap();
-
-      // Option 2: If you have a Redux action to update count
-      // dispatch(updateCountQueue({ ...countQueue, count: newCount }));
-
-      // Option 3: If countQueue comes from RTK Query, invalidate the tag to refetch
       dispatch(queueApi.util.invalidateTags(["Queue"]));
 
       resetForm();
@@ -165,7 +158,7 @@ export const useQueue = () => {
       return {
         mainQueue,
         queueDetails: queueDetailsResult,
-        newCount, // Return the new count for reference
+        newCount,
       };
     } catch (error) {
       console.error("❌ Queue creation process failed:", error);

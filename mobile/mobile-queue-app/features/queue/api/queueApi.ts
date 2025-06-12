@@ -1,6 +1,6 @@
 import { RootState } from "@/libs/redux/store";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { createQueueDetailsPayload, createQueuePayload } from "./interface";
+import { createQueueDetailsPayload, createQueuePayload2 } from "./interface";
 
 export const queueApi = createApi({
   reducerPath: "queueApi",
@@ -13,7 +13,7 @@ export const queueApi = createApi({
 
     const ipAddress = state.config?.ipAddress;
     const port = state.config?.port;
-    const baseUrl = `http://${ipAddress}:${port}`;
+    const baseUrl = `http://${ipAddress}:${port}/api`;
 
     console.log("Using IP:", ipAddress);
     console.log("Using Port:", port);
@@ -34,7 +34,7 @@ export const queueApi = createApi({
     return baseQuery(adjustedArgs, api, extraOptions);
   },
   endpoints: (builder) => ({
-    createQueue: builder.mutation<void, createQueuePayload>({
+    createQueue: builder.mutation<void, createQueuePayload2>({
       query: (data) => ({
         url: "/queue",
         method: "POST",
@@ -52,7 +52,7 @@ export const queueApi = createApi({
       invalidatesTags: ["Queue"],
     }),
 
-    countQueue: builder.query<{ count: number }[], void>({
+    countQueue: builder.query<{ count: number }, void>({
       query: () => ({
         url: "/queue/count",
         method: "GET",

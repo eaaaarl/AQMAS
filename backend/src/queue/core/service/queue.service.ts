@@ -1,13 +1,18 @@
 import { QueueRepository } from '../../queue.repository';
-import { queueDTO, queueSchema } from '../schema/queu.schema';
+import { queueDetailsDTO, queueDetailsSchema, queueDTO, queueSchema } from '../schema/queu.schema';
 
 export class QueueService {
   constructor(private readonly queueRepository: QueueRepository) {}
 
   async createQueue(data: queueDTO) {
-    const payload = queueSchema.parse(data);
-    const newQueue = await this.queueRepository.createQueue(payload);
+    const queuePayload = queueSchema.parse(data);
+    const newQueue = await this.queueRepository.createQueue(queuePayload);
     return newQueue;
+  }
+
+  async createQueueDetail(data: queueDetailsDTO[]) {
+    const validatedPayload = data.map(item => queueDetailsSchema.parse(item));
+    return await this.queueRepository.createQueueDetails(validatedPayload);
   }
 
   async countQueue() {
