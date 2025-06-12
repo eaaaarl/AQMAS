@@ -13,20 +13,44 @@ exports.QueueRepository = void 0;
 const database_1 = require("../infrastructure/database/database");
 const CustomErrors_1 = require("../libs/CustomErrors");
 class QueueRepository {
-    constructor() {
-        this.database = database_1.db;
+    constructor(database = database_1.db) {
+        this.database = database;
     }
-    createQueue(payload) {
+    beginTransaction() {
         return __awaiter(this, void 0, void 0, function* () {
+            return this.database.transaction();
+        });
+    }
+    createQueue(payload, trx) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const db = trx || this.database;
             try {
-                const newQueue = yield this.database('queue')
-                    .insert(Object.assign(Object.assign({}, payload), { trans_date: new Date().toISOString() }))
-                    .returning(['trans_date']);
+                const [transId] = yield db('queue').insert(Object.assign(Object.assign({}, payload), { trans_date: new Date().toISOString() }));
+                const newQueue = yield db('queue').where('trans_id', transId).first();
                 return newQueue;
             }
             catch (error) {
                 console.error('Database error in createQueue:', error);
-                throw new CustomErrors_1.DatabaseErrors('Failed to create queue at createQueue method');
+                throw new CustomErrors_1.DatabaseErrors('Failed to create queue at createQueue method at Repository Layer');
+            }
+        });
+    }
+    createQueueDetails(payload, trx) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const db = trx || this.database;
+            try {
+                const dataToInsert = payload.map(p => ({
+                    trans_id: p.trans_id,
+                    trans_date: new Date().toISOString(),
+                    service_id: p.service_id,
+                }));
+                const insertedIds = yield db('queue_detail').insert(dataToInsert);
+                const newQueueDetails = yield db('queue_detail').whereIn('trans_id', insertedIds);
+                return newQueueDetails;
+            }
+            catch (error) {
+                console.error('Database error in createQueueDetails:', error);
+                throw new CustomErrors_1.DatabaseErrors('Failed to create queue detail at createQueueDetails method at Repository Layer');
             }
         });
     }
@@ -43,7 +67,7 @@ class QueueRepository {
             }
             catch (error) {
                 console.error('Database error in countQueueForTodayAlt:', error);
-                throw new CustomErrors_1.DatabaseErrors('Failed to count queue for today at countQueueForTodayAlt method');
+                throw new CustomErrors_1.DatabaseErrors('Failed to count queue countQueue method at Repository Layer');
             }
         });
     }

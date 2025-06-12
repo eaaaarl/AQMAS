@@ -17,9 +17,15 @@ class QueueService {
     }
     createQueue(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            const payload = queu_schema_1.queueSchema.parse(data);
-            const newQueue = yield this.queueRepository.createQueue(payload);
+            const queuePayload = queu_schema_1.queueSchema.parse(data);
+            const newQueue = yield this.queueRepository.createQueue(queuePayload);
             return newQueue;
+        });
+    }
+    createQueueDetail(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const validatedPayload = data.map(item => queu_schema_1.queueDetailsSchema.parse(item));
+            return yield this.queueRepository.createQueueDetails(validatedPayload);
         });
     }
     countQueue() {

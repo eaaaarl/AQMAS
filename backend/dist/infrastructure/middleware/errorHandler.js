@@ -13,15 +13,23 @@ const errorHandler = (err, req, res, next) => {
         });
         return;
     }
-    if (err instanceof zod_1.ZodError) {
-        console.log('Validation errors raw:', err.errors);
-        const formattedErrors = err.errors.map(error => ({
-            path: error.path.join('.'),
-            message: error.message,
-        }));
+    if (err instanceof zod_1.z.ZodError) {
         res.status(400).json({
-            message: 'Validation Error',
-            errors: formattedErrors,
+            success: false,
+            message: 'Validation failed',
+            errors: err.errors.map(err => ({
+                field: err.path.join('.'),
+                message: err.message,
+                code: err.code,
+            })),
+        });
+        return;
+    }
+    if (err instanceof CustomErrors_1.ValidationError) {
+        res.status(400).json({
+            success: false,
+            message: err.message,
+            errors: err,
         });
         return;
     }

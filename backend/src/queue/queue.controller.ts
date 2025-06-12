@@ -4,6 +4,7 @@ import { QueueService } from './core/service/queue.service';
 export class QueueController {
   constructor(private readonly queueService: QueueService) {
     this.createQueue = this.createQueue.bind(this);
+    this.createQueueDetail = this.createQueueDetail.bind(this);
     this.countQueue = this.countQueue.bind(this);
   }
 
@@ -13,7 +14,25 @@ export class QueueController {
       console.log(payload);
       const newQueue = await this.queueService.createQueue(payload);
 
-      res.status(200).json(newQueue);
+      res.status(200).json({
+        success: true,
+        data: newQueue,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async createQueueDetail(req: Request, res: Response, next: NextFunction) {
+    try {
+      const payload = req.body;
+      console.log(payload);
+      const newQueueDetail = await this.queueService.createQueueDetail(payload);
+
+      res.status(200).json({
+        success: true,
+        data: newQueueDetail,
+      });
     } catch (error) {
       next(error);
     }
