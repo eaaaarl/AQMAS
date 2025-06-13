@@ -30,7 +30,7 @@ export class QueueRepository {
   async createQueueDetails(payload: queueDetailsDTO[], trx?: Knex.Transaction) {
     const db = trx || this.database;
     try {
-      const dataToInsert = payload.map(p => ({
+      const dataToInsert =  payload.map(p => ({
         trans_id: p.trans_id,
         trans_date: new Date().toISOString(),
         service_id: p.service_id,
