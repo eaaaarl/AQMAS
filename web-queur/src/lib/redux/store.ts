@@ -35,7 +35,7 @@ const storage =
 const persistConfig = {
   key: "root",
   storage,
-  blacklist: apisReducerPath,
+  blacklist: ["modal", ...apisReducerPath],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

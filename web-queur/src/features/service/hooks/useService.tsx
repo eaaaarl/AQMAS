@@ -1,45 +1,23 @@
 import { useState } from "react";
 import { useGetServicesQuery } from "../api/serviceApi";
+import type { Service } from "../api/interface";
 
 
 export const useService = () => {
-    const { data: services = [], isError, isLoading } = useGetServicesQuery();
-    const [selectedTransactions, setSelectedTransactions] = useState<string[]>([]);
+    const { data: services, isError, isLoading } = useGetServicesQuery();
+    const [selectedTransactions, setSelectedTransactions] = useState<Service[]>([]);
     const [showMore, setShowMore] = useState<boolean>(false);
 
-    const activeServices = services.filter(service =>
-        service.is_active?.data?.[0] === 1
-    );
+    const transService = services?.results || []
+    const mainServices = transService.filter(service => service.header_id === 1);
+    const additionalServices = transService.filter(service => service.header_id === 0);
 
-    const mainServices = activeServices.filter(service => service.header_id === 1);
-    const additionalServices = activeServices.filter(service => service.header_id === 0);
-
-    const getServiceIcon = (serviceName: string): string => {
-        const iconMap: Record<string, string> = {
-            'New Accounts': '📝',
-            'Encashment': '💵',
-            'Withdrawal': '🏧',
-            'Account Inquiries': '🔍',
-            'Loans': '🏦',
-            'Deposit': '💰',
-            'Transfer': '↔️',
-            'Bill Payment': '🧾',
-            'Statement': '📄',
-            'Card Services': '💳',
-            'Settings': '⚙️',
-            'Service Name 1': '📋',
-            'Service Name 3': '📋',
-            'Widthrawal': '🏧'
-        };
-        return iconMap[serviceName] || '📋';
-    };
-
-    const toggleTransaction = (name: string) => {
+    const toggleTransaction = (service: Service) => {
         setSelectedTransactions(prev => {
-            if (prev.includes(name)) {
-                return prev.filter(item => item !== name);
+            if (prev.some(item => item.service_name === service.service_name)) {
+                return prev.filter(item => item.service_name !== service.service_name);
             } else {
-                return [...prev, name];
+                return [...prev, service];
             }
         });
     };
@@ -53,10 +31,9 @@ export const useService = () => {
         setSelectedTransactions,
         showMore,
         setShowMore,
-        activeServices,
+        transService,
         mainServices,
         additionalServices,
-        getServiceIcon,
         toggleTransaction
     }
 }

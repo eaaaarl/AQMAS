@@ -1,6 +1,10 @@
 import { RootState } from "@/libs/redux/store";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { createQueueDetailsPayload, createQueuePayload2 } from "./interface";
+import {
+    createQueueDetailsPayload,
+    createQueuePayload2,
+    QueueApiResponse,
+} from "./interface";
 
 export const queueApi = createApi({
   reducerPath: "queueApi",
@@ -34,7 +38,7 @@ export const queueApi = createApi({
     return baseQuery(adjustedArgs, api, extraOptions);
   },
   endpoints: (builder) => ({
-    createQueue: builder.mutation<void, createQueuePayload2>({
+    createQueue: builder.mutation<QueueApiResponse, createQueuePayload2>({
       query: (data) => ({
         url: "/queue",
         method: "POST",

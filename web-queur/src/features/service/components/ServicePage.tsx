@@ -1,32 +1,74 @@
-
-import type { ServiceResponse } from '../api/interface';
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
+import type { Service } from '../api/interface';
 import { useService } from '../hooks/useService';
+import CustomerNameModal from './CustomerNameModal';
+import { setModalOpen } from '@/lib/redux/state/modalSlice';
+import { useConfig } from '@/features/config/hooks/useConfig';
+import { useState } from 'react';
 
 
 export default function ServicePage() {
-
-    const { additionalServices,
-        getServiceIcon,
+    const dispatch = useAppDispatch()
+    const { open } = useAppSelector((state) => state.modal)
+    const {
+        additionalServices,
         isError,
         isLoading,
         mainServices,
         selectedTransactions,
         setShowMore,
         showMore,
-        toggleTransaction
+        toggleTransaction,
+        setSelectedTransactions
     } = useService()
 
-    const renderServiceItem = (service: ServiceResponse) => (
+    const { AskCustomerName } = useConfig()
+    const [customerName, setCustomerName] = useState('');
+
+    const handleCancelCustomerNameModal = () => {
+        dispatch(setModalOpen(false))
+        setCustomerName("")
+    }
+    const handlePrintReceipt = async () => {
+        if (AskCustomerName && !customerName) {
+            dispatch(setModalOpen(true))
+            return;
+        }
+        await callQueueConfirm()
+    }
+
+    const handleConfirmCustomerName = async () => {
+        await callQueueConfirm()
+    }
+
+    const callQueueConfirm = async () => {
+        let ticket;
+        const count = 1;
+        if (selectedTransactions.length === 1) {
+            ticket = `${selectedTransactions[0].service_format}${count}`
+        } else {
+            ticket = `${count}`
+        }
+
+        alert(ticket)
+
+
+        // Reset state
+        setCustomerName("")
+        dispatch(setModalOpen(false))
+        setSelectedTransactions([])
+    }
+
+    const renderServiceItem = (service: Service) => (
         <button
             key={service.service_id}
             className={`h-42 rounded-lg flex flex-col items-center justify-center 
-                ${selectedTransactions.includes(service.service_name)
+                ${selectedTransactions.find((t) => t.service_name === service.service_name)
                     ? 'bg-blue-500 text-white'
                     : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}
                 transition-colors duration-200 w-full`}
-            onClick={() => toggleTransaction(service.service_name)}
+            onClick={() => toggleTransaction(service)}
         >
-            <span className="text-4xl">{getServiceIcon(service.service_name)}</span>
             <span className="mt-2 font-bold">{service.button_caption}</span>
         </button>
     );
@@ -51,7 +93,7 @@ export default function ServicePage() {
         <div className="min-h-screen bg-white p-4 flex flex-col items-center justify-center">
             <div className="w-full max-w-2xl">
                 <div className='mb-4'>
-                    {selectedTransactions.map((st) => st).join(' | ')}
+                    {selectedTransactions.map((st) => st.service_name).join(' | ')}
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                     {!showMore ? (
@@ -66,7 +108,6 @@ export default function ServicePage() {
                                     className={`h-42 rounded-lg flex flex-col items-center justify-center bg-gray-100 hover:bg-gray-200 transition-colors w-full`}
                                     onClick={() => setShowMore(true)}
                                 >
-                                    <span className="text-2xl">➕</span>
                                     <span className="mt-2 font-bold">MORE</span>
                                 </button>
                             )}
@@ -91,19 +132,27 @@ export default function ServicePage() {
                 </div>
 
                 {selectedTransactions.length > 0 && (
-                    <div className="w-full mt-8">
+                    <div className="w-full my-8">
                         <button
                             className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-lg w-full font-bold"
-                            onClick={() => alert(`Selected Services: ${selectedTransactions.join(', ')}`)}
+                            onClick={() => handlePrintReceipt()}
                         >
                             PRINT RECEIPT ({selectedTransactions.length})
                         </button>
                     </div>
                 )}
-
-
-
             </div>
+
+
+
+            <CustomerNameModal
+                open={open}
+                onCancel={handleCancelCustomerNameModal}
+                name={customerName}
+                setName={setCustomerName}
+                onConfirm={handleConfirmCustomerName}
+            />
+
         </div>
     );
 }
