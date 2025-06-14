@@ -11,7 +11,6 @@ export class QueueController {
   async createQueue(req: Request, res: Response, next: NextFunction) {
     try {
       const payload = req.body;
-      console.log(payload);
       const newQueue = await this.queueService.createQueue(payload);
 
       res.status(200).json({
@@ -26,7 +25,6 @@ export class QueueController {
   async createQueueDetail(req: Request, res: Response, next: NextFunction) {
     try {
       const payload = req.body;
-      console.log(payload);
       const newQueueDetail = await this.queueService.createQueueDetail(payload);
 
       res.status(200).json({

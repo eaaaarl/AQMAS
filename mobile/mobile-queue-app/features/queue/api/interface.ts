@@ -19,3 +19,20 @@ export interface createQueuePayload2 {
   trans_status?: number;
   single_trans_only?: number;
 }
+
+export interface Queue {
+  trans_id: string;
+  trans_date: string;
+  type_id: number;
+  trans_status?: number;
+  single_trans_only?: {
+    type: string;
+    data: [];
+  };
+  customer_name: string;
+}
+
+export interface QueueApiResponse {
+  sucess: true;
+  data: Queue;
+}

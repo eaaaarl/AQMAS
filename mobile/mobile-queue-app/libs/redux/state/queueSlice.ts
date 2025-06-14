@@ -3,28 +3,35 @@ import { Service } from "@/features/service/api/interface";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface QueueState {
-  selectedTransactions: Service[];
-  customerName: string;
   customerType: CustomerTypeResponse | null;
-  showCustomerNameModal: boolean;
+  customerName: string;
+  selectedTransactions: Service[];
   showCustomerTypeModal: boolean;
-  isLoading: boolean;
+  showCustomerNameModal: boolean;
 }
 
 const initialState: QueueState = {
-  customerName: "",
   customerType: null,
-  isLoading: false,
+  customerName: "",
   selectedTransactions: [],
-  showCustomerNameModal: false,
   showCustomerTypeModal: false,
+  showCustomerNameModal: false,
 };
 
 export const queueSlice = createSlice({
   name: "queue",
   initialState,
   reducers: {
-    toggleTransactions: (state, action: PayloadAction<Service>) => {
+    setCustomerType: (
+      state,
+      action: PayloadAction<CustomerTypeResponse | null>
+    ) => {
+      state.customerType = action.payload;
+    },
+    setCustomerName: (state, action: PayloadAction<string>) => {
+      state.customerName = action.payload;
+    },
+    toggleTransaction: (state, action: PayloadAction<Service>) => {
       const existingIndex = state.selectedTransactions.findIndex(
         (item) => item.service_id === action.payload.service_id
       );
@@ -34,46 +41,27 @@ export const queueSlice = createSlice({
         state.selectedTransactions.push(action.payload);
       }
     },
-    setCustomerName: (state, action: PayloadAction<string>) => {
-      state.customerName = action.payload;
+    setTransactions: (state, action: PayloadAction<Service[]>) => {
+      state.selectedTransactions = action.payload;
     },
-    setCustomerType: (
-      state,
-      action: PayloadAction<CustomerTypeResponse | null>
-    ) => {
-      state.customerType = action.payload;
-    },
-    setShowCustomerNameModal: (state, action: PayloadAction<boolean>) => {
-      state.showCustomerNameModal = action.payload;
-    },
-    setShowCustomerTypeModal: (state, action: PayloadAction<boolean>) => {
+    showCustomerTypeModal: (state, action: PayloadAction<boolean>) => {
       state.showCustomerTypeModal = action.payload;
     },
-    resetQueueState: () => initialState,
-    setLoading: (state, action: PayloadAction<boolean>) => {
-      state.isLoading = action.payload;
+    showCustomerNameModal: (state, action: PayloadAction<boolean>) => {
+      state.showCustomerNameModal = action.payload;
     },
-    clearSelectedTransactions: (state) => {
-      state.selectedTransactions = [];
-    },
-    removeTransaction: (state, action: PayloadAction<Service>) => {
-      state.selectedTransactions = state.selectedTransactions.filter(
-        (item) => item.service_id !== action.payload.service_id
-      );
-    },
+    resetQueueForm: () => initialState,
   },
 });
 
 export const {
-  toggleTransactions,
-  setCustomerName,
   setCustomerType,
-  setShowCustomerNameModal,
-  setShowCustomerTypeModal,
-  resetQueueState,
-  setLoading,
-  clearSelectedTransactions,
-  removeTransaction,
+  setCustomerName,
+  toggleTransaction,
+  setTransactions,
+  showCustomerTypeModal,
+  showCustomerNameModal,
+  resetQueueForm,
 } = queueSlice.actions;
 
 export const queueReducer = queueSlice.reducer;

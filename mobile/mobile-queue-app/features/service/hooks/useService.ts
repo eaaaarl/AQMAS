@@ -1,4 +1,5 @@
 import { configApi } from "@/features/config/api/configApi";
+import { customerApi } from "@/features/customer/api/customerApi";
 import { useAppDispatch } from "@/libs/redux/hooks";
 import { useState } from "react";
 import { serviceApi, useGetServicesQuery } from "../api/serviceApi";
@@ -21,6 +22,7 @@ export const useService = () => {
       await Promise.all([
         dispatch(serviceApi.util.invalidateTags(["Services"])),
         dispatch(configApi.util.invalidateTags(["Configs"])),
+        dispatch(customerApi.util.invalidateTags(["Customer"])),
       ]);
     } finally {
       setRefreshing(false);

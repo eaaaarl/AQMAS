@@ -5,18 +5,21 @@ import { useAppDispatch } from "@/libs/redux/hooks";
 import { useState } from "react";
 import Toast from "react-native-toast-message";
 import {
-    createQueueDetailsPayload,
-    createQueuePayload2,
+  createQueueDetailsPayload,
+  createQueuePayload2,
 } from "../api/interface";
 import {
-    queueApi,
-    useCountQueueQuery,
-    useCreateQueueDetailsMutation,
-    useCreateQueueMutation,
+  queueApi,
+  useCountQueueQuery,
+  useCreateQueueDetailsMutation,
+  useCreateQueueMutation,
 } from "../api/queueApi";
 
 export const useQueue = () => {
+  const dispatch = useAppDispatch();
+
   const { showAskCustomerType, showAskCustomerName } = useConfig();
+
   const [customerType, setCustomerType] = useState<CustomerTypeResponse | null>(
     null
   );
@@ -110,26 +113,26 @@ export const useQueue = () => {
     setShowCustomerType(false);
     setShowCustomerName(false);
   };
-  const dispatch = useAppDispatch();
   const callCreateQueue = async () => {
     try {
       let currentCount = countQueue?.count ?? 0;
       const newCount = currentCount + 1;
 
       let transId: string;
-      if (selectedTransactions.length === 1) {
-        transId = `${selectedTransactions[0].service_format}${newCount}${customerType?.suffix}`;
-      } else {
-        transId = `${newCount}${customerType?.suffix}`;
-      }
 
-      // const mainQueueData: createQueuePayload = {
-      //   transId: transId,
-      //   customerName: customerName,
-      //   typeId: customerType?.type_id ?? 0,
-      //   singleTransOnly: selectedTransactions.length === 1 ? 1 : 0,
-      //   transStatus: 0,
-      // };
+      if (selectedTransactions.length === 1) {
+        if (customerType?.suffix) {
+          transId = `${selectedTransactions[0].service_format}${newCount}${customerType.suffix}`;
+        } else {
+          transId = `${selectedTransactions[0].service_format}${newCount}`;
+        }
+      } else {
+        if (customerType?.suffix) {
+          transId = `${newCount}${customerType.suffix}`;
+        } else {
+          transId = `${newCount}`;
+        }
+      }
 
       const mainQueueData: createQueuePayload2 = {
         customer_name: customerName,
@@ -139,7 +142,7 @@ export const useQueue = () => {
         trans_status: 0,
       };
 
-      const mainQueue = await createQueue(mainQueueData).unwrap();
+      await createQueue(mainQueueData).unwrap();
 
       const queueDetailsPayload: createQueueDetailsPayload[] =
         selectedTransactions.map((service) => ({
@@ -147,9 +150,7 @@ export const useQueue = () => {
           service_id: service.service_id,
         }));
 
-      const queueDetailsResult = await createQueueDetails(
-        queueDetailsPayload
-      ).unwrap();
+      await createQueueDetails(queueDetailsPayload).unwrap();
 
       dispatch(queueApi.util.invalidateTags(["Queue"]));
       resetForm();
@@ -157,18 +158,13 @@ export const useQueue = () => {
       Toast.show({
         type: "success",
         text1: "Queue Created!",
-        // text2: queueName
-        //   ? `"${queueName}" has been created successfully`
-        //   : "Your queue has been created successfully",
+        text2: transId
+          ? `"${transId}" has been created successfully`
+          : "Your queue has been created successfully",
         visibilityTime: 3000,
         autoHide: true,
         topOffset: 50,
       });
-      return {
-        mainQueue,
-        queueDetails: queueDetailsResult,
-        newCount,
-      };
     } catch (error) {
       console.error("❌ Queue creation process failed:", error);
       resetForm();

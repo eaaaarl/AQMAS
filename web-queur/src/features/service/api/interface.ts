@@ -1,4 +1,4 @@
-export interface ServiceResponse {
+export interface Service {
   service_id: number;
   service_name: string;
   button_caption: string;
@@ -9,4 +9,8 @@ export interface ServiceResponse {
     data: number[];
   };
   header_id: number;
+}
+
+export interface ServiceApiResponse {
+  results: Service[];
 }

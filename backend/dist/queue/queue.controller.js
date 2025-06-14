@@ -21,7 +21,6 @@ class QueueController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const payload = req.body;
-                console.log(payload);
                 const newQueue = yield this.queueService.createQueue(payload);
                 res.status(200).json({
                     success: true,
@@ -37,7 +36,6 @@ class QueueController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const payload = req.body;
-                console.log(payload);
                 const newQueueDetail = yield this.queueService.createQueueDetail(payload);
                 res.status(200).json({
                     success: true,
