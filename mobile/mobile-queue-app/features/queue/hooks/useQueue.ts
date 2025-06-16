@@ -4,7 +4,6 @@ import { CustomerTypeResponse } from "@/features/customer/api/interface";
 import { Service } from "@/features/service/api/interface";
 import { useAppDispatch } from "@/libs/redux/hooks";
 import { useState } from "react";
-import Toast from "react-native-toast-message";
 import {
   createQueueDetailsPayload,
   createQueuePayload,
@@ -21,8 +20,13 @@ import {
 export const useQueue = () => {
   const dispatch = useAppDispatch();
 
-  const { showAskCustomerType, showAskCustomerName, enabledSequenceByService } =
-    useConfig();
+  const {
+    showAskCustomerType,
+    showAskCustomerName,
+    enabledSequenceByService,
+    surveyMessage,
+    enabledTicket,
+  } = useConfig();
 
   const [customerType, setCustomerType] = useState<CustomerTypeResponse | null>(
     null
@@ -33,6 +37,11 @@ export const useQueue = () => {
   const [showCustomerType, setShowCustomerType] = useState<boolean>(false);
   const [showCustomerName, setShowCustomerName] = useState<boolean>(false);
   const [customerName, setCustomerName] = useState("");
+  const [openConfirmationToast, setOpenConfirmationToast] = useState(false);
+  const [openTicketModal, setOpenTicketModal] = useState(false);
+  const [currentTicket, setCurrentTicket] = useState<string>("");
+  const [shouldShowToastAfterModal, setShouldShowToastAfterModal] =
+    useState(false);
 
   const [createQueue, { isLoading: isLoadingQueue }] = useCreateQueueMutation();
   const [createQueueDetails, { isLoading: isLoadingDetails }] =
@@ -132,9 +141,33 @@ export const useQueue = () => {
     }, 100);
   };
 
+  const handleOpenConfirmationToast = () => {
+    setOpenConfirmationToast(true);
+  };
+
+  const handleCloseConfirmationToast = () => {
+    setOpenConfirmationToast(false);
+  };
+
+  const handleOpenTicketModal = () => {
+    setOpenTicketModal(true);
+  };
+
+  const handleCloseTicketModal = () => {
+    setOpenTicketModal(false);
+    setCurrentTicket("");
+    setCustomerName("");
+
+    if (shouldShowToastAfterModal) {
+      setShouldShowToastAfterModal(false);
+      setTimeout(() => {
+        handleOpenConfirmationToast();
+      }, 300);
+    }
+  };
+
   const resetForm = () => {
     setCustomerType(null);
-    setCustomerName("");
     setSelectedTransactions([]);
     setShowCustomerType(false);
     setShowCustomerName(false);
@@ -224,24 +257,27 @@ export const useQueue = () => {
       console.log("Queue DATA", mainQueuePayload);
       console.log("Queue Detail DATA", queueDetailsPayload);
 
-      Promise.all([
-        await createQueue(mainQueuePayload).unwrap(),
-        await createQueueDetails(queueDetailsPayload).unwrap(),
+      await Promise.all([
+        createQueue(mainQueuePayload).unwrap(),
+        createQueueDetails(queueDetailsPayload).unwrap(),
       ]);
 
       dispatch(queueApi.util.invalidateTags(["Queue"]));
 
+      setCurrentTicket(ticket as string);
+      const shouldShowTicket = enabledTicket && ticket;
+      const shouldShowToast = surveyMessage !== "";
+
+      if (shouldShowTicket && shouldShowToast) {
+        setShouldShowToastAfterModal(true);
+        handleOpenTicketModal();
+      } else if (shouldShowTicket) {
+        handleOpenTicketModal();
+      } else if (shouldShowToast) {
+        handleOpenConfirmationToast();
+      }
+
       resetForm();
-      Toast.show({
-        type: "success",
-        text1: "Queue Created!",
-        text2: (ticket as string)
-          ? `"${ticket}" has been created successfully`
-          : "Your queue has been created successfully",
-        visibilityTime: 3000,
-        autoHide: true,
-        topOffset: 50,
-      });
     } catch (error) {
       console.error("❌ Queue creation process failed:", error);
       resetForm();
@@ -257,6 +293,10 @@ export const useQueue = () => {
     showCustomerType,
     showCustomerName,
     isLoading: isLoadingQueue || isLoadingDetails,
+    openConfirmationToast,
+    surveyMessage,
+    openTicketModal,
+    currentTicket,
 
     // HANDLERS
     toggleTransactions,
@@ -270,5 +310,9 @@ export const useQueue = () => {
     setSelectedTransactions,
     setCustomerType,
     resetForm,
+    handleCloseConfirmationToast,
+    handleOpenConfirmationToast,
+    handleOpenTicketModal,
+    handleCloseTicketModal,
   };
 };

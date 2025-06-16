@@ -1,7 +1,9 @@
 import { useConfig } from '@/features/config/hooks/useConfig';
 import { useGetCustomerTypeQuery } from '@/features/customer/api/customerApi';
+import ConfirmationToast from '@/features/queue/components/ConfirmationToast';
 import CustomerNameModal from '@/features/queue/components/CustomerNameModal';
 import CustomerTypeModal from '@/features/queue/components/CustomerTypeModal';
+import TicketModal from '@/features/queue/components/TicketModal';
 import { useQueue } from '@/features/queue/hooks/useQueue';
 import { PaginationControls } from '@/features/service/components/PaginationControl';
 import { ServiceItem } from '@/features/service/components/ServiceItem';
@@ -45,7 +47,14 @@ export default function Transaction() {
     handleSetCustomerName,
     handleCancelName,
     customerName,
-    showCustomerName
+    showCustomerName,
+
+    handleCloseConfirmationToast,
+    openConfirmationToast,
+    surveyMessage,
+    openTicketModal,
+    handleCloseTicketModal,
+    currentTicket
   } = useQueue()
 
   const { data: customerTypeData } = useGetCustomerTypeQuery({ is_show: '1' })
@@ -195,6 +204,13 @@ export default function Transaction() {
         <Text className='text-center'>{selectedTransactions.map((st) => st.service_name).join(' | ')}</Text>
       </ScrollView>
 
+      <TouchableOpacity
+        className="absolute bottom-5 left-5 bg-blue-500 p-4 rounded-full shadow-lg"
+        onPress={() => { }}
+      >
+        <Text className="text-white font-bold">Survey</Text>
+      </TouchableOpacity>
+
       <CustomerNameModal
         isShowName={showCustomerName}
         customerName={customerName}
@@ -210,6 +226,20 @@ export default function Transaction() {
         onSelectCustomerType={handleSetCustomerType}
         selectedCustomerType={customerType}
         onConfirm={handleCustomerTypeConfirm}
+      />
+
+      <ConfirmationToast
+        visible={openConfirmationToast}
+        message={surveyMessage}
+        onClose={() => handleCloseConfirmationToast()}
+      />
+
+      <TicketModal
+        onClose={handleCloseTicketModal}
+        visible={openTicketModal}
+        ticket={currentTicket}
+        confirmText='OK'
+        customerName={customerName}
       />
 
     </SafeAreaView>

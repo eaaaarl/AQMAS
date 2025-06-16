@@ -45,6 +45,13 @@ export const useConfig = () => {
       config.SectionName === "Kiosk" && config.KeyName === "Survey_Message"
   )?.Value;
 
+  const ticket = configData?.find(
+    (config) =>
+      config.SectionName === "Kiosk" && config.KeyName === "Show_Ticket"
+  )?.Value;
+
+  const enabledTicket = ticket === "1";
+
   return {
     configData,
     isConfigsLoading,
@@ -55,5 +62,6 @@ export const useConfig = () => {
     enabledSequenceByService,
     enabledSurvey,
     surveyMessage,
+    enabledTicket,
   };
 };
