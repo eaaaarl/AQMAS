@@ -1,15 +1,17 @@
 import { useConfig } from "@/features/config/hooks/useConfig";
+import { useGetCustomerTypeQuery } from "@/features/customer/api/customerApi";
 import { CustomerTypeResponse } from "@/features/customer/api/interface";
 import { Service } from "@/features/service/api/interface";
 import { useAppDispatch } from "@/libs/redux/hooks";
 import { useState } from "react";
-import Toast from "react-native-toast-message";
 import {
   createQueueDetailsPayload,
-  createQueuePayload2,
+  createQueuePayload,
 } from "../api/interface";
 import {
   queueApi,
+  useAllServiceCountQuery,
+  useByServiceCountQuery,
   useCountQueueQuery,
   useCreateQueueDetailsMutation,
   useCreateQueueMutation,
@@ -18,7 +20,13 @@ import {
 export const useQueue = () => {
   const dispatch = useAppDispatch();
 
-  const { showAskCustomerType, showAskCustomerName } = useConfig();
+  const {
+    showAskCustomerType,
+    showAskCustomerName,
+    enabledSequenceByService,
+    surveyMessage,
+    enabledTicket,
+  } = useConfig();
 
   const [customerType, setCustomerType] = useState<CustomerTypeResponse | null>(
     null
@@ -29,11 +37,38 @@ export const useQueue = () => {
   const [showCustomerType, setShowCustomerType] = useState<boolean>(false);
   const [showCustomerName, setShowCustomerName] = useState<boolean>(false);
   const [customerName, setCustomerName] = useState("");
+  const [openConfirmationToast, setOpenConfirmationToast] = useState(false);
+  const [openTicketModal, setOpenTicketModal] = useState(false);
+  const [currentTicket, setCurrentTicket] = useState<string>("");
+  const [shouldShowToastAfterModal, setShouldShowToastAfterModal] =
+    useState(false);
 
   const [createQueue, { isLoading: isLoadingQueue }] = useCreateQueueMutation();
   const [createQueueDetails, { isLoading: isLoadingDetails }] =
     useCreateQueueDetailsMutation();
-  const { data: countQueue } = useCountQueueQuery();
+
+  const { data: countQueue } = useCountQueueQuery({
+    customer_type: customerType?.type_id || 0,
+    own_sequence:
+      customerType?.own_sequence.data?.[0] === 1
+        ? customerType.own_sequence.data?.[0]
+        : "",
+  });
+  const { data: allServiceCount } = useAllServiceCountQuery();
+  const { data: customerTypeDefault } = useGetCustomerTypeQuery({
+    is_show: "1",
+  });
+
+  const singleServiceId =
+    selectedTransactions.length === 1
+      ? selectedTransactions[0]?.service_id
+      : undefined;
+
+  const { data: byServiceCount } = useByServiceCountQuery(
+    singleServiceId as number,
+    { skip: !singleServiceId }
+  );
+
   const toggleTransactions = (service: Service) => {
     setSelectedTransactions((prevTransactions) => {
       const existingIndex = prevTransactions.findIndex(
@@ -106,65 +141,143 @@ export const useQueue = () => {
     }, 100);
   };
 
+  const handleOpenConfirmationToast = () => {
+    setOpenConfirmationToast(true);
+  };
+
+  const handleCloseConfirmationToast = () => {
+    setOpenConfirmationToast(false);
+  };
+
+  const handleOpenTicketModal = () => {
+    setOpenTicketModal(true);
+  };
+
+  const handleCloseTicketModal = () => {
+    setOpenTicketModal(false);
+    setCurrentTicket("");
+    setCustomerName("");
+
+    if (shouldShowToastAfterModal) {
+      setShouldShowToastAfterModal(false);
+      setTimeout(() => {
+        handleOpenConfirmationToast();
+      }, 300);
+    }
+  };
+
   const resetForm = () => {
     setCustomerType(null);
-    setCustomerName("");
     setSelectedTransactions([]);
     setShowCustomerType(false);
     setShowCustomerName(false);
   };
+
+  const customerTypeDef = customerTypeDefault?.find(
+    (ctd) => ctd.default.data?.[0]
+  );
+
   const callCreateQueue = async () => {
     try {
-      let currentCount = countQueue?.count ?? 0;
-      const newCount = currentCount + 1;
+      let ByServiceCount;
+      let CountAllService;
+      let CountSequence;
+      let ticket: string | undefined;
 
-      let transId: string;
+      const singleTransactions = selectedTransactions.length === 1;
 
-      if (selectedTransactions.length === 1) {
-        if (customerType?.suffix) {
-          transId = `${selectedTransactions[0].service_format}${newCount}${customerType.suffix}`;
+      if (customerType?.own_sequence.data?.[0] === 1) {
+        CountSequence = countQueue?.find((cq) => cq)?.count || 0;
+        const newCountSequence = Number(CountSequence) + 1;
+        if (singleTransactions) {
+          ticket = `${
+            selectedTransactions?.[0].service_format
+          }${newCountSequence}${customerType?.suffix ?? ""}`;
+          console.log("Customer Type have sequence 1 transactions:", ticket);
         } else {
-          transId = `${selectedTransactions[0].service_format}${newCount}`;
+          ticket = `${newCountSequence}${customerType.suffix ?? ""}`;
+          console.log("Customer Type have sequence more transactions:", ticket);
         }
       } else {
-        if (customerType?.suffix) {
-          transId = `${newCount}${customerType.suffix}`;
+        if (!enabledSequenceByService) {
+          CountAllService = allServiceCount?.find((asc) => asc)?.count || 0;
+          const newCountAllService = Number(CountAllService) + 1;
+          if (singleTransactions) {
+            ticket = `${
+              selectedTransactions?.[0].service_format
+            }${newCountAllService}${customerType?.suffix ?? ""}`;
+            console.log(
+              "if not enabled sequence by service single transactions:",
+              ticket
+            );
+          } else {
+            ticket = `${newCountAllService}${customerType?.suffix ?? ""}`;
+            console.log(
+              "if not enabled sequence by service more transactions:",
+              ticket
+            );
+          }
         } else {
-          transId = `${newCount}`;
+          ByServiceCount = byServiceCount?.find((bsc) => bsc)?.count || 0;
+          const newByServiceCount = Number(ByServiceCount) + 1;
+          if (singleTransactions) {
+            ticket = `${
+              selectedTransactions?.[0].service_format
+            }${newByServiceCount}${customerType?.suffix ?? ""}`;
+            console.log(
+              "if enabled sequence by service single transactions:",
+              ticket
+            );
+          } else {
+            CountAllService = allServiceCount?.find((asc) => asc)?.count || 0;
+            const newCountAllService = Number(CountAllService) + 1;
+            ticket = `${newCountAllService}${customerType?.suffix ?? ""}`;
+            console.log(
+              "if enabled sequence by service more transactions:",
+              ticket
+            );
+          }
         }
       }
 
-      const mainQueueData: createQueuePayload2 = {
-        customer_name: customerName,
-        trans_id: transId,
-        type_id: customerType?.type_id ?? 0,
-        single_trans_only: selectedTransactions.length === 1 ? 1 : 0,
-        trans_status: 0,
+      const mainQueuePayload: createQueuePayload = {
+        customerName: customerName,
+        transId: ticket as string,
+        typeId: customerType?.type_id ?? Number(customerTypeDef?.type_id),
+        singleTransOnly: selectedTransactions.length === 1 ? 1 : 0,
+        transStatus: 0,
       };
-
-      await createQueue(mainQueueData).unwrap();
 
       const queueDetailsPayload: createQueueDetailsPayload[] =
         selectedTransactions.map((service) => ({
-          trans_id: transId,
+          trans_id: ticket as string,
           service_id: service.service_id,
         }));
 
-      await createQueueDetails(queueDetailsPayload).unwrap();
+      console.log("Queue DATA", mainQueuePayload);
+      console.log("Queue Detail DATA", queueDetailsPayload);
+
+      await Promise.all([
+        createQueue(mainQueuePayload).unwrap(),
+        createQueueDetails(queueDetailsPayload).unwrap(),
+      ]);
 
       dispatch(queueApi.util.invalidateTags(["Queue"]));
-      resetForm();
 
-      Toast.show({
-        type: "success",
-        text1: "Queue Created!",
-        text2: transId
-          ? `"${transId}" has been created successfully`
-          : "Your queue has been created successfully",
-        visibilityTime: 3000,
-        autoHide: true,
-        topOffset: 50,
-      });
+      setCurrentTicket(ticket as string);
+      const shouldShowTicket = enabledTicket && ticket;
+      const shouldShowToast = surveyMessage !== "";
+
+      if (shouldShowTicket && shouldShowToast) {
+        setShouldShowToastAfterModal(true);
+        handleOpenTicketModal();
+      } else if (shouldShowTicket) {
+        handleOpenTicketModal();
+      } else if (shouldShowToast) {
+        handleOpenConfirmationToast();
+      }
+
+      resetForm();
     } catch (error) {
       console.error("❌ Queue creation process failed:", error);
       resetForm();
@@ -180,6 +293,10 @@ export const useQueue = () => {
     showCustomerType,
     showCustomerName,
     isLoading: isLoadingQueue || isLoadingDetails,
+    openConfirmationToast,
+    surveyMessage,
+    openTicketModal,
+    currentTicket,
 
     // HANDLERS
     toggleTransactions,
@@ -193,5 +310,9 @@ export const useQueue = () => {
     setSelectedTransactions,
     setCustomerType,
     resetForm,
+    handleCloseConfirmationToast,
+    handleOpenConfirmationToast,
+    handleOpenTicketModal,
+    handleCloseTicketModal,
   };
 };

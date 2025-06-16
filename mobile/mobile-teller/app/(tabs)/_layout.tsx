@@ -12,8 +12,6 @@ const TopTabs = createMaterialTopTabNavigator();
 export default function TabLayout() {
 
     useEffect(() => {
-        NavigationBar.setPositionAsync("absolute");
-        NavigationBar.setBackgroundColorAsync("#ffffff01");
         NavigationBar.setButtonStyleAsync("dark");
     }, [])
 
