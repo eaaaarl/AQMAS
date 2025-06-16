@@ -211,7 +211,7 @@ export default function Transaction() {
         selectedCustomerType={customerType}
         onConfirm={handleCustomerTypeConfirm}
       />
-      
+
     </SafeAreaView>
   );
 }

@@ -27,8 +27,8 @@ export default function Login() {
                         className="w-32 h-32 mb-4"
                         resizeMode="contain"
                     /> */}
-                    <Text className="text-2xl font-bold text-gray-800">Teller Portal</Text>
-                    <Text className="text-gray-500 mt-2">Sign in to your account</Text>
+                    <Text className="text-2xl font-bold text-gray-800">Counter Portal</Text>
+                    <Text className="font-bold mt-2">Sign in to your account</Text>
                 </View>
 
                 <View className="space-y-4 gap-5">
@@ -72,10 +72,10 @@ export default function Login() {
                         <View className="flex-row items-center">
                             <TouchableOpacity className="w-5 h-5 border border-gray-300 rounded mr-2">
                             </TouchableOpacity>
-                            <Text className="text-gray-600">Remember me</Text>
+                            <Text className="text-gray-600 font-semibold">Remember me</Text>
                         </View>
-                        <TouchableOpacity>
-                            <Text className="text-blue-600">Forgot password?</Text>
+                        <TouchableOpacity className='p-2'>
+                            <Text className="text-blue-600 font-bold">Forgot passwod?</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -89,7 +89,7 @@ export default function Login() {
                         </Text>
                     </TouchableOpacity>
                 </View>
-                <Text className="text-center text-gray-400 mt-8">v1.0.0 • Bank Teller System</Text>
+                <Text className="text-center text-gray-400 mt-8">v1.0.0</Text>
             </View>
         </KeyboardAvoidingView>
     );

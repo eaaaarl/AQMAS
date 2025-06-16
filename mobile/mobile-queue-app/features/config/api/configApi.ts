@@ -8,16 +8,16 @@ export const configApi = createApi({
   baseQuery: async (args, api, extraOptions) => {
     const state = api.getState() as RootState;
 
-    console.log("State keys:", Object.keys(state));
-    console.log("Config exists:", !!state.config);
+    // console.log("State keys:", Object.keys(state));
+    // console.log("Config exists:", !!state.config);
 
     const ipAddress = state.config?.ipAddress;
     const port = state.config?.port;
-    const baseUrl = `http://${ipAddress}:${port}/api/system`;
+    const baseUrl = `http://${ipAddress}:${port}`;
 
-    console.log("Using IP:", ipAddress);
-    console.log("Using Port:", port);
-    console.log("Constructed baseUrl:", baseUrl);
+    // console.log("Using IP:", ipAddress);
+    // console.log("Using Port:", port);
+    // console.log("Constructed baseUrl:", baseUrl);
 
     let url: string;
     let adjustedArgs: any;
@@ -36,7 +36,7 @@ export const configApi = createApi({
   endpoints: (builder) => ({
     getConfigs: builder.query<ConfigApiResponse[], void>({
       query: () => ({
-        url: "/configs",
+        url: "/config",
         method: "GET",
       }),
       providesTags: ["Configs"],
