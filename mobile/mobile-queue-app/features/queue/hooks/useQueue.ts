@@ -31,9 +31,11 @@ export const useQueue = () => {
   const [customerType, setCustomerType] = useState<CustomerTypeResponse | null>(
     null
   );
+
   const [selectedTransactions, setSelectedTransactions] = useState<Service[]>(
     []
   );
+
   const [showCustomerType, setShowCustomerType] = useState<boolean>(false);
   const [showCustomerName, setShowCustomerName] = useState<boolean>(false);
   const [customerName, setCustomerName] = useState("");

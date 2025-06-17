@@ -6,6 +6,8 @@ export class QueueController {
     this.createQueue = this.createQueue.bind(this);
     this.createQueueDetail = this.createQueueDetail.bind(this);
     this.countQueue = this.countQueue.bind(this);
+    this.countQueueAllService = this.countQueueAllService.bind(this);
+    this.countByServiceCount = this.countByServiceCount.bind(this);
   }
 
   async createQueue(req: Request, res: Response, next: NextFunction) {
@@ -38,8 +40,34 @@ export class QueueController {
 
   async countQueue(req: Request, res: Response, next: NextFunction) {
     try {
-      const countQueue = await this.queueService.countQueue();
+      const query = req.query;
+      const [rawQueryKey] = Object.keys(query).filter(key => key.startsWith('DATE'));
+      const rawQueryValue = query[rawQueryKey];
+      const dateQuery = `${rawQueryKey}=${rawQueryValue}`;
+      const countQueue = await this.queueService.countQueue({
+        type_id: Number(query.type_id),
+        Date: dateQuery,
+      });
       res.status(200).json({ count: countQueue });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async countQueueAllService(req: Request, res: Response, next: NextFunction) {
+    try {
+      const countAllService = await this.queueService.countQueueAllService();
+      res.status(200).json({ count: countAllService });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async countByServiceCount(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { service_id } = req.params;
+      const countByService = await this.queueService.countByServiceCount({ service_id });
+      res.status(200).json({ count: countByService });
     } catch (error) {
       next(error);
     }

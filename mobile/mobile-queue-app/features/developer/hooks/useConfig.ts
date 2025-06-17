@@ -3,7 +3,7 @@ import { setConfig } from "@/libs/redux/state/configSlice";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert } from "react-native";
-import { serviceApi } from "../api/serviceApi";
+import { serviceApi } from "../../service/api/serviceApi";
 
 export const useConfigUpdate = () => {
   const [ipAddress, setIpAddress] = useState("");
@@ -39,8 +39,6 @@ export const useConfigUpdate = () => {
 
       dispatch(serviceApi.util.resetApiState());
 
-      // dispatch(serviceApi.util.invalidateTags(['Services']));
-
       Alert.alert(
         "Configuration Updated",
         "The configuration and cache have been updated successfully!",
@@ -63,15 +61,11 @@ export const useConfigUpdate = () => {
 
   return {
     currentConfig,
-
     ipAddress,
     setIpAddress,
-
     isUpdating,
-
     port,
     setPort,
-
     handleSubmit,
   };
 };

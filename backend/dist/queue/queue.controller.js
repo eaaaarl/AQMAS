@@ -16,6 +16,8 @@ class QueueController {
         this.createQueue = this.createQueue.bind(this);
         this.createQueueDetail = this.createQueueDetail.bind(this);
         this.countQueue = this.countQueue.bind(this);
+        this.countQueueAllService = this.countQueueAllService.bind(this);
+        this.countByServiceCount = this.countByServiceCount.bind(this);
     }
     createQueue(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -50,8 +52,38 @@ class QueueController {
     countQueue(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const countQueue = yield this.queueService.countQueue();
+                const query = req.query;
+                const [rawQueryKey] = Object.keys(query).filter(key => key.startsWith('DATE'));
+                const rawQueryValue = query[rawQueryKey];
+                const dateQuery = `${rawQueryKey}=${rawQueryValue}`;
+                const countQueue = yield this.queueService.countQueue({
+                    type_id: Number(query.type_id),
+                    Date: dateQuery,
+                });
                 res.status(200).json({ count: countQueue });
+            }
+            catch (error) {
+                next(error);
+            }
+        });
+    }
+    countQueueAllService(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const countAllService = yield this.queueService.countQueueAllService();
+                res.status(200).json({ count: countAllService });
+            }
+            catch (error) {
+                next(error);
+            }
+        });
+    }
+    countByServiceCount(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { service_id } = req.params;
+                const countByService = yield this.queueService.countByServiceCount({ service_id });
+                res.status(200).json({ count: countByService });
             }
             catch (error) {
                 next(error);

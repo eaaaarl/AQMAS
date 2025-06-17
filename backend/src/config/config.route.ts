@@ -3,6 +3,6 @@ import { configController } from './configuration.config';
 
 const router = express.Router();
 
-router.get('/configs', configController.getAllConfig);
+router.get('/config', configController.getAllConfig);
 
 export const configRoute = router;

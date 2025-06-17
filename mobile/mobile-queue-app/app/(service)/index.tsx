@@ -42,13 +42,11 @@ export default function Transaction() {
     customerType,
     handleSetCustomerType,
     handleCustomerTypeConfirm,
-
     handleCustomerNameConfirm,
     handleSetCustomerName,
     handleCancelName,
     customerName,
     showCustomerName,
-
     handleCloseConfirmationToast,
     openConfirmationToast,
     surveyMessage,
@@ -72,23 +70,9 @@ export default function Transaction() {
     (currentPage + 1) * SERVICES_PER_PAGE
   );
 
-  if (isLoading || isConfigsLoading) {
-    return (
-      renderLoading()
-    );
-  }
-
-  if (services.length === 0) {
-    return (
-      renderNoServices()
-    );
-  }
-
-  if (isError || isConfigsError) {
-    return (
-      renderError()
-    );
-  }
+  if (isLoading || isConfigsLoading) return renderLoading()
+  if (services.length === 0) return renderNoServices()
+  if (isError || isConfigsError) return renderError()
 
   return (
     <SafeAreaView className='flex-1 bg-white'>

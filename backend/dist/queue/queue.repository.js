@@ -54,20 +54,50 @@ class QueueRepository {
             }
         });
     }
-    countQueue() {
-        return __awaiter(this, void 0, void 0, function* () {
+    countQueue(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ Date, type_id }) {
             try {
                 const result = yield this.database('queue')
                     .count('* as count')
-                    .whereRaw('DATE(trans_date) = CURDATE()') // For MySQL
-                    // .whereRaw('DATE(trans_date) = DATE(\'now\')') // For SQLite
-                    // .whereRaw('trans_date::date = CURRENT_DATE') // For PostgreSQL
+                    .whereRaw(`${Date}`)
+                    .andWhere('type_id', type_id)
                     .first();
                 return parseInt(result === null || result === void 0 ? void 0 : result.count) || 0;
             }
             catch (error) {
-                console.error('Database error in countQueueForTodayAlt:', error);
+                console.error('Database error in countQueue:', error);
                 throw new CustomErrors_1.DatabaseErrors('Failed to count queue countQueue method at Repository Layer');
+            }
+        });
+    }
+    countQueueAllService() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield this.database('queue')
+                    .count('* as count')
+                    .where('trans_date', 'DATE(NOW())')
+                    .first();
+                return Number(result === null || result === void 0 ? void 0 : result.count) || 0;
+            }
+            catch (error) {
+                console.error('Database error in countQueueAllService:', error);
+                throw new CustomErrors_1.DatabaseErrors('Failed to countQueueAllService method at Repository Layer');
+            }
+        });
+    }
+    countByServiceCount(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ service_id }) {
+            try {
+                const result = yield this.database('queue')
+                    .count('* as count')
+                    .where('type_id', service_id)
+                    .andWhere('trans_date', 'DATE(NOW())')
+                    .first();
+                return Number(result === null || result === void 0 ? void 0 : result.count) || 0;
+            }
+            catch (error) {
+                console.error('Database error in countByServiceCount:', error);
+                throw new CustomErrors_1.DatabaseErrors('Failed to countQueueAllService method at Repository Layer');
             }
         });
     }

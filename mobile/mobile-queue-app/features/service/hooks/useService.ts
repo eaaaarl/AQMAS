@@ -1,5 +1,6 @@
 import { configApi } from "@/features/config/api/configApi";
 import { customerApi } from "@/features/customer/api/customerApi";
+import { queueApi } from "@/features/queue/api/queueApi";
 import { useAppDispatch } from "@/libs/redux/hooks";
 import { useState } from "react";
 import { serviceApi, useGetServicesQuery } from "../api/serviceApi";
@@ -23,6 +24,7 @@ export const useService = () => {
         dispatch(serviceApi.util.invalidateTags(["Services"])),
         dispatch(configApi.util.invalidateTags(["Configs"])),
         dispatch(customerApi.util.invalidateTags(["Customer"])),
+        dispatch(queueApi.util.invalidateTags(["Queue"])),
       ]);
     } finally {
       setRefreshing(false);

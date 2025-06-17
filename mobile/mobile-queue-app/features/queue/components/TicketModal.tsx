@@ -9,7 +9,7 @@ interface TicketModalProps {
     ticket?: string;
     confirmText?: string;
     customerName?: string;
-    autoCloseDelay?: number; // Auto-close after X seconds
+    autoCloseDelay?: number;
     showCountdown?: boolean;
 }
 
@@ -19,7 +19,7 @@ export default function TicketModal({
     ticket,
     confirmText = 'OK',
     customerName,
-    autoCloseDelay = 0, // 0 means no auto-close
+    autoCloseDelay = 0,
     showCountdown = false
 }: TicketModalProps) {
     const [countdown, setCountdown] = useState(autoCloseDelay);
@@ -52,7 +52,6 @@ export default function TicketModal({
                 ])
             ).start();
 
-            // Auto-close countdown
             if (autoCloseDelay > 0) {
                 setCountdown(autoCloseDelay);
                 const timer = setInterval(() => {
