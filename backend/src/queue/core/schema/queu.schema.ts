@@ -19,5 +19,16 @@ export const queueDetailsSchema = z.object({
   service_id: z.number().min(1, 'service_id is required'),
 });
 
+export const queueCountQuerySchema = z.object({
+  Date: z.string().optional(),
+  type_id: z.number().optional(),
+});
+
+export const queueByServiceCountSchema = z.object({
+  service_id: z.string().optional(),
+});
+
+export type queueByServiceCountDTO = z.infer<typeof queueByServiceCountSchema>;
+export type queueCountQueryDTO = z.infer<typeof queueCountQuerySchema>;
 export type queueDetailsDTO = z.infer<typeof queueDetailsSchema>;
 export type queueDTO = z.infer<typeof queueSchema>;

@@ -28,10 +28,22 @@ class QueueService {
             return yield this.queueRepository.createQueueDetails(validatedPayload);
         });
     }
-    countQueue() {
+    countQueue(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            const getQueueForToday = this.queueRepository.countQueue();
+            const queueCountQueryPayload = queu_schema_1.queueCountQuerySchema.parse(data);
+            const getQueueForToday = yield this.queueRepository.countQueue(queueCountQueryPayload);
             return getQueueForToday;
+        });
+    }
+    countQueueAllService() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.queueRepository.countQueueAllService();
+        });
+    }
+    countByServiceCount(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const queueByServiceCountPayload = queu_schema_1.queueByServiceCountSchema.parse(data);
+            return yield this.queueRepository.countByServiceCount(queueByServiceCountPayload);
         });
     }
 }

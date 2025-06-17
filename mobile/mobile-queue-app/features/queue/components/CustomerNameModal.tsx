@@ -2,6 +2,8 @@ import DismissKeyboard from '@/components/DismissKeyboard';
 import React from 'react';
 import { Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
+
+
 interface CustomerNameModalProps {
     isShowName: boolean;
     customerName: string;
@@ -15,7 +17,7 @@ export default function CustomerNameModal({
     customerName,
     onCustomerNameChange,
     onConfirm,
-    onCancel
+    onCancel,
 }: CustomerNameModalProps) {
     return (
         <Modal

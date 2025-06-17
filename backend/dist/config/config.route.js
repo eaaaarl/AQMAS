@@ -7,5 +7,5 @@ exports.configRoute = void 0;
 const express_1 = __importDefault(require("express"));
 const configuration_config_1 = require("./configuration.config");
 const router = express_1.default.Router();
-router.get('/configs', configuration_config_1.configController.getAllConfig);
+router.get('/config', configuration_config_1.configController.getAllConfig);
 exports.configRoute = router;

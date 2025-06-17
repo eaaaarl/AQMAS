@@ -24,10 +24,10 @@ export const startApp = () => {
   app.use(express.json());
 
   //Core Routes
-  app.use('/api/user', serviceRoutes);
-  app.use('/api/system', configRoute);
-  app.use('/api/queue', queueRoute);
-  app.use('/api/customer', customerRoute);
+  app.use(serviceRoutes);
+  app.use(configRoute);
+  app.use('/queue', queueRoute);
+  app.use('/customer',customerRoute);
 
   //Error Handler
   app.use(errorHandler);

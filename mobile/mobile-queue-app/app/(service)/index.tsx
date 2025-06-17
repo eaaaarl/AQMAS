@@ -7,10 +7,10 @@ import TicketModal from '@/features/queue/components/TicketModal';
 import { useQueue } from '@/features/queue/hooks/useQueue';
 import { PaginationControls } from '@/features/service/components/PaginationControl';
 import { ServiceItem } from '@/features/service/components/ServiceItem';
+import SurveyButton from '@/features/service/components/SurveyButton';
 import { useService } from '@/features/service/hooks/useService';
 import { renderError } from '@/features/service/utils/errorUtils';
 import { renderLoading, renderNoServices } from '@/features/service/utils/loadingUtils';
-import { useState } from 'react';
 import { Dimensions, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -25,6 +25,10 @@ export default function Transaction() {
     services,
     setShowMore,
     showMore,
+    currentPage,
+    paginatedServices,
+    totalPages,
+    setCurrentPage
   } = useService()
 
   const {
@@ -42,13 +46,11 @@ export default function Transaction() {
     customerType,
     handleSetCustomerType,
     handleCustomerTypeConfirm,
-
     handleCustomerNameConfirm,
     handleSetCustomerName,
     handleCancelName,
     customerName,
     showCustomerName,
-
     handleCloseConfirmationToast,
     openConfirmationToast,
     surveyMessage,
@@ -58,37 +60,19 @@ export default function Transaction() {
   } = useQueue()
 
   const { data: customerTypeData } = useGetCustomerTypeQuery({ is_show: '1' })
-  const [currentPage, setCurrentPage] = useState(0);
+  const { enabledSurvey } = useConfig()
 
   const { width, height } = Dimensions.get('window');
   const isLandscape = width > height;
   const cardWidth = isLandscape ? (width - 60) / 3 : (width - 40) / 2;
 
-  const SERVICES_PER_PAGE = 4;
-  const totalPages = Math.ceil(services.length / SERVICES_PER_PAGE);
 
-  const paginatedServices = services.slice(
-    currentPage * SERVICES_PER_PAGE,
-    (currentPage + 1) * SERVICES_PER_PAGE
-  );
 
-  if (isLoading || isConfigsLoading) {
-    return (
-      renderLoading()
-    );
-  }
 
-  if (services.length === 0) {
-    return (
-      renderNoServices()
-    );
-  }
+  if (isLoading || isConfigsLoading) return renderLoading()
+  if (services.length === 0) return renderNoServices()
+  if (isError || isConfigsError) return renderError()
 
-  if (isError || isConfigsError) {
-    return (
-      renderError()
-    );
-  }
 
   return (
     <SafeAreaView className='flex-1 bg-white'>
@@ -204,12 +188,9 @@ export default function Transaction() {
         <Text className='text-center'>{selectedTransactions.map((st) => st.service_name).join(' | ')}</Text>
       </ScrollView>
 
-      <TouchableOpacity
-        className="absolute bottom-5 left-5 bg-blue-500 p-4 rounded-full shadow-lg"
-        onPress={() => { }}
-      >
-        <Text className="text-white font-bold">Survey</Text>
-      </TouchableOpacity>
+
+      {/* Survey Button */}
+      {enabledSurvey && <SurveyButton />}
 
       <CustomerNameModal
         isShowName={showCustomerName}

@@ -1,6 +1,6 @@
 import { useConfig } from "@/features/config/hooks/useConfig";
-import { useGetCustomerTypeQuery } from "@/features/customer/api/customerApi";
 import { CustomerTypeResponse } from "@/features/customer/api/interface";
+import { useCustomer } from "@/features/customer/hooks/useCustomer";
 import { Service } from "@/features/service/api/interface";
 import { useAppDispatch } from "@/libs/redux/hooks";
 import { useState } from "react";
@@ -25,15 +25,16 @@ export const useQueue = () => {
     showAskCustomerName,
     enabledSequenceByService,
     surveyMessage,
-    enabledTicket,
   } = useConfig();
 
   const [customerType, setCustomerType] = useState<CustomerTypeResponse | null>(
     null
   );
+
   const [selectedTransactions, setSelectedTransactions] = useState<Service[]>(
     []
   );
+
   const [showCustomerType, setShowCustomerType] = useState<boolean>(false);
   const [showCustomerName, setShowCustomerName] = useState<boolean>(false);
   const [customerName, setCustomerName] = useState("");
@@ -55,9 +56,8 @@ export const useQueue = () => {
         : "",
   });
   const { data: allServiceCount } = useAllServiceCountQuery();
-  const { data: customerTypeDefault } = useGetCustomerTypeQuery({
-    is_show: "1",
-  });
+
+  const { customerTypeDefault } = useCustomer();
 
   const singleServiceId =
     selectedTransactions.length === 1
@@ -173,10 +173,6 @@ export const useQueue = () => {
     setShowCustomerName(false);
   };
 
-  const customerTypeDef = customerTypeDefault?.find(
-    (ctd) => ctd.default.data?.[0]
-  );
-
   const callCreateQueue = async () => {
     try {
       let ByServiceCount;
@@ -243,7 +239,7 @@ export const useQueue = () => {
       const mainQueuePayload: createQueuePayload = {
         customerName: customerName,
         transId: ticket as string,
-        typeId: customerType?.type_id ?? Number(customerTypeDef?.type_id),
+        typeId: customerType?.type_id ?? Number(customerTypeDefault?.type_id),
         singleTransOnly: selectedTransactions.length === 1 ? 1 : 0,
         transStatus: 0,
       };
@@ -254,9 +250,6 @@ export const useQueue = () => {
           service_id: service.service_id,
         }));
 
-      console.log("Queue DATA", mainQueuePayload);
-      console.log("Queue Detail DATA", queueDetailsPayload);
-
       await Promise.all([
         createQueue(mainQueuePayload).unwrap(),
         createQueueDetails(queueDetailsPayload).unwrap(),
@@ -265,7 +258,7 @@ export const useQueue = () => {
       dispatch(queueApi.util.invalidateTags(["Queue"]));
 
       setCurrentTicket(ticket as string);
-      const shouldShowTicket = enabledTicket && ticket;
+      const shouldShowTicket = ticket;
       const shouldShowToast = surveyMessage !== "";
 
       if (shouldShowTicket && shouldShowToast) {

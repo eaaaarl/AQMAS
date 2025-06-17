@@ -10,4 +10,6 @@ const router = express_1.default.Router();
 router.post('/', queue_config_1.queueController.createQueue);
 router.post('/detail', queue_config_1.queueController.createQueueDetail);
 router.get('/count', queue_config_1.queueController.countQueue);
+router.get('/allservicecount', queue_config_1.queueController.countQueueAllService);
+router.get('/byservicecount/:service_id', queue_config_1.queueController.countByServiceCount);
 exports.queueRoute = router;

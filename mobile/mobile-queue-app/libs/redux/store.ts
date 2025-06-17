@@ -16,7 +16,7 @@ const persistConfig = {
   key: "root",
   version: 1,
   storage: AsyncStorage,
-  blacklist: ["queue", ...apisReducersPath],
+  blacklist: ["survey", "customerSurvey", ...apisReducersPath],
 };
 
 AsyncStorage.getAllKeys().then(console.log).catch(console.error);

@@ -1,5 +1,14 @@
 import { QueueRepository } from '../../queue.repository';
-import { queueDetailsDTO, queueDetailsSchema, queueDTO, queueSchema } from '../schema/queu.schema';
+import {
+  queueByServiceCountDTO,
+  queueByServiceCountSchema,
+  queueCountQueryDTO,
+  queueCountQuerySchema,
+  queueDetailsDTO,
+  queueDetailsSchema,
+  queueDTO,
+  queueSchema,
+} from '../schema/queu.schema';
 
 export class QueueService {
   constructor(private readonly queueRepository: QueueRepository) {}
@@ -15,8 +24,18 @@ export class QueueService {
     return await this.queueRepository.createQueueDetails(validatedPayload);
   }
 
-  async countQueue() {
-    const getQueueForToday = this.queueRepository.countQueue();
+  async countQueue(data: queueCountQueryDTO) {
+    const queueCountQueryPayload = queueCountQuerySchema.parse(data);
+    const getQueueForToday = await this.queueRepository.countQueue(queueCountQueryPayload);
     return getQueueForToday;
+  }
+
+  async countQueueAllService() {
+    return await this.queueRepository.countQueueAllService();
+  }
+
+  async countByServiceCount(data: queueByServiceCountDTO) {
+    const queueByServiceCountPayload = queueByServiceCountSchema.parse(data);
+    return await this.queueRepository.countByServiceCount(queueByServiceCountPayload);
   }
 }
