@@ -1,44 +1,45 @@
-import React from 'react'
-import { Text, TouchableOpacity, View } from 'react-native'
-import { useSurvey } from '../hooks/useSurvey'
+import React from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
+import { useSurvey } from '../hooks/useSurvey';
 
 
 export default function SurveyFooter() {
-    const { handleSubmit, currentQuestion, handlePrevious, handleNext, isLastQuestion, canGoNext } = useSurvey()
+    const { currentQuestionIndex, handlePrevious, canProceed, isLastQuestion, handleSubmit, handleNext } = useSurvey()
     return (
-        <View className="flex-row justify-between items-center px-8 pb-8">
-            <TouchableOpacity
-                className={`py-4 px-8 rounded-xl ${currentQuestion === 0 ? 'bg-gray-200' : 'bg-gray-600'
-                    }`}
-                onPress={handlePrevious}
-                disabled={currentQuestion === 0}
-            >
-                <Text className={`font-bold text-lg ${currentQuestion === 0 ? 'text-gray-400' : 'text-white'
-                    }`}>
-                    Previous
-                </Text>
-            </TouchableOpacity>
-
-            {isLastQuestion ? (
+        <View className="p-6">
+            <View className="flex-row justify-between gap-4">
                 <TouchableOpacity
-                    className="py-4 px-8 rounded-xl bg-green-600"
-                    onPress={handleSubmit}
-                >
-                    <Text className="text-white font-bold text-lg">Submit</Text>
-                </TouchableOpacity>
-            ) : (
-                <TouchableOpacity
-                    className={`py-4 px-8 rounded-xl ${canGoNext() ? 'bg-blue-600' : 'bg-gray-300'
+                    className={`flex-1 py-4 px-6 rounded-xl ${currentQuestionIndex > 0
+                        ? 'bg-gray-200'
+                        : 'bg-gray-100 opacity-50'
                         }`}
-                    onPress={handleNext}
-                    disabled={!canGoNext()}
+                    onPress={handlePrevious}
+                    disabled={currentQuestionIndex === 0}
                 >
-                    <Text className={`font-bold text-lg ${canGoNext() ? 'text-white' : 'text-gray-500'
+                    <Text className={`text-center font-semibold ${currentQuestionIndex > 0
+                        ? 'text-gray-700'
+                        : 'text-gray-400'
                         }`}>
-                        Next
+                        Previous
                     </Text>
                 </TouchableOpacity>
-            )}
+
+                <TouchableOpacity
+                    className={`flex-1 py-4 px-6 rounded-xl ${canProceed
+                        ? 'bg-blue-500'
+                        : 'bg-gray-300'
+                        }`}
+                    onPress={isLastQuestion ? handleSubmit : handleNext}
+                    disabled={!canProceed}
+                >
+                    <Text className={`text-center font-semibold ${canProceed
+                        ? 'text-white'
+                        : 'text-gray-500'
+                        }`}>
+                        {isLastQuestion ? 'Submit' : 'Next'}
+                    </Text>
+                </TouchableOpacity>
+            </View>
         </View>
-    )
+    );
 }

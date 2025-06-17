@@ -15,6 +15,7 @@ export const useService = () => {
 
   const [showMore, setShowMore] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
 
   const services = response?.results || [];
   const onRefresh = async () => {
@@ -35,7 +36,12 @@ export const useService = () => {
   const additionalServices = services.filter(
     (service) => service.header_id === 1
   );
-
+  const SERVICES_PER_PAGE = 4;
+  const totalPages = Math.ceil(services.length / SERVICES_PER_PAGE);
+  const paginatedServices = services.slice(
+    currentPage * SERVICES_PER_PAGE,
+    (currentPage + 1) * SERVICES_PER_PAGE
+  );
   return {
     isLoading: isServicesLoading,
     isError: isServicesError,
@@ -46,5 +52,9 @@ export const useService = () => {
     mainServices,
     additionalServices,
     setShowMore,
+    totalPages,
+    paginatedServices,
+    currentPage,
+    setCurrentPage,
   };
 };

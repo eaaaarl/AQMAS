@@ -25,7 +25,6 @@ export const useQueue = () => {
     showAskCustomerName,
     enabledSequenceByService,
     surveyMessage,
-    enabledTicket,
   } = useConfig();
 
   const [customerType, setCustomerType] = useState<CustomerTypeResponse | null>(
@@ -259,7 +258,7 @@ export const useQueue = () => {
       dispatch(queueApi.util.invalidateTags(["Queue"]));
 
       setCurrentTicket(ticket as string);
-      const shouldShowTicket = enabledTicket && ticket;
+      const shouldShowTicket = ticket;
       const shouldShowToast = surveyMessage !== "";
 
       if (shouldShowTicket && shouldShowToast) {
