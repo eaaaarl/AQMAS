@@ -7,6 +7,7 @@ import TicketModal from '@/features/queue/components/TicketModal';
 import { useQueue } from '@/features/queue/hooks/useQueue';
 import { PaginationControls } from '@/features/service/components/PaginationControl';
 import { ServiceItem } from '@/features/service/components/ServiceItem';
+import SurveyButton from '@/features/service/components/SurveyButton';
 import { useService } from '@/features/service/hooks/useService';
 import { renderError } from '@/features/service/utils/errorUtils';
 import { renderLoading, renderNoServices } from '@/features/service/utils/loadingUtils';
@@ -188,12 +189,7 @@ export default function Transaction() {
         <Text className='text-center'>{selectedTransactions.map((st) => st.service_name).join(' | ')}</Text>
       </ScrollView>
 
-      <TouchableOpacity
-        className="absolute bottom-5 left-5 bg-blue-500 p-4 rounded-full shadow-lg"
-        onPress={() => { }}
-      >
-        <Text className="text-white font-bold">Survey</Text>
-      </TouchableOpacity>
+      <SurveyButton />
 
       <CustomerNameModal
         isShowName={showCustomerName}
