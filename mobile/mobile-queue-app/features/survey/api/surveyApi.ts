@@ -1,10 +1,12 @@
 import { RootState } from "@/libs/redux/store";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import {
-    SurveyQuestionDetailsResponse,
-    SurveyQuestions,
-    SurveyResponse,
-} from "./interface";
+  SurveyAnswerPayload,
+  SurveyAnswerPayloadResponse,
+  SurveyResponse,
+} from "../interface/survey.interface";
+import { SurveyQuestions } from "../interface/surveyQuestion.interface";
+import { SurveyQuestionDetailsResponse } from "../interface/surveyQuestionDetail.interface";
 
 export const surveyApi = createApi({
   reducerPath: "surveyApi",
@@ -64,6 +66,17 @@ export const surveyApi = createApi({
       }),
       providesTags: ["Survey"],
     }),
+
+    createSurveyAnswer: builder.mutation<
+      SurveyAnswerPayloadResponse,
+      SurveyAnswerPayload
+    >({
+      query: (data) => ({
+        url: `/survey/answer-info`,
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -71,4 +84,5 @@ export const {
   useGetSurveyResultQuery,
   useGetSurveyQuestionQuery,
   useGetSurveyQuestionsDetailsQuery,
+  useCreateSurveyAnswerMutation,
 } = surveyApi;

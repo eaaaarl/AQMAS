@@ -56,10 +56,12 @@ export default function Transaction() {
     surveyMessage,
     openTicketModal,
     handleCloseTicketModal,
-    currentTicket
+    currentTicket,
+    customerNameError
   } = useQueue()
 
   const { data: customerTypeData } = useGetCustomerTypeQuery({ is_show: '1' })
+
   const { enabledSurvey } = useConfig()
 
   const { width, height } = Dimensions.get('window');
@@ -189,7 +191,6 @@ export default function Transaction() {
       </ScrollView>
 
 
-      {/* Survey Button */}
       {enabledSurvey && <SurveyButton />}
 
       <CustomerNameModal
@@ -198,6 +199,7 @@ export default function Transaction() {
         onCustomerNameChange={handleSetCustomerName}
         onCancel={handleCancelName}
         onConfirm={handleCustomerNameConfirm}
+        errMsg={customerNameError || ''}
       />
 
       <CustomerTypeModal

@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CustomerRepository = void 0;
-// customer.repository.ts
 const database_1 = require("../infrastructure/database/database");
 const CustomErrors_1 = require("../libs/CustomErrors");
 class CustomerRepository {
