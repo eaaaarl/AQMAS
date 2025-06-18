@@ -106,6 +106,7 @@ export const useQueue = () => {
   const handleCancelName = () => {
     setShowCustomerName(false);
     setCustomerName("");
+    setCustomerNameError("");
   };
 
   const handleCustomerNameConfirm = async () => {

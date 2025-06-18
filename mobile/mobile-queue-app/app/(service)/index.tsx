@@ -199,7 +199,7 @@ export default function Transaction() {
         onCustomerNameChange={handleSetCustomerName}
         onCancel={handleCancelName}
         onConfirm={handleCustomerNameConfirm}
-        errMsg={customerNameError}
+        errMsg={customerNameError || ''}
       />
 
       <CustomerTypeModal
