@@ -1,6 +1,6 @@
 import { useConfig } from "@/features/config/hooks/useConfig";
+import { useGetCustomerTypeQuery } from "@/features/customer/api/customerApi";
 import { CustomerTypeResponse } from "@/features/customer/api/interface";
-import { useCustomer } from "@/features/customer/hooks/useCustomer";
 import { Service } from "@/features/service/api/interface";
 import { useAppDispatch } from "@/libs/redux/hooks";
 import { useState } from "react";
@@ -10,11 +10,11 @@ import {
 } from "../api/interface";
 import {
   queueApi,
-  useAllServiceCountQuery,
-  useByServiceCountQuery,
-  useCountQueueQuery,
   useCreateQueueDetailsMutation,
   useCreateQueueMutation,
+  useLazyAllServiceCountQuery,
+  useLazyByServiceCountQuery,
+  useLazyCountQueueQuery,
 } from "../api/queueApi";
 
 export const useQueue = () => {
@@ -48,26 +48,23 @@ export const useQueue = () => {
   const [createQueueDetails, { isLoading: isLoadingDetails }] =
     useCreateQueueDetailsMutation();
 
-  const { data: countQueue } = useCountQueueQuery({
-    customer_type: customerType?.type_id || 0,
-    own_sequence:
-      customerType?.own_sequence.data?.[0] === 1
-        ? customerType.own_sequence.data?.[0]
-        : "",
+  const { data: customerTypeData } = useGetCustomerTypeQuery({
+    is_show: "1",
   });
-  const { data: allServiceCount } = useAllServiceCountQuery();
 
-  const { customerTypeDefault } = useCustomer();
+  const customerTypeDefaultData = customerTypeData?.find(
+    (ctd) => ctd.default.data?.[0] === 1
+  );
+
+  const [triggerCountQueue] = useLazyCountQueueQuery();
 
   const singleServiceId =
     selectedTransactions.length === 1
       ? selectedTransactions[0]?.service_id
       : undefined;
 
-  const { data: byServiceCount } = useByServiceCountQuery(
-    singleServiceId as number,
-    { skip: !singleServiceId }
-  );
+  const [triggerByServiceCount] = useLazyByServiceCountQuery();
+  const [triggerCountAllService] = useLazyAllServiceCountQuery();
 
   const toggleTransactions = (service: Service) => {
     setSelectedTransactions((prevTransactions) => {
@@ -182,52 +179,75 @@ export const useQueue = () => {
 
       const singleTransactions = selectedTransactions.length === 1;
 
-      if (customerType?.own_sequence.data?.[0] === 1) {
-        CountSequence = countQueue?.find((cq) => cq)?.count || 0;
+      if (Number(customerTypeDefaultData?.own_sequence?.data?.[0]) === 1) {
+        const { data: freshCountQueue } = await triggerCountQueue({
+          customer_type:
+            customerTypeDefaultData?.type_id ?? customerType?.type_id,
+        });
+        CountSequence = freshCountQueue?.[0]?.count || 0;
         const newCountSequence = Number(CountSequence) + 1;
+
         if (singleTransactions) {
           ticket = `${
-            selectedTransactions?.[0].service_format
-          }${newCountSequence}${customerType?.suffix ?? ""}`;
+            selectedTransactions?.[0]?.service_format
+          }${newCountSequence}${
+            customerTypeDefaultData?.suffix ?? customerType?.suffix
+          }`;
           console.log("Customer Type have sequence 1 transactions:", ticket);
         } else {
-          ticket = `${newCountSequence}${customerType.suffix ?? ""}`;
+          ticket = `${newCountSequence}${
+            customerTypeDefaultData?.suffix ?? customerType?.suffix
+          }`;
           console.log("Customer Type have sequence more transactions:", ticket);
         }
       } else {
         if (!enabledSequenceByService) {
-          CountAllService = allServiceCount?.find((asc) => asc)?.count || 0;
+          const { data: freshAllServiceCount } = await triggerCountAllService();
+          CountAllService = freshAllServiceCount?.[0]?.count || 0;
           const newCountAllService = Number(CountAllService) + 1;
           if (singleTransactions) {
             ticket = `${
-              selectedTransactions?.[0].service_format
-            }${newCountAllService}${customerType?.suffix ?? ""}`;
+              selectedTransactions?.[0]?.service_format
+            }${newCountAllService}${
+              customerType?.suffix ?? customerTypeDefaultData?.suffix
+            }`;
             console.log(
               "if not enabled sequence by service single transactions:",
               ticket
             );
           } else {
-            ticket = `${newCountAllService}${customerType?.suffix ?? ""}`;
+            ticket = `${newCountAllService}${
+              customerType?.suffix ?? customerTypeDefaultData?.suffix
+            }`;
             console.log(
               "if not enabled sequence by service more transactions:",
               ticket
             );
           }
         } else {
-          ByServiceCount = byServiceCount?.find((bsc) => bsc)?.count || 0;
+          const { data: freshByServiceCount } = await triggerByServiceCount(
+            singleServiceId as number
+          );
+          ByServiceCount = freshByServiceCount?.[0]?.count || 0;
           const newByServiceCount = Number(ByServiceCount) + 1;
           if (singleTransactions) {
             ticket = `${
-              selectedTransactions?.[0].service_format
-            }${newByServiceCount}${customerType?.suffix ?? ""}`;
+              selectedTransactions?.[0]?.service_format
+            }${newByServiceCount}${
+              customerType?.suffix ?? customerTypeDefaultData?.suffix
+            }`;
             console.log(
               "if enabled sequence by service single transactions:",
               ticket
             );
           } else {
-            CountAllService = allServiceCount?.find((asc) => asc)?.count || 0;
+            const { data: freshAllServiceCount } =
+              await triggerCountAllService();
+            CountAllService = freshAllServiceCount?.[0]?.count || 0;
             const newCountAllService = Number(CountAllService) + 1;
-            ticket = `${newCountAllService}${customerType?.suffix ?? ""}`;
+            ticket = `${newCountAllService}${
+              customerType?.suffix ?? customerTypeDefaultData?.suffix
+            }`;
             console.log(
               "if enabled sequence by service more transactions:",
               ticket
@@ -239,16 +259,18 @@ export const useQueue = () => {
       const mainQueuePayload: createQueuePayload = {
         customerName: customerName,
         transId: ticket as string,
-        typeId: customerType?.type_id ?? Number(customerTypeDefault?.type_id),
+        typeId:
+          customerType?.type_id ?? Number(customerTypeDefaultData?.type_id),
         singleTransOnly: selectedTransactions.length === 1 ? 1 : 0,
         transStatus: 0,
       };
-
+      console.log(mainQueuePayload);
       const queueDetailsPayload: createQueueDetailsPayload[] =
         selectedTransactions.map((service) => ({
           trans_id: ticket as string,
-          service_id: service.service_id,
+          service_id: service?.service_id,
         }));
+      console.log(queueDetailsPayload);
 
       await Promise.all([
         createQueue(mainQueuePayload).unwrap(),

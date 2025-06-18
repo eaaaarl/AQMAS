@@ -60,11 +60,15 @@ export default function Transaction() {
   } = useQueue()
 
   const { data: customerTypeData } = useGetCustomerTypeQuery({ is_show: '1' })
+
   const { enabledSurvey } = useConfig()
 
   const { width, height } = Dimensions.get('window');
   const isLandscape = width > height;
   const cardWidth = isLandscape ? (width - 60) / 3 : (width - 40) / 2;
+
+
+
 
   if (isLoading || isConfigsLoading) return renderLoading()
   if (services.length === 0) return renderNoServices()

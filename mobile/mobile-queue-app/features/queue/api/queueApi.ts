@@ -58,19 +58,10 @@ export const queueApi = createApi({
     }),
 
     countQueue: builder.query<{ count: string }[], QueueQueryParams>({
-      query: ({ customer_type, own_sequence }) => {
-        if (own_sequence === 1) {
-          return {
-            url: `/queue/count?DATE(queue.trans_date)=DATE(NOW())&type_id=${customer_type}`,
-            method: "GET",
-          };
-        }
-
-        return {
-          url: "/queue/count",
-          method: "GET",
-        };
-      },
+      query: ({ customer_type }) => ({
+        url: `/queue/count?DATE(queue.trans_date)=DATE(NOW())&type_id=${customer_type}`,
+        method: "GET",
+      }),
       providesTags: ["Queue"],
     }),
 
@@ -96,6 +87,9 @@ export const {
   useCreateQueueMutation,
   useCreateQueueDetailsMutation,
   useCountQueueQuery,
+  useLazyCountQueueQuery,
   useAllServiceCountQuery,
+  useLazyAllServiceCountQuery,
   useByServiceCountQuery,
+  useLazyByServiceCountQuery,
 } = queueApi;

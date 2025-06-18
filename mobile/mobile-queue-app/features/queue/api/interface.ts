@@ -34,7 +34,6 @@ export interface Queue {
 
 export interface QueueQueryParams {
   customer_type?: number;
-  own_sequence?: number | "";
 }
 
 export interface QueueApiResponse {
