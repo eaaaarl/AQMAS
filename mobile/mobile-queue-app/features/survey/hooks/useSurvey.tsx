@@ -3,7 +3,6 @@ import { nextQuestion, previousQuestion, resetSurvey, setAnswer } from "@/libs/r
 import { useMemo } from "react";
 import { Alert } from "react-native";
 import { useGetSurveyQuestionQuery, useGetSurveyQuestionsDetailsQuery, useGetSurveyResultQuery } from "../api/surveyApi";
-import { useCustomerForm } from "./useCustomerForm";
 
 export const useSurvey = () => {
     const dispatch = useAppDispatch();
@@ -28,7 +27,6 @@ export const useSurvey = () => {
     const surveyQuestionDetails = surveyQuestionDetail?.results || [];
     const currentQuestion = surveyQuestions[currentQuestionIndex];
     const isLastQuestion = currentQuestionIndex === surveyQuestions.length - 1;
-    const { handleOpen } = useCustomerForm();
 
     const canProceed = useMemo(() => {
         if (!currentQuestion) return false;
@@ -74,11 +72,8 @@ export const useSurvey = () => {
 
     const handleSubmit = async (customerData: any) => {
         if (!validateSurvey()) return;
-
         try {
             console.log('Submitting survey with:', { answers, customerData });
-
-            handleOpen();
         } catch {
             Alert.alert('Submission failed', 'Please try again');
         }

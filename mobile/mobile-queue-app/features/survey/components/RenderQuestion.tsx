@@ -1,10 +1,23 @@
 import React from 'react';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useSurvey } from '../hooks/useSurvey';
+import { SurveyQuestion, SurveyResult } from '../api/interface';
 
 
-export default function RenderQuestion() {
-    const { currentQuestion, answers, handleAnswer, surveyQuestionDetails } = useSurvey()
+interface RenderQuestionProps {
+    currentQuestion: SurveyQuestion | undefined;
+    answers: Record<number, string | null>;
+    handleAnswer: (answer: string) => void;
+    surveyQuestionDetails: SurveyResult[]
+}
+
+export default function RenderQuestion(props: RenderQuestionProps) {
+    const {
+        answers,
+        currentQuestion,
+        handleAnswer,
+        surveyQuestionDetails
+    } = props;
+
     if (!currentQuestion) {
         return null;
     }

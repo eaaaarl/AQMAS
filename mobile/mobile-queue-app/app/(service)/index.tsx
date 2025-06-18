@@ -66,9 +66,6 @@ export default function Transaction() {
   const isLandscape = width > height;
   const cardWidth = isLandscape ? (width - 60) / 3 : (width - 40) / 2;
 
-
-
-
   if (isLoading || isConfigsLoading) return renderLoading()
   if (services.length === 0) return renderNoServices()
   if (isError || isConfigsError) return renderError()
@@ -189,7 +186,6 @@ export default function Transaction() {
       </ScrollView>
 
 
-      {/* Survey Button */}
       {enabledSurvey && <SurveyButton />}
 
       <CustomerNameModal

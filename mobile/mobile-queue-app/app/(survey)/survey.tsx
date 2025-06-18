@@ -11,6 +11,7 @@ import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SurveyScreen() {
+
     const {
         openCustomerFormModal,
         formData,
@@ -18,7 +19,20 @@ export default function SurveyScreen() {
         handleClose,
     } = useCustomerForm();
 
-    const { handleSubmit, handleResetSurvey } = useSurvey();
+    const {
+        handleSubmit,
+        handleResetSurvey,
+        currentQuestion,
+        answers,
+        handleAnswer,
+        surveyQuestionDetails,
+        canProceed,
+        currentQuestionIndex,
+        isLastQuestion,
+        handleNext,
+        handlePrevious,
+        surveyQuestions
+    } = useSurvey();
 
     const handleFormConfirm = async () => {
         const customerData = formData;
@@ -28,13 +42,35 @@ export default function SurveyScreen() {
         router.push('/(service)')
     };
 
+    const handleConfirmBack = () => {
+        router.push('/(service)')
+        handleResetSurvey()
+    }
+
     return (
         <DismissKeyboard>
             <SafeAreaView className="flex-1 bg-gray-50">
-                <BackButton />
-                <SurveyHeader />
-                <RenderQuestion />
-                <SurveyFooter />
+                <BackButton
+                    onPress={handleConfirmBack}
+                />
+                <SurveyHeader
+                    currentQuestionIndex={currentQuestionIndex}
+                    surveyQuestions={surveyQuestions}
+                />
+                <RenderQuestion
+                    answers={answers}
+                    currentQuestion={currentQuestion}
+                    handleAnswer={handleAnswer}
+                    surveyQuestionDetails={surveyQuestionDetails}
+                />
+                <SurveyFooter
+                    canProceed={canProceed}
+                    currentQuestionIndex={currentQuestionIndex}
+                    isLastQuestion={isLastQuestion}
+                    onNext={handleNext}
+                    onPrev={handlePrevious}
+                    onSubmit={handleFormConfirm}
+                />
                 <CustomerFormModal
                     isOpen={openCustomerFormModal}
                     onCancel={handleClose}
@@ -42,6 +78,7 @@ export default function SurveyScreen() {
                     formData={formData}
                     onFormChange={onChangeInput}
                 />
+
             </SafeAreaView>
         </DismissKeyboard>
     );

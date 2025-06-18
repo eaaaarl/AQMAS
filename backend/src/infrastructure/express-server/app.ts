@@ -27,7 +27,7 @@ export const startApp = () => {
   app.use(serviceRoutes);
   app.use(configRoute);
   app.use('/queue', queueRoute);
-  app.use('/customer',customerRoute);
+  app.use('/customer', customerRoute);
 
   //Error Handler
   app.use(errorHandler);

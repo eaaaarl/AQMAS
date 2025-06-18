@@ -1,10 +1,25 @@
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { useSurvey } from '../hooks/useSurvey';
 
+interface SurveyFooterProps {
+    onPrev: () => void;
+    onNext: () => void;
+    onSubmit: () => void;
+    currentQuestionIndex: number;
+    canProceed: boolean;
+    isLastQuestion: boolean;
+}
 
-export default function SurveyFooter() {
-    const { currentQuestionIndex, handlePrevious, canProceed, isLastQuestion, handleSubmit, handleNext } = useSurvey()
+export default function SurveyFooter(props: SurveyFooterProps) {
+    const {
+        onPrev,
+        onNext,
+        onSubmit,
+        currentQuestionIndex,
+        canProceed,
+        isLastQuestion
+    } = props;
+
     return (
         <View className="p-6">
             <View className="flex-row justify-between gap-4">
@@ -13,7 +28,7 @@ export default function SurveyFooter() {
                         ? 'bg-gray-200'
                         : 'bg-gray-100 opacity-50'
                         }`}
-                    onPress={handlePrevious}
+                    onPress={onPrev}
                     disabled={currentQuestionIndex === 0}
                 >
                     <Text className={`text-center font-semibold ${currentQuestionIndex > 0
@@ -29,7 +44,7 @@ export default function SurveyFooter() {
                         ? 'bg-blue-500'
                         : 'bg-gray-300'
                         }`}
-                    onPress={isLastQuestion ? handleSubmit : handleNext}
+                    onPress={isLastQuestion ? onSubmit : onNext}
                     disabled={!canProceed}
                 >
                     <Text className={`text-center font-semibold ${canProceed

@@ -6,7 +6,6 @@ export default function SurveyButton() {
     const handlePress = () => {
         router.push('/(survey)/survey');
     };
-
     return (
         <TouchableOpacity
             className="absolute bottom-5 left-5  p-4 rounded-full shadow-lg"
