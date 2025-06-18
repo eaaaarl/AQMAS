@@ -39,6 +39,17 @@ export const queueApi = createApi({
     return baseQuery(adjustedArgs, api, extraOptions);
   },
   endpoints: (builder) => ({
+    getCustomerNameCount: builder.query<
+      { count: number },
+      { customerName: string }
+    >({
+      query: ({ customerName }) => ({
+        url: `/queue/customer-name-count/${customerName}`,
+        method: "GET",
+      }),
+      providesTags: ["Queue"],
+    }),
+
     createQueue: builder.mutation<QueueApiResponse, createQueuePayload>({
       query: (data) => ({
         url: "/queue",
@@ -92,4 +103,6 @@ export const {
   useLazyAllServiceCountQuery,
   useByServiceCountQuery,
   useLazyByServiceCountQuery,
+  useGetCustomerNameCountQuery,
+  useLazyGetCustomerNameCountQuery,
 } = queueApi;

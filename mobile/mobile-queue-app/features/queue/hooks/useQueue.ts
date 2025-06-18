@@ -4,6 +4,7 @@ import { CustomerTypeResponse } from "@/features/customer/api/interface";
 import { Service } from "@/features/service/api/interface";
 import { useAppDispatch } from "@/libs/redux/hooks";
 import { useState } from "react";
+import Toast from "react-native-toast-message";
 import {
   createQueueDetailsPayload,
   createQueuePayload,
@@ -12,29 +13,19 @@ import {
   queueApi,
   useCreateQueueDetailsMutation,
   useCreateQueueMutation,
+  useGetCustomerNameCountQuery,
   useLazyAllServiceCountQuery,
   useLazyByServiceCountQuery,
   useLazyCountQueueQuery,
 } from "../api/queueApi";
 
 export const useQueue = () => {
-  const dispatch = useAppDispatch();
-
-  const {
-    showAskCustomerType,
-    showAskCustomerName,
-    enabledSequenceByService,
-    surveyMessage,
-  } = useConfig();
-
   const [customerType, setCustomerType] = useState<CustomerTypeResponse | null>(
     null
   );
-
   const [selectedTransactions, setSelectedTransactions] = useState<Service[]>(
     []
   );
-
   const [showCustomerType, setShowCustomerType] = useState<boolean>(false);
   const [showCustomerName, setShowCustomerName] = useState<boolean>(false);
   const [customerName, setCustomerName] = useState("");
@@ -43,7 +34,17 @@ export const useQueue = () => {
   const [currentTicket, setCurrentTicket] = useState<string>("");
   const [shouldShowToastAfterModal, setShouldShowToastAfterModal] =
     useState(false);
+  const [customerNameError, setCustomerNameError] = useState<string | null>(
+    null
+  );
 
+  const dispatch = useAppDispatch();
+  const {
+    showAskCustomerType,
+    showAskCustomerName,
+    enabledSequenceByService,
+    surveyMessage,
+  } = useConfig();
   const [createQueue, { isLoading: isLoadingQueue }] = useCreateQueueMutation();
   const [createQueueDetails, { isLoading: isLoadingDetails }] =
     useCreateQueueDetailsMutation();
@@ -65,6 +66,11 @@ export const useQueue = () => {
 
   const [triggerByServiceCount] = useLazyByServiceCountQuery();
   const [triggerCountAllService] = useLazyAllServiceCountQuery();
+
+  const { data: customerNameCount } = useGetCustomerNameCountQuery(
+    { customerName: customerName },
+    { skip: !customerName.trim() }
+  );
 
   const toggleTransactions = (service: Service) => {
     setSelectedTransactions((prevTransactions) => {
@@ -104,13 +110,18 @@ export const useQueue = () => {
 
   const handleCustomerNameConfirm = async () => {
     if (!customerName.trim()) {
+      setCustomerNameError("Customer name is required");
       return;
     }
-    setShowCustomerName(false);
 
-    setTimeout(async () => {
-      await callCreateQueue();
-    }, 100);
+    if ((customerNameCount?.count ?? 0) > 0) {
+      setCustomerNameError("This name is already in use. Please try another.");
+      return;
+    }
+
+    setCustomerNameError(null);
+    setShowCustomerName(false);
+    setTimeout(() => callCreateQueue(), 100);
   };
 
   const handleCancelType = () => {
@@ -172,6 +183,21 @@ export const useQueue = () => {
 
   const callCreateQueue = async () => {
     try {
+      if (
+        showAskCustomerName &&
+        customerName.trim() &&
+        (customerNameCount?.count ?? 0) > 0
+      ) {
+        Toast.show({
+          type: "error",
+          text1: "Customer Name Exists",
+          text2:
+            "This customer name is already in use. Please use a different name.",
+          visibilityTime: 3000,
+        });
+        return;
+      }
+
       let ByServiceCount;
       let CountAllService;
       let CountSequence;
@@ -264,13 +290,12 @@ export const useQueue = () => {
         singleTransOnly: selectedTransactions.length === 1 ? 1 : 0,
         transStatus: 0,
       };
-      console.log(mainQueuePayload);
+
       const queueDetailsPayload: createQueueDetailsPayload[] =
         selectedTransactions.map((service) => ({
           trans_id: ticket as string,
           service_id: service?.service_id,
         }));
-      console.log(queueDetailsPayload);
 
       await Promise.all([
         createQueue(mainQueuePayload).unwrap(),
@@ -302,6 +327,7 @@ export const useQueue = () => {
 
   return {
     // DATA
+    customerNameError,
     selectedTransactions,
     customerType,
     customerName,

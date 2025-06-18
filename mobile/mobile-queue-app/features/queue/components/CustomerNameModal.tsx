@@ -2,14 +2,13 @@ import DismissKeyboard from '@/components/DismissKeyboard';
 import React from 'react';
 import { Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-
-
 interface CustomerNameModalProps {
     isShowName: boolean;
     customerName: string;
     onCustomerNameChange: (name: string) => void;
     onConfirm: () => void;
     onCancel: () => void;
+    errMsg: string;
 }
 
 export default function CustomerNameModal({
@@ -18,6 +17,7 @@ export default function CustomerNameModal({
     onCustomerNameChange,
     onConfirm,
     onCancel,
+    errMsg
 }: CustomerNameModalProps) {
     return (
         <Modal
@@ -32,14 +32,20 @@ export default function CustomerNameModal({
                         <Text className="text-gray-600 text-center mb-4">
                             Please enter customer name for record keeping
                         </Text>
+                        {errMsg && (
+                            <Text className="text-red-500 text-xs mb-4 mt-1">
+                                {errMsg}
+                            </Text>
+                        )}
                         <TextInput
-                            className="border border-gray-300 rounded-lg p-3 mb-4 text-lg"
+                            className={`border ${errMsg ? 'border-red-400' : 'border-gray-300'} rounded-lg p-3 mb-2 text-lg`}
                             placeholder="Customer Name"
                             value={customerName}
                             onChangeText={onCustomerNameChange}
                             autoFocus={true}
                             autoCapitalize="words"
                         />
+
                         <View className="flex-row gap-3">
                             <TouchableOpacity
                                 className="flex-1 bg-gray-500 p-3 rounded-lg"

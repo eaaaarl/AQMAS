@@ -56,7 +56,8 @@ export default function Transaction() {
     surveyMessage,
     openTicketModal,
     handleCloseTicketModal,
-    currentTicket
+    currentTicket,
+    customerNameError
   } = useQueue()
 
   const { data: customerTypeData } = useGetCustomerTypeQuery({ is_show: '1' })
@@ -198,6 +199,7 @@ export default function Transaction() {
         onCustomerNameChange={handleSetCustomerName}
         onCancel={handleCancelName}
         onConfirm={handleCustomerNameConfirm}
+        errMsg={customerNameError}
       />
 
       <CustomerTypeModal
