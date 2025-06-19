@@ -9,12 +9,29 @@ import { PaginationControls } from '@/features/service/components/PaginationCont
 import { ServiceItem } from '@/features/service/components/ServiceItem';
 import SurveyButton from '@/features/service/components/SurveyButton';
 import { useService } from '@/features/service/hooks/useService';
-import { renderError } from '@/features/service/utils/errorUtils';
-import { renderLoading, renderNoServices } from '@/features/service/utils/loadingUtils';
+import { RenderError } from '@/features/service/utils/errorUtils';
+import { RenderLoading } from '@/features/service/utils/loadingUtils';
+import { RenderNoServices } from '@/features/service/utils/RenderNoServices';
 import { Dimensions, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Transaction() {
+  /**
+   * Custom hook values for service management
+   * @property {Service[]} additionalServices - Array of additional service items
+   * @property {boolean} isError - Error state flag
+   * @property {boolean} isLoading - Loading state flag
+   * @property {Service[]} mainServices - Array of main service items
+   * @property {() => void} onRefresh - Function to handle refresh action
+   * @property {boolean} refreshing - Refresh state flag
+   * @property {Service[]} services - Array of all service items
+   * @property {(value: boolean) => void} setShowMore - Function to update show more state
+   * @property {boolean} showMore - Show more state flag
+   * @property {number} currentPage - Current page number in pagination
+   * @property {Service[]} paginatedServices - Array of services for current pagination page
+   * @property {number} totalPages - Total number of pages in pagination
+   * @property {(page: number) => void} setCurrentPage - Function to update current page number
+   */
   const {
     additionalServices,
     isError,
@@ -31,6 +48,12 @@ export default function Transaction() {
     setCurrentPage
   } = useService()
 
+  /**
+   * Configuration state and controls from useConfig hook
+   * @property {boolean} isConfigsError - Indicates if there was an error loading configurations
+   * @property {boolean} isConfigsLoading - Indicates if configurations are currently loading
+   * @property {boolean} shouldShowAllServices - Controls whether all services should be displayed
+   */
   const {
     isConfigsError,
     isConfigsLoading,
@@ -68,13 +91,7 @@ export default function Transaction() {
   const isLandscape = width > height;
   const cardWidth = isLandscape ? (width - 60) / 3 : (width - 40) / 2;
 
-
-
-
-  if (isLoading || isConfigsLoading) return renderLoading()
-  if (services.length === 0) return renderNoServices()
-  if (isError || isConfigsError) return renderError()
-
+  if (isLoading || isConfigsLoading) return RenderLoading()
 
   return (
     <SafeAreaView className='flex-1 bg-white'>
@@ -193,6 +210,8 @@ export default function Transaction() {
 
       {enabledSurvey && <SurveyButton />}
 
+      {isError || isConfigsError && <RenderError />}
+
       <CustomerNameModal
         isShowName={showCustomerName}
         customerName={customerName}
@@ -224,6 +243,9 @@ export default function Transaction() {
         confirmText='OK'
         customerName={customerName}
       />
+
+
+      {services.length === 0 && <RenderNoServices onRefresh={() => onRefresh()} />}
 
     </SafeAreaView>
   );

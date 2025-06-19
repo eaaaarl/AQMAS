@@ -20,6 +20,7 @@ export default function SurveyResultsScreen() {
         skip: !selectedQuestion?.survey_id
     })
     const questionDetail = surveyQuestionDetail?.results || [];
+
     const handleConfirmBack = () => {
         router.push('/(service)');
     };
@@ -76,7 +77,6 @@ export default function SurveyResultsScreen() {
                 <View className="flex-1 p-4">
                     {surveyQuestion?.length ? (
                         <FlatList
-
                             data={surveyQuestion}
                             renderItem={({ item }) => (
                                 <RenderSurveyQuestion
@@ -109,6 +109,7 @@ export default function SurveyResultsScreen() {
                     questionDetail={questionDetail}
                     onClose={closeModal}
                 />
+
             </SafeAreaView>
         </DismissKeyboard>
     );

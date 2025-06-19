@@ -30,6 +30,16 @@ export interface SurveyAnswer {
 
 export type SurveyAnswers = Record<number, string | null>;
 
+
+// Survey Answer POST 
+
+export interface SurveyAnswerPayload {
+  respondent_ref: string;
+  repondent_name: string;
+  respondent_telno: string;
+  respondent_address: string;
+}
+
 export interface SurveyAnswerPayloadResponse {
   ghError: number;
   ghMessage: string;

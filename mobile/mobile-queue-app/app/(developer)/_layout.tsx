@@ -29,7 +29,6 @@ export default function ConfigLayout() {
                             <Text style={{ color: '#007AFF', fontSize: 16 }}>Done</Text>
                         </TouchableOpacity>
                     ),
-                    // Animation options
                     animationTypeForReplace: 'push',
                     gestureEnabled: true,
                 }}
