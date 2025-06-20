@@ -6,10 +6,6 @@ import { useAppDispatch } from "@/libs/redux/hooks";
 import { useState } from "react";
 import Toast from "react-native-toast-message";
 import {
-  createQueueDetailsPayload,
-  createQueuePayload,
-} from "../api/interface";
-import {
   queueApi,
   useCreateQueueDetailsMutation,
   useCreateQueueMutation,
@@ -20,6 +16,7 @@ import {
 } from "../api/queueApi";
 
 export const useQueue = () => {
+  const dispatch = useAppDispatch();
   const [customerType, setCustomerType] = useState<CustomerTypeResponse | null>(
     null
   );
@@ -38,17 +35,16 @@ export const useQueue = () => {
     null
   );
 
-  const dispatch = useAppDispatch();
   const {
     showAskCustomerType,
     showAskCustomerName,
     enabledSequenceByService,
     surveyMessage,
   } = useConfig();
+
   const [createQueue, { isLoading: isLoadingQueue }] = useCreateQueueMutation();
   const [createQueueDetails, { isLoading: isLoadingDetails }] =
     useCreateQueueDetailsMutation();
-
   const { data: customerTypeData, isError: customerTypeDataError } =
     useGetCustomerTypeQuery({
       is_show: "1",
@@ -62,7 +58,6 @@ export const useQueue = () => {
     selectedTransactions.length === 1
       ? selectedTransactions[0]?.service_id
       : undefined;
-
   const [triggerByServiceCount] = useLazyByServiceCountQuery();
   const [triggerCountAllService] = useLazyAllServiceCountQuery();
 
@@ -174,13 +169,6 @@ export const useQueue = () => {
     }
   };
 
-  const resetForm = () => {
-    setCustomerType(null);
-    setSelectedTransactions([]);
-    setShowCustomerType(false);
-    setShowCustomerName(false);
-  };
-
   const callCreateQueue = async () => {
     try {
       if (
@@ -198,10 +186,49 @@ export const useQueue = () => {
         return;
       }
 
+      const ticket = await generateTicketNumber();
+      if (!ticket) {
+        throw new Error("Failed to generate ticket number");
+      }
+
+      console.log("🎫 Creating main queue entry...");
+      const mainQueuePayload = {
+        customerName: customerName ?? "",
+        transId: ticket,
+        typeId:
+          customerType?.type_id ?? Number(customerTypeDefaultData?.type_id),
+        singleTransOnly: selectedTransactions.length === 1 ? 1 : 0,
+        transStatus: 0,
+      };
+
+      await createQueue(mainQueuePayload).unwrap();
+      console.log("✅ Main queue entry created successfully");
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      console.log("📋 Creating queue details...");
+      const queueDetailsPayload = selectedTransactions.map((service) => ({
+        trans_id: ticket,
+        service_id: service?.service_id,
+      }));
+
+      await createQueueDetails(queueDetailsPayload).unwrap();
+      console.log("✅ Queue details created successfully");
+
+      await handleSuccessFlow(ticket);
+    } catch (error) {
+      console.error("❌ Queue creation process failed:", error);
+      await handleErrorFlow(error);
+      throw error;
+    }
+  };
+
+  const generateTicketNumber = async () => {
+    try {
       let ByServiceCount;
       let CountAllService;
       let CountSequence;
-      let ticket: string | undefined;
+      let ticket;
 
       const singleTransactions = selectedTransactions.length === 1;
 
@@ -219,36 +246,27 @@ export const useQueue = () => {
           }${newCountSequence}${
             customerTypeDefaultData?.suffix ?? customerType?.suffix
           }`;
-          console.log("Customer Type have sequence 1 transactions:", ticket);
         } else {
           ticket = `${newCountSequence}${
             customerTypeDefaultData?.suffix ?? customerType?.suffix
           }`;
-          console.log("Customer Type have sequence more transactions:", ticket);
         }
       } else {
         if (!enabledSequenceByService) {
           const { data: freshAllServiceCount } = await triggerCountAllService();
           CountAllService = freshAllServiceCount?.[0]?.count || 0;
           const newCountAllService = Number(CountAllService) + 1;
+
           if (singleTransactions) {
             ticket = `${
               selectedTransactions?.[0]?.service_format
             }${newCountAllService}${
               customerType?.suffix ?? customerTypeDefaultData?.suffix
             }`;
-            console.log(
-              "if not enabled sequence by service single transactions:",
-              ticket
-            );
           } else {
             ticket = `${newCountAllService}${
               customerType?.suffix ?? customerTypeDefaultData?.suffix
             }`;
-            console.log(
-              "if not enabled sequence by service more transactions:",
-              ticket
-            );
           }
         } else {
           const { data: freshByServiceCount } = await triggerByServiceCount(
@@ -256,16 +274,13 @@ export const useQueue = () => {
           );
           ByServiceCount = freshByServiceCount?.[0]?.count || 0;
           const newByServiceCount = Number(ByServiceCount) + 1;
+
           if (singleTransactions) {
             ticket = `${
               selectedTransactions?.[0]?.service_format
             }${newByServiceCount}${
               customerType?.suffix ?? customerTypeDefaultData?.suffix
             }`;
-            console.log(
-              "if enabled sequence by service single transactions:",
-              ticket
-            );
           } else {
             const { data: freshAllServiceCount } =
               await triggerCountAllService();
@@ -274,35 +289,21 @@ export const useQueue = () => {
             ticket = `${newCountAllService}${
               customerType?.suffix ?? customerTypeDefaultData?.suffix
             }`;
-            console.log(
-              "if enabled sequence by service more transactions:",
-              ticket
-            );
           }
         }
       }
 
-      const mainQueuePayload: createQueuePayload = {
-        customerName: customerName ?? "",
-        transId: ticket as string,
-        typeId:
-          customerType?.type_id ?? Number(customerTypeDefaultData?.type_id),
-        singleTransOnly: selectedTransactions.length === 1 ? 1 : 0,
-        transStatus: 0,
-      };
-      const queueDetailsPayload: createQueueDetailsPayload[] =
-        selectedTransactions.map((service) => ({
-          trans_id: ticket as string,
-          service_id: service?.service_id,
-        }));
-      await Promise.all([
-        createQueue(mainQueuePayload).unwrap(),
-        createQueueDetails(queueDetailsPayload).unwrap(),
-      ]);
+      console.log("🎯 Generated ticket:", ticket);
+      return ticket;
+    } catch (error) {
+      console.error("❌ Failed to generate ticket number:", error);
+      return null;
+    }
+  };
 
-      dispatch(queueApi.util.invalidateTags(["Queue"]));
-
-      setCurrentTicket(ticket as string);
+  const handleSuccessFlow = async (ticket: string) => {
+    try {
+      setCurrentTicket(ticket);
       const shouldShowTicket = ticket;
       const shouldShowToast = surveyMessage !== "";
 
@@ -315,17 +316,50 @@ export const useQueue = () => {
         handleOpenConfirmationToast();
       }
 
-      resetForm();
+      resetFormState();
+
+      dispatch(queueApi.util.invalidateTags(["Queue"]));
     } catch (error) {
-      console.error("❌ Queue creation process failed:", error);
-      /* Toast.show({
-        type: "error",
-        text1: "An Error occured!",
-        text2: "Please contact developer, CODE: 112304",
-      }); */
-      resetForm();
-      throw error;
+      console.error("❌ Error in success flow:", error);
     }
+  };
+
+  const handleErrorFlow = async (error: any) => {
+    try {
+      const isForeignKeyError =
+        error?.message?.includes("foreign key") ||
+        error?.status === 409 ||
+        error?.data?.message?.includes("constraint");
+
+      if (isForeignKeyError) {
+        Toast.show({
+          type: "error",
+          text1: "Database Sync Error",
+          text2: "Please try again in a moment. The system is updating.",
+          visibilityTime: 4000,
+        });
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "An Error occurred!",
+          text2: "Please contact administrator",
+          visibilityTime: 5000,
+        });
+      }
+
+      // Reset form state on error
+      resetFormState();
+    } catch (resetError) {
+      console.error("❌ Error in error handling:", resetError);
+    }
+  };
+
+  // Reset form state helper
+  const resetFormState = () => {
+    setCustomerType(null);
+    setSelectedTransactions([]);
+    setShowCustomerType(false);
+    setShowCustomerName(false);
   };
 
   return {
@@ -354,7 +388,6 @@ export const useQueue = () => {
     handleCustomerNameConfirm,
     setSelectedTransactions,
     setCustomerType,
-    resetForm,
     handleCloseConfirmationToast,
     handleOpenConfirmationToast,
     handleOpenTicketModal,
