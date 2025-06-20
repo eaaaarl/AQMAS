@@ -49,16 +49,15 @@ export const useQueue = () => {
   const [createQueueDetails, { isLoading: isLoadingDetails }] =
     useCreateQueueDetailsMutation();
 
-  const { data: customerTypeData } = useGetCustomerTypeQuery({
-    is_show: "1",
-  });
+  const { data: customerTypeData, isError: customerTypeDataError } =
+    useGetCustomerTypeQuery({
+      is_show: "1",
+    });
 
   const customerTypeDefaultData = customerTypeData?.find(
     (ctd) => ctd.default.data?.[0] === 1
   );
-
   const [triggerCountQueue] = useLazyCountQueueQuery();
-
   const singleServiceId =
     selectedTransactions.length === 1
       ? selectedTransactions[0]?.service_id
@@ -284,7 +283,7 @@ export const useQueue = () => {
       }
 
       const mainQueuePayload: createQueuePayload = {
-        customerName: customerName,
+        customerName: customerName ?? "",
         transId: ticket as string,
         typeId:
           customerType?.type_id ?? Number(customerTypeDefaultData?.type_id),
@@ -339,6 +338,7 @@ export const useQueue = () => {
     surveyMessage,
     openTicketModal,
     currentTicket,
+    customerTypeDataError,
 
     // HANDLERS
     toggleTransactions,

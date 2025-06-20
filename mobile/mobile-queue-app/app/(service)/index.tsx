@@ -80,7 +80,8 @@ export default function Transaction() {
     openTicketModal,
     handleCloseTicketModal,
     currentTicket,
-    customerNameError
+    customerNameError,
+    customerTypeDataError
   } = useQueue()
 
   const { data: customerTypeData } = useGetCustomerTypeQuery({ is_show: '1' })
@@ -92,6 +93,14 @@ export default function Transaction() {
   const cardWidth = isLandscape ? (width - 60) / 3 : (width - 40) / 2;
 
   if (isLoading || isConfigsLoading) return RenderLoading()
+
+  if (isError || isConfigsError || customerTypeDataError) return RenderError({
+    message: 'Something went wrong',
+    description: 'We encountered an error while loading the content. Please try again.',
+    onRetry: null,
+    showIcon: true,
+    type: 'error'
+  })
 
   return (
     <SafeAreaView className='flex-1 bg-white'>
@@ -210,7 +219,7 @@ export default function Transaction() {
 
       {enabledSurvey && <SurveyButton />}
 
-      {isError || isConfigsError && <RenderError />}
+      {services.length === 0 && <RenderNoServices onRefresh={() => onRefresh()} />}
 
       <CustomerNameModal
         isShowName={showCustomerName}
@@ -245,7 +254,6 @@ export default function Transaction() {
       />
 
 
-      {services.length === 0 && <RenderNoServices onRefresh={() => onRefresh()} />}
 
     </SafeAreaView>
   );

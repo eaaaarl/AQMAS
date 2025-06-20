@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.QueueRepository = void 0;
 const database_1 = require("../infrastructure/database/database");
 const CustomErrors_1 = require("../libs/CustomErrors");
+const DateMoment_1 = require("../libs/DateMoment");
 class QueueRepository {
     constructor(database = database_1.db) {
         this.database = database;
@@ -25,8 +26,14 @@ class QueueRepository {
         return __awaiter(this, void 0, void 0, function* () {
             const db = trx || this.database;
             try {
-                const [transId] = yield db('queue').insert(Object.assign(Object.assign({}, payload), { trans_date: new Date().toISOString() }));
-                const newQueue = yield db('queue').where('trans_id', transId).first();
+                const newQueue = yield db('queue').insert({
+                    trans_id: payload.transId,
+                    type_id: payload.typeId,
+                    trans_status: payload.transStatus,
+                    single_trans_only: payload.singleTransOnly,
+                    customer_name: payload.customerName,
+                    trans_date: (0, DateMoment_1.getTransDate)()
+                });
                 return newQueue;
             }
             catch (error) {
@@ -41,8 +48,8 @@ class QueueRepository {
             try {
                 const dataToInsert = payload.map(p => ({
                     trans_id: p.trans_id,
-                    trans_date: new Date().toISOString(),
                     service_id: p.service_id,
+                    trans_date: (0, DateMoment_1.getTransDate)()
                 }));
                 const insertedIds = yield db('queue_detail').insert(dataToInsert);
                 const newQueueDetails = yield db('queue_detail').whereIn('trans_id', insertedIds);
@@ -73,9 +80,10 @@ class QueueRepository {
     countQueueAllService() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = yield this.database('queue')
+                const result = yield this.database('queue_detail as qd')
+                    .join('ent_service as es', 'qd.service_id', 'es.service_id')
+                    .whereRaw('DATE(qd.trans_date) = CURDATE()')
                     .count('* as count')
-                    .where('trans_date', 'DATE(NOW())')
                     .first();
                 return Number(result === null || result === void 0 ? void 0 : result.count) || 0;
             }
@@ -88,10 +96,10 @@ class QueueRepository {
     countByServiceCount(_a) {
         return __awaiter(this, arguments, void 0, function* ({ service_id }) {
             try {
-                const result = yield this.database('queue')
+                const result = yield this.database('queue_detail as qd')
                     .count('* as count')
-                    .where('type_id', service_id)
-                    .andWhere('trans_date', 'DATE(NOW())')
+                    .where('qd.service_id', service_id)
+                    .andWhereRaw('DATE(qd.trans_date) = CURDATE()') // ← Critical fix here
                     .first();
                 return Number(result === null || result === void 0 ? void 0 : result.count) || 0;
             }

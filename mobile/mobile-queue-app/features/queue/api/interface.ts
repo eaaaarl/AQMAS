@@ -2,7 +2,6 @@ export interface createQueuePayload {
   transId: string;
   typeId: number;
   customerName: string;
-  counter_no?: number;
   transStatus?: number;
   singleTransOnly?: number;
 }

@@ -48,7 +48,7 @@ export class QueueController {
         type_id: Number(query.type_id),
         Date: dateQuery,
       });
-      res.status(200).json({ count: countQueue });
+      res.status(200).json([{ count: countQueue }]);
     } catch (error) {
       next(error);
     }
@@ -57,7 +57,7 @@ export class QueueController {
   async countQueueAllService(req: Request, res: Response, next: NextFunction) {
     try {
       const countAllService = await this.queueService.countQueueAllService();
-      res.status(200).json({ count: countAllService });
+      res.status(200).json([{ count: countAllService }]);
     } catch (error) {
       next(error);
     }
@@ -67,7 +67,7 @@ export class QueueController {
     try {
       const { service_id } = req.params;
       const countByService = await this.queueService.countByServiceCount({ service_id });
-      res.status(200).json({ count: countByService });
+      res.status(200).json([{ count: countByService }]);
     } catch (error) {
       next(error);
     }

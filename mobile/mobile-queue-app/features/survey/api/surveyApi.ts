@@ -6,7 +6,10 @@ import {
   SurveyResponse,
 } from "../interface/survey.interface";
 import { SurveyQuestions } from "../interface/surveyQuestion.interface";
-import { SurveyQuestionDetailsResponse } from "../interface/surveyQuestionDetail.interface";
+import {
+  SurveyQuestionDetailPayload,
+  SurveyQuestionDetailsResponse,
+} from "../interface/surveyQuestionDetail.interface";
 
 export const surveyApi = createApi({
   reducerPath: "surveyApi",
@@ -38,7 +41,7 @@ export const surveyApi = createApi({
     const baseQuery = fetchBaseQuery({ baseUrl });
     return baseQuery(adjustedArgs, api, extraOptions);
   },
-  tagTypes: ["Survey"],
+  tagTypes: ["Survey", "SurveyQuestion", "SurveyQuestionDetail"],
   endpoints: (builder) => ({
     getSurveyResult: builder.query<SurveyResponse, void>({
       query: () => ({
@@ -53,7 +56,7 @@ export const surveyApi = createApi({
         url: `/survey/questions/${survey_id}`,
         method: "GET",
       }),
-      providesTags: ["Survey"],
+      providesTags: ["SurveyQuestion"],
     }),
 
     getSurveyQuestionsDetails: builder.query<
@@ -64,7 +67,7 @@ export const surveyApi = createApi({
         url: `/survey/question-details?survey_id=${survey_id}&survey_index=${survey_index}`,
         method: "GET",
       }),
-      providesTags: ["Survey"],
+      providesTags: ["SurveyQuestionDetail"],
     }),
 
     createSurveyAnswer: builder.mutation<
@@ -76,6 +79,19 @@ export const surveyApi = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Survey", "SurveyQuestion", "SurveyQuestionDetail"],
+    }),
+
+    createSurveyDetailAnswer: builder.mutation<
+      void,
+      SurveyQuestionDetailPayload[]
+    >({
+      query: (data) => ({
+        url: `/survey/answer-detail`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Survey", "SurveyQuestion", "SurveyQuestionDetail"],
     }),
   }),
 });
@@ -85,4 +101,5 @@ export const {
   useGetSurveyQuestionQuery,
   useGetSurveyQuestionsDetailsQuery,
   useCreateSurveyAnswerMutation,
+  useCreateSurveyDetailAnswerMutation,
 } = surveyApi;

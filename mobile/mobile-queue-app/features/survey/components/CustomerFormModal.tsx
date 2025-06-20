@@ -1,6 +1,6 @@
 import DismissKeyboard from '@/components/DismissKeyboard';
 import React from 'react';
-import { Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 interface CustomerFormModalProps {
     isOpen: boolean;
@@ -13,6 +13,7 @@ interface CustomerFormModalProps {
         reference: string;
     };
     onFormChange: (field: string, value: string) => void;
+    isLoading: boolean;
 }
 
 export default function CustomerFormModal({
@@ -21,6 +22,7 @@ export default function CustomerFormModal({
     onConfirm,
     formData,
     onFormChange,
+    isLoading
 }: CustomerFormModalProps) {
     const { name, address, contact, reference } = formData;
 
@@ -110,10 +112,10 @@ export default function CustomerFormModal({
                             <TouchableOpacity
                                 className={`flex-1 p-3 rounded-lg ${isFormValid() ? 'bg-blue-500' : 'bg-gray-300'}`}
                                 onPress={onConfirm}
-                                disabled={!isFormValid()}
+                                disabled={!isFormValid() || isLoading}
                             >
                                 <Text className={`text-center font-bold ${isFormValid() ? 'text-white' : 'text-gray-500'}`}>
-                                    Confirm
+                                    {isLoading ? (<ActivityIndicator size={'large'} color="#0000FF" />) : 'Confirm'}
                                 </Text>
                             </TouchableOpacity>
                         </View>
