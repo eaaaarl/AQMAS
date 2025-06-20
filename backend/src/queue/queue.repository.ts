@@ -7,6 +7,7 @@ import {
   queueDetailsDTO,
   queueDTO,
 } from './core/schema/queu.schema';
+import { getTransDate } from '../libs/DateMoment';
 
 export class QueueRepository {
   constructor(private database = db) {}
@@ -18,12 +19,14 @@ export class QueueRepository {
   async createQueue(payload: queueDTO, trx?: Knex.Transaction) {
     const db = trx || this.database;
     try {
-      const [transId] = await db('queue').insert({
-        ...payload,
-        trans_date: new Date().toISOString(),
+      const newQueue = await db('queue').insert({
+        trans_id: payload.transId,
+        type_id: payload.typeId,
+        trans_status: payload.transStatus,
+        single_trans_only: payload.singleTransOnly,
+        customer_name: payload.customerName,
+        trans_date: getTransDate()
       });
-
-      const newQueue = await db('queue').where('trans_id', transId).first();
       return newQueue;
     } catch (error) {
       console.error('Database error in createQueue:', error);
@@ -36,8 +39,8 @@ export class QueueRepository {
     try {
       const dataToInsert = payload.map(p => ({
         trans_id: p.trans_id,
-        trans_date: new Date().toISOString(),
         service_id: p.service_id,
+        trans_date: getTransDate()
       }));
 
       const insertedIds = await db('queue_detail').insert(dataToInsert);
@@ -69,9 +72,10 @@ export class QueueRepository {
 
   async countQueueAllService(): Promise<number> {
     try {
-      const result = await this.database('queue')
+      const result = await this.database('queue_detail as qd')
+        .join('ent_service as es', 'qd.service_id', 'es.service_id')
+        .whereRaw('DATE(qd.trans_date) = CURDATE()')
         .count('* as count')
-        .where('trans_date', 'DATE(NOW())')
         .first();
 
       return Number(result?.count) || 0;
@@ -81,17 +85,17 @@ export class QueueRepository {
     }
   }
 
-  async countByServiceCount({ service_id }: queueByServiceCountDTO) {
-    try {
-      const result = await this.database('queue')
-        .count('* as count')
-        .where('type_id', service_id)
-        .andWhere('trans_date', 'DATE(NOW())')
-        .first();
-      return Number(result?.count) || 0;
-    } catch (error) {
-      console.error('Database error in countByServiceCount:', error);
-      throw new DatabaseErrors('Failed to countQueueAllService method at Repository Layer');
-    }
+ async countByServiceCount({ service_id }: queueByServiceCountDTO) {
+  try {
+    const result = await this.database('queue_detail as qd')
+      .count('* as count')
+      .where('qd.service_id', service_id)
+      .andWhereRaw('DATE(qd.trans_date) = CURDATE()') // ← Critical fix here
+      .first();
+    return Number(result?.count) || 0;
+  } catch (error) {
+    console.error('Database error in countByServiceCount:', error);
+    throw new DatabaseErrors('Failed to countQueueAllService method at Repository Layer');
   }
+}
 }

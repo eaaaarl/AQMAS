@@ -9,12 +9,29 @@ import { PaginationControls } from '@/features/service/components/PaginationCont
 import { ServiceItem } from '@/features/service/components/ServiceItem';
 import SurveyButton from '@/features/service/components/SurveyButton';
 import { useService } from '@/features/service/hooks/useService';
-import { renderError } from '@/features/service/utils/errorUtils';
-import { renderLoading, renderNoServices } from '@/features/service/utils/loadingUtils';
+import { RenderError } from '@/features/service/utils/errorUtils';
+import { RenderLoading } from '@/features/service/utils/loadingUtils';
+import { RenderNoServices } from '@/features/service/utils/RenderNoServices';
 import { Dimensions, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Transaction() {
+  /**
+   * Custom hook values for service management
+   * @property {Service[]} additionalServices - Array of additional service items
+   * @property {boolean} isError - Error state flag
+   * @property {boolean} isLoading - Loading state flag
+   * @property {Service[]} mainServices - Array of main service items
+   * @property {() => void} onRefresh - Function to handle refresh action
+   * @property {boolean} refreshing - Refresh state flag
+   * @property {Service[]} services - Array of all service items
+   * @property {(value: boolean) => void} setShowMore - Function to update show more state
+   * @property {boolean} showMore - Show more state flag
+   * @property {number} currentPage - Current page number in pagination
+   * @property {Service[]} paginatedServices - Array of services for current pagination page
+   * @property {number} totalPages - Total number of pages in pagination
+   * @property {(page: number) => void} setCurrentPage - Function to update current page number
+   */
   const {
     additionalServices,
     isError,
@@ -31,6 +48,12 @@ export default function Transaction() {
     setCurrentPage
   } = useService()
 
+  /**
+   * Configuration state and controls from useConfig hook
+   * @property {boolean} isConfigsError - Indicates if there was an error loading configurations
+   * @property {boolean} isConfigsLoading - Indicates if configurations are currently loading
+   * @property {boolean} shouldShowAllServices - Controls whether all services should be displayed
+   */
   const {
     isConfigsError,
     isConfigsLoading,
@@ -57,7 +80,9 @@ export default function Transaction() {
     openTicketModal,
     handleCloseTicketModal,
     currentTicket,
-    customerNameError
+    customerNameError,
+    customerTypeDataError,
+    isLoadingMutation
   } = useQueue()
 
   const { data: customerTypeData } = useGetCustomerTypeQuery({ is_show: '1' })
@@ -68,13 +93,15 @@ export default function Transaction() {
   const isLandscape = width > height;
   const cardWidth = isLandscape ? (width - 60) / 3 : (width - 40) / 2;
 
+  if (isLoading || isConfigsLoading) return RenderLoading()
 
-
-
-  if (isLoading || isConfigsLoading) return renderLoading()
-  if (services.length === 0) return renderNoServices()
-  if (isError || isConfigsError) return renderError()
-
+  if (isError || isConfigsError || customerTypeDataError) return RenderError({
+    message: 'Something went wrong',
+    description: 'We encountered an error while loading the content. Please try again.',
+    onRetry: null,
+    showIcon: true,
+    type: 'error'
+  })
 
   return (
     <SafeAreaView className='flex-1 bg-white'>
@@ -106,6 +133,7 @@ export default function Transaction() {
                 {paginatedServices.map((service) => (
                   <View key={service.service_id} style={{ width: cardWidth, minWidth: isLandscape ? 180 : cardWidth }}>
                     <ServiceItem
+                      isLoading={isLoadingMutation}
                       service={service}
                       cardWidth={cardWidth}
                       isSelected={selectedTransactions.some(item => item.service_id === service.service_id)}
@@ -121,6 +149,7 @@ export default function Transaction() {
                     {mainServices.map((service) => (
                       <View key={service.service_id} style={{ width: cardWidth, minWidth: isLandscape ? 180 : cardWidth }}>
                         <ServiceItem
+                          isLoading={isLoadingMutation}
                           service={service}
                           cardWidth={cardWidth}
                           isSelected={selectedTransactions.some(item => item.service_id === service.service_id)}
@@ -133,6 +162,7 @@ export default function Transaction() {
                         <TouchableOpacity
                           className="h-32 m-1 rounded-full items-center shadow-lg border border-gray-300 justify-center bg-gray-100"
                           onPress={() => setShowMore(true)}
+                          disabled={isLoadingMutation}
                         >
                           <Text className="mt-2 text-3xl font-medium text-center text-gray-800">More</Text>
                         </TouchableOpacity>
@@ -144,6 +174,7 @@ export default function Transaction() {
                     {additionalServices.map((service) => (
                       <View key={service.service_id} style={{ width: cardWidth, minWidth: isLandscape ? 180 : cardWidth }}>
                         <ServiceItem
+                          isLoading={isLoadingMutation}
                           service={service}
                           cardWidth={cardWidth}
                           isSelected={selectedTransactions.some(item => item.service_id === service.service_id)}
@@ -155,6 +186,7 @@ export default function Transaction() {
                       <TouchableOpacity
                         className="h-32 m-1 rounded-full shadow-lg border border-gray-300 items-center justify-center bg-gray-100"
                         onPress={() => setShowMore(false)}
+                        disabled={isLoadingMutation}
                       >
                         <Text className="mt-2 font-medium text-center text-3xl text-gray-800">Back</Text>
                       </TouchableOpacity>
@@ -193,6 +225,8 @@ export default function Transaction() {
 
       {enabledSurvey && <SurveyButton />}
 
+      {services.length === 0 && <RenderNoServices onRefresh={() => onRefresh()} />}
+
       <CustomerNameModal
         isShowName={showCustomerName}
         customerName={customerName}
@@ -224,6 +258,8 @@ export default function Transaction() {
         confirmText='OK'
         customerName={customerName}
       />
+
+
 
     </SafeAreaView>
   );

@@ -28,6 +28,23 @@ class QueueService {
             return yield this.queueRepository.createQueueDetails(validatedPayload);
         });
     }
+    createQueueWithDetail(queueData, queueDetailsData) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const trx = yield this.queueRepository.beginTransaction();
+            try {
+                const queuePayload = queu_schema_1.queueSchema.parse(queueData);
+                const detailsPayload = queueDetailsData.map(item => queu_schema_1.queueDetailsSchema.parse(item));
+                const queue = yield this.queueRepository.createQueue(queuePayload, trx);
+                const details = yield this.queueRepository.createQueueDetails(detailsPayload, trx);
+                yield trx.commit();
+                return { queue, details };
+            }
+            catch (error) {
+                yield trx.rollback();
+                throw error;
+            }
+        });
+    }
     countQueue(data) {
         return __awaiter(this, void 0, void 0, function* () {
             const queueCountQueryPayload = queu_schema_1.queueCountQuerySchema.parse(data);

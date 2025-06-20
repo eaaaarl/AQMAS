@@ -24,6 +24,23 @@ export class QueueService {
     return await this.queueRepository.createQueueDetails(validatedPayload);
   }
 
+  async createQueueWithDetail(queueData: queueDTO, queueDetailsData: queueDetailsDTO[]) {
+    const trx = await this.queueRepository.beginTransaction();
+    try {
+      const queuePayload = queueSchema.parse(queueData);
+      const detailsPayload = queueDetailsData.map(item => queueDetailsSchema.parse(item));
+
+      const queue = await this.queueRepository.createQueue(queuePayload, trx);
+      const details = await this.queueRepository.createQueueDetails(detailsPayload, trx);
+
+      await trx.commit();
+      return { queue, details };
+    } catch (error) {
+      await trx.rollback();
+      throw error;
+    }
+  }
+
   async countQueue(data: queueCountQueryDTO) {
     const queueCountQueryPayload = queueCountQuerySchema.parse(data);
     const getQueueForToday = await this.queueRepository.countQueue(queueCountQueryPayload);

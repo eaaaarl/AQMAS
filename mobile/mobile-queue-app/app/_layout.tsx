@@ -28,8 +28,15 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Provider store={reduxStore}>
         <PersistGate loading={null} persistor={persistor}>
-          <Stack screenOptions={{ headerShown: false }} />
-          <Toast />
+          <>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(service)" options={{ headerShown: false }} />
+              <Stack.Screen name="(survey)" options={{ headerShown: false }} />
+              <Stack.Screen name="(developer)" options={{ headerShown: false }} />
+            </Stack>
+            <Toast />
+          </>
+
         </PersistGate>
       </Provider>
     </GestureHandlerRootView>

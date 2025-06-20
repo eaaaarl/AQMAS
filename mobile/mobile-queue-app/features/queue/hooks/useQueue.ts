@@ -49,16 +49,15 @@ export const useQueue = () => {
   const [createQueueDetails, { isLoading: isLoadingDetails }] =
     useCreateQueueDetailsMutation();
 
-  const { data: customerTypeData } = useGetCustomerTypeQuery({
-    is_show: "1",
-  });
+  const { data: customerTypeData, isError: customerTypeDataError } =
+    useGetCustomerTypeQuery({
+      is_show: "1",
+    });
 
   const customerTypeDefaultData = customerTypeData?.find(
     (ctd) => ctd.default.data?.[0] === 1
   );
-
   const [triggerCountQueue] = useLazyCountQueueQuery();
-
   const singleServiceId =
     selectedTransactions.length === 1
       ? selectedTransactions[0]?.service_id
@@ -284,20 +283,18 @@ export const useQueue = () => {
       }
 
       const mainQueuePayload: createQueuePayload = {
-        customerName: customerName,
+        customerName: customerName ?? "",
         transId: ticket as string,
         typeId:
           customerType?.type_id ?? Number(customerTypeDefaultData?.type_id),
         singleTransOnly: selectedTransactions.length === 1 ? 1 : 0,
         transStatus: 0,
       };
-
       const queueDetailsPayload: createQueueDetailsPayload[] =
         selectedTransactions.map((service) => ({
           trans_id: ticket as string,
           service_id: service?.service_id,
         }));
-
       await Promise.all([
         createQueue(mainQueuePayload).unwrap(),
         createQueueDetails(queueDetailsPayload).unwrap(),
@@ -321,6 +318,11 @@ export const useQueue = () => {
       resetForm();
     } catch (error) {
       console.error("❌ Queue creation process failed:", error);
+      /* Toast.show({
+        type: "error",
+        text1: "An Error occured!",
+        text2: "Please contact developer, CODE: 112304",
+      }); */
       resetForm();
       throw error;
     }
@@ -334,11 +336,12 @@ export const useQueue = () => {
     customerName,
     showCustomerType,
     showCustomerName,
-    isLoading: isLoadingQueue || isLoadingDetails,
+    isLoadingMutation: isLoadingQueue || isLoadingDetails,
     openConfirmationToast,
     surveyMessage,
     openTicketModal,
     currentTicket,
+    customerTypeDataError,
 
     // HANDLERS
     toggleTransactions,

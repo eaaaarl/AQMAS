@@ -12,3 +12,11 @@ export interface SurveyQuestionDetailsResponse {
   };
   results: SurveyResult[];
 }
+
+export interface SurveyQuestionDetailPayload {
+  repondent_index?: number;
+  choice_index: string;
+  survey_index: number;
+  survey_id: number;
+  survey_answer: string;
+}
