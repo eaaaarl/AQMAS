@@ -1,3 +1,6 @@
+import { useGetEmployeeInfoQuery } from '@/features/auth/api/authApi';
+import { useAppDispatch, useAppSelector } from '@/libs/redux/hooks';
+import { removeEmployee } from '@/libs/redux/state/employeeSlice';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -12,24 +15,17 @@ import {
 } from 'react-native';
 
 export default function Settings() {
-    // Customer type toggles
+    const dispatch = useAppDispatch()
+    const emp = useAppSelector((state) => state.employee)
+    const { data: empInfo } = useGetEmployeeInfoQuery({ empId: emp.employee_id as number })
+    const empInformation = empInfo?.results || [];
+    
     const [seniorCitizen, setSeniorCitizen] = useState(true);
     const [vip, setVip] = useState(true);
     const [regularCustomer, setRegularCustomer] = useState(true);
 
-    // Service toggles
     const [cash, setCash] = useState(true);
     const [credit, setCredit] = useState(true);
-
-    // Counter user information (this would typically come from props, context, or API)
-    const counterUserInfo = {
-        name: "Maria Santos",
-        counterNumber: "C-03",
-        employeeId: "EMP-2024-001",
-        shift: "Morning Shift",
-        status: "Active",
-        loginTime: "08:00 AM"
-    };
 
     const handleLogout = () => {
         Alert.alert(
@@ -44,6 +40,7 @@ export default function Settings() {
                     text: 'Logout',
                     style: 'destructive',
                     onPress: () => {
+                        dispatch(removeEmployee())
                         router.push('/auth/login')
                     },
                 },
@@ -103,19 +100,20 @@ export default function Settings() {
                         <SectionHeader title="Counter Information" />
 
                         <View className="space-y-1">
-                            <InfoRow label="Counter" value={counterUserInfo.counterNumber} />
+                            <InfoRow label="Counter" value={empInformation?.[0]?.employee_no} />
                             <View className="h-px bg-gray-100 mx-1" />
 
-                            <InfoRow label="Operator" value={counterUserInfo.name} />
+                            <InfoRow label="Operator" value={`${empInformation?.[0]?.first_name} ${empInformation?.[0]?.mid_name} ${empInformation?.[0]?.last_name}`} />
                             <View className="h-px bg-gray-100 mx-1" />
 
-                            <InfoRow label="Employee ID" value={counterUserInfo.employeeId} />
+                            <InfoRow label="Employee ID" value={`${empInformation?.[0]?.employee_id}`} />
                             <View className="h-px bg-gray-100 mx-1" />
 
-                            <InfoRow label="Shift" value={counterUserInfo.shift} />
+                            {/* <InfoRow label="Shift" value={counterUserInfo.shift} />
                             <View className="h-px bg-gray-100 mx-1" />
 
-                            <InfoRow label="Login Time" value={counterUserInfo.loginTime} />
+                            <InfoRow label="Login Time" value={counterUserInfo.loginTime} /> */}
+
                             <View className="h-px bg-gray-100 mx-1" />
 
                             <View className="flex-row justify-between items-center py-3 px-1">
@@ -123,9 +121,19 @@ export default function Settings() {
                                     Status
                                 </Text>
                                 <View className="flex-row items-center">
-                                    <View className="w-2 h-2 bg-green-500 rounded-full mr-2" />
-                                    <Text className="text-green-600 text-sm font-semibold">
-                                        {counterUserInfo.status}
+                                    <View
+                                        className={`w-2 h-2 rounded-full mr-2 ${empInformation?.[0]?.is_active?.data?.[0] === 1
+                                            ? 'bg-green-500'
+                                            : 'bg-red-500'
+                                            }`}
+                                    />
+                                    <Text
+                                        className={`${empInformation?.[0]?.is_active?.data?.[0] === 1
+                                            ? 'text-green-600'
+                                            : 'text-red-600'
+                                            } text-sm font-semibold`}
+                                    >
+                                        {empInformation?.[0]?.is_active?.data?.[0] === 1 ? 'Active' : 'Inactive'}
                                     </Text>
                                 </View>
                             </View>

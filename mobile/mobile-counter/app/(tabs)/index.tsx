@@ -1,7 +1,29 @@
+import { useGetEmployeeInfoQuery, useGetEmployeeRoleQuery } from '@/features/auth/api/authApi';
+import { useGetConfigQuery } from '@/features/config/api/configApi';
+import { useAppSelector } from '@/libs/redux/hooks';
 import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, StatusBar, Text, TouchableOpacity, View } from "react-native";
 
-export default function TicketInterface() {
+export default function CounterScreen() {
+  // GET CONFIG
+  const { data: config } = useGetConfigQuery()
+
+  // GET STATE EMPLOYEE INFORMATION
+  const emp = useAppSelector((state) => state.employee)
+
+  // GET EMPLOYEE INFORMATION 
+  const { data: empInfo } = useGetEmployeeInfoQuery({ empId: emp.employee_id as number })
+  const empInformation = empInfo?.results || [];
+
+  // GET EMPLOYE ROLE BY EMPLOYEE ID
+  const { data: empRole } = useGetEmployeeRoleQuery({ emp_id: empInformation?.[0]?.employee_id })
+
+  // GET ROLE NAME
+  const roleName = empRole?.[0]?.role_name;
+
+  // GET COUNTER NO
+  const counterNo = empRole?.[0]?.counter_no;
+
   const [currentTime, setCurrentTime] = useState(new Date());
   const [currentTicket, setCurrentTicket] = useState({
     number: 'CR1RE',
@@ -15,13 +37,11 @@ export default function TicketInterface() {
     remaining: 16
   });
 
-  // Update time every second
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
-    // Cleanup interval on component unmount
     return () => clearInterval(timer);
   }, []);
 
@@ -59,13 +79,13 @@ export default function TicketInterface() {
 
           <View style={{ backgroundColor: '#1c3f83' }} className="px-6 py-4">
             <View className="flex-row items-center justify-between mb-2">
-              <Text className="text-white text-lg font-semibold">Counter 1</Text>
+              <Text className="text-white text-lg font-semibold">{config?.[0]?.Value} {counterNo}</Text>
               <TouchableOpacity>
                 <Text className="text-white/80 text-xl">☰</Text>
               </TouchableOpacity>
             </View>
             <View>
-              <Text className="text-white/80 text-sm">1 Cashier</Text>
+              <Text className="text-white/80 text-sm">{counterNo} {roleName}</Text>
               <Text className="text-white text-xl font-bold">
                 {currentTime.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
               </Text>
