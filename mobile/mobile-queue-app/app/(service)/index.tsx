@@ -81,7 +81,8 @@ export default function Transaction() {
     handleCloseTicketModal,
     currentTicket,
     customerNameError,
-    customerTypeDataError
+    customerTypeDataError,
+    isLoadingMutation
   } = useQueue()
 
   const { data: customerTypeData } = useGetCustomerTypeQuery({ is_show: '1' })
@@ -132,6 +133,7 @@ export default function Transaction() {
                 {paginatedServices.map((service) => (
                   <View key={service.service_id} style={{ width: cardWidth, minWidth: isLandscape ? 180 : cardWidth }}>
                     <ServiceItem
+                      isLoading={isLoadingMutation}
                       service={service}
                       cardWidth={cardWidth}
                       isSelected={selectedTransactions.some(item => item.service_id === service.service_id)}
@@ -147,6 +149,7 @@ export default function Transaction() {
                     {mainServices.map((service) => (
                       <View key={service.service_id} style={{ width: cardWidth, minWidth: isLandscape ? 180 : cardWidth }}>
                         <ServiceItem
+                          isLoading={isLoadingMutation}
                           service={service}
                           cardWidth={cardWidth}
                           isSelected={selectedTransactions.some(item => item.service_id === service.service_id)}
@@ -159,6 +162,7 @@ export default function Transaction() {
                         <TouchableOpacity
                           className="h-32 m-1 rounded-full items-center shadow-lg border border-gray-300 justify-center bg-gray-100"
                           onPress={() => setShowMore(true)}
+                          disabled={isLoadingMutation}
                         >
                           <Text className="mt-2 text-3xl font-medium text-center text-gray-800">More</Text>
                         </TouchableOpacity>
@@ -170,6 +174,7 @@ export default function Transaction() {
                     {additionalServices.map((service) => (
                       <View key={service.service_id} style={{ width: cardWidth, minWidth: isLandscape ? 180 : cardWidth }}>
                         <ServiceItem
+                          isLoading={isLoadingMutation}
                           service={service}
                           cardWidth={cardWidth}
                           isSelected={selectedTransactions.some(item => item.service_id === service.service_id)}
@@ -181,6 +186,7 @@ export default function Transaction() {
                       <TouchableOpacity
                         className="h-32 m-1 rounded-full shadow-lg border border-gray-300 items-center justify-center bg-gray-100"
                         onPress={() => setShowMore(false)}
+                        disabled={isLoadingMutation}
                       >
                         <Text className="mt-2 font-medium text-center text-3xl text-gray-800">Back</Text>
                       </TouchableOpacity>

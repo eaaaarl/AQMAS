@@ -290,13 +290,11 @@ export const useQueue = () => {
         singleTransOnly: selectedTransactions.length === 1 ? 1 : 0,
         transStatus: 0,
       };
-
       const queueDetailsPayload: createQueueDetailsPayload[] =
         selectedTransactions.map((service) => ({
           trans_id: ticket as string,
           service_id: service?.service_id,
         }));
-
       await Promise.all([
         createQueue(mainQueuePayload).unwrap(),
         createQueueDetails(queueDetailsPayload).unwrap(),
@@ -320,6 +318,11 @@ export const useQueue = () => {
       resetForm();
     } catch (error) {
       console.error("❌ Queue creation process failed:", error);
+      /* Toast.show({
+        type: "error",
+        text1: "An Error occured!",
+        text2: "Please contact developer, CODE: 112304",
+      }); */
       resetForm();
       throw error;
     }
@@ -333,7 +336,7 @@ export const useQueue = () => {
     customerName,
     showCustomerType,
     showCustomerName,
-    isLoading: isLoadingQueue || isLoadingDetails,
+    isLoadingMutation: isLoadingQueue || isLoadingDetails,
     openConfirmationToast,
     surveyMessage,
     openTicketModal,

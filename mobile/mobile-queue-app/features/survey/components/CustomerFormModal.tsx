@@ -39,7 +39,7 @@ export default function CustomerFormModal({
         >
             <View className="flex-1 justify-center items-center bg-black/50">
                 <DismissKeyboard>
-                    <View className="bg-white rounded-lg p-6 w-4/5 max-w-md max-h-4/5">
+                    <View className="bg-white rounded-lg p-6 w-4/5 max-w-lg max-h-4/5">
                         <Text className="text-xl font-bold text-center mb-4 text-gray-800">
                             Customer Information
                         </Text>
@@ -115,7 +115,7 @@ export default function CustomerFormModal({
                                 disabled={!isFormValid() || isLoading}
                             >
                                 <Text className={`text-center font-bold ${isFormValid() ? 'text-white' : 'text-gray-500'}`}>
-                                    {isLoading ? (<ActivityIndicator size={'large'} color="#0000FF" />) : 'Confirm'}
+                                    {isLoading ? (<ActivityIndicator size={'large'} />) : 'Confirm'}
                                 </Text>
                             </TouchableOpacity>
                         </View>

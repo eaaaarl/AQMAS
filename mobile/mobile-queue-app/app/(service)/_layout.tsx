@@ -3,7 +3,7 @@ import { router, Stack } from 'expo-router';
 import React from 'react';
 
 export default function LayoutService() {
-    
+
     return (
         <TapDetector
             TAPS_COUNT_THRESHOLD={7}
@@ -14,8 +14,7 @@ export default function LayoutService() {
                 router.push('/(developer)/setting');
             }}
         >
-            <Stack>
-                <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack screenOptions={{ headerShown: false }} >
             </Stack>
         </TapDetector>
     )

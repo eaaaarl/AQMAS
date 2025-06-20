@@ -54,7 +54,6 @@ export default function SurveyResultsScreen() {
         skip: !selectedQuestion?.survey_id
     })
 
-
     const randomQuestions = surveyResultData?.results.find((srd) => srd.random_questions.data?.[0] === 1)
     const questionDetail = surveyQuestionDetail?.results || [];
     const isAllQuestionsAnswered = surveyQuestion?.length === surveyAnswers.length;
@@ -88,7 +87,6 @@ export default function SurveyResultsScreen() {
 
     const handleAnswerSubmit = (answer: SurveyQuestionDetailPayload) => {
         setSurveyAnswers(prev => {
-            // Remove any existing answer for this question first
             const filteredAnswers = prev.filter(item => item.survey_index !== answer.survey_index);
 
             const newAnswer = {
@@ -137,6 +135,12 @@ export default function SurveyResultsScreen() {
             }))
 
             await createSurveyDetail(payloadDetail)
+
+            Toast.show({
+                type: 'success',
+                text1: 'Thank you for your feedback!',
+                text2: 'Your survey has been submitted successfully'
+            })
             setOpenCustomerForm(false);
             setCustomerFormData({
                 name: '',
@@ -145,13 +149,6 @@ export default function SurveyResultsScreen() {
                 reference: ''
             });
             setSurveyAnswers([])
-
-            Toast.show({
-                type: 'success',
-                text1: 'Thank you for your feedback!',
-                text2: 'Your survey has been submitted successfully'
-            })
-
             router.push('/(service)');
         } catch (error) {
             console.log(error)
@@ -163,6 +160,30 @@ export default function SurveyResultsScreen() {
         }
     };
 
+    // Helper function to get question type
+    const getQuestionType = (question: SurveyQuestion) => {
+        if (question.survey_type !== undefined) {
+            switch (question.survey_type) {
+                case 0: return 'yesno';
+                case 1: return 'multiple';
+                case 2: return 'text';
+                default: return 'multiple';
+            }
+        }
+
+        if (question.strType) {
+            const type = question.strType.toLowerCase();
+            if (type.includes('yes') || type.includes('no')) {
+                return 'yesno';
+            } else if (type.includes('commentary') || type.includes('text') || type.includes('comment')) {
+                return 'text';
+            } else if (type.includes('multiple')) {
+                return 'multiple';
+            }
+        }
+
+        return 'multiple';
+    };
 
     if (isLoading) {
         return (
@@ -216,15 +237,22 @@ export default function SurveyResultsScreen() {
                     {displayQuestions?.length ? (
                         <FlatList
                             data={displayQuestions}
-                            renderItem={({ item, index }) => (
-                                <RenderSurveyQuestion
-                                    item={item}
-                                    displayIndex={index + 1} // Show display order (1, 2, 3, etc.)
-                                    onPress={() => handleQuestionPress(item)}
-                                    isAnswered={surveyAnswers.some(answer => answer.survey_index === item.survey_index)}
-                                    isRandomized={!!randomQuestions}
-                                />
-                            )}
+                            renderItem={({ item, index }) => {
+                                const currentAnswer = surveyAnswers.find(answer => answer.survey_index === item.survey_index);
+                                const questionType = getQuestionType(item);
+
+                                return (
+                                    <RenderSurveyQuestion
+                                        item={item}
+                                        displayIndex={index + 1}
+                                        onPress={() => handleQuestionPress(item)}
+                                        isAnswered={!!currentAnswer}
+                                        isRandomized={!!randomQuestions}
+                                        currentAnswer={currentAnswer}
+                                        questionType={questionType}
+                                    />
+                                );
+                            }}
                             keyExtractor={(item, index) => `${item.survey_index}-${index}`}
                             ListHeaderComponent={
                                 <Text className="text-xl font-bold mb-4">
@@ -268,7 +296,7 @@ export default function SurveyResultsScreen() {
                     questionDetail={questionDetail}
                     onClose={() => setModalVisible(false)}
                     onAnswerSubmit={handleAnswerSubmit}
-
+                    existingAnswer={selectedQuestion ? surveyAnswers.find(answer => answer.survey_index === selectedQuestion.survey_index) : undefined}
                 />
 
                 <CustomerFormModal
@@ -290,10 +318,18 @@ interface RenderSurveyQuestionProps {
     onPress: () => void;
     isAnswered?: boolean;
     isRandomized?: boolean;
+    currentAnswer?: SurveyQuestionDetailPayload;
+    questionType?: string;
 }
 
 export function RenderSurveyQuestion(props: RenderSurveyQuestionProps) {
-    const { item, displayIndex, onPress, isAnswered, isRandomized } = props;
+    const { item, displayIndex, onPress, isAnswered, isRandomized, currentAnswer, questionType } = props;
+
+    // Helper function to truncate text for display
+    // const truncateText = (text: string, maxLength: number = 50) => {
+    //     if (text.length <= maxLength) return text;
+    //     return text.substring(0, maxLength) + '...';
+    // };
 
     return (
         <TouchableOpacity onPress={onPress} className="mb-4">
@@ -339,7 +375,39 @@ export function RenderSurveyQuestion(props: RenderSurveyQuestionProps) {
                     </View>
                 )}
 
-                <View className="flex-row items-center justify-between">
+                {/* Display Answer Preview (except for text/commentary questions) */}
+                {isAnswered && currentAnswer && questionType !== 'text' && (
+                    <View className="mt-3 p-3 bg-green-100 rounded-lg border border-green-200">
+                        <View className="flex-row items-center mb-1">
+                            <Ionicons name="chatbubble-ellipses" size={14} color="#059669" />
+                            <Text className="text-green-700 text-xs font-medium ml-1 uppercase tracking-wide">
+                                Your Answer
+                            </Text>
+                        </View>
+                        <Text className="text-green-800 font-medium">
+                            {currentAnswer.survey_answer}
+                        </Text>
+                    </View>
+                )}
+
+                {/* Show indicator for text questions that they have been answered */}
+                {isAnswered && currentAnswer && questionType === 'text' && (
+                    <View className="mt-3 p-3 bg-blue-100 rounded-lg border border-blue-200">
+                        <View className="flex-row items-center">
+                            <Ionicons name="document-text" size={14} color="#2563eb" />
+                            <Text className="text-blue-700 text-xs font-medium ml-1 uppercase tracking-wide">
+                                Commentary Provided
+                            </Text>
+                            <View className="ml-auto bg-blue-500 rounded-full px-2 py-1">
+                                <Text className="text-white text-xs font-medium">
+                                    {currentAnswer.survey_answer?.length || 0} chars
+                                </Text>
+                            </View>
+                        </View>
+                    </View>
+                )}
+
+                <View className="flex-row items-center justify-between mt-3">
                     <Text className="text-gray-500 text-sm">
                         Choices: #{item.no_of_choices}
                     </Text>
@@ -356,21 +424,46 @@ interface RenderSurveyQuestionModalProps {
     questionDetail: SurveyResult[];
     onClose: () => void;
     onAnswerSubmit: (answer: SurveyQuestionDetailPayload) => void;
+    existingAnswer?: SurveyQuestionDetailPayload; // Add existing answer prop
+}
+
+interface RenderSurveyQuestionModalProps {
+    visible: boolean;
+    question: SurveyQuestion | null;
+    questionDetail: SurveyResult[];
+    onClose: () => void;
+    onAnswerSubmit: (answer: SurveyQuestionDetailPayload) => void;
+    existingAnswer?: SurveyQuestionDetailPayload; // Add existing answer prop
 }
 
 export function RenderSurveyQuestionModal(props: RenderSurveyQuestionModalProps) {
-    const { visible, question, onClose, questionDetail, onAnswerSubmit } = props;
+    const { visible, question, onClose, questionDetail, onAnswerSubmit, existingAnswer } = props;
     const [selectedAnswer, setSelectedAnswer] = useState<any>(null);
     const [textResponse, setTextResponse] = useState<string>('');
 
     useEffect(() => {
-        setSelectedAnswer(null);
-        setTextResponse('');
-    }, [question?.survey_index]);
+        // Pre-populate with existing answer if available
+        if (existingAnswer && question) {
+            const questionType = getQuestionType();
+
+            if (questionType === 'text') {
+                setTextResponse(existingAnswer.survey_answer || '');
+                setSelectedAnswer(null);
+            } else {
+                setSelectedAnswer(existingAnswer.survey_answer || null);
+                setTextResponse('');
+            }
+        } else {
+            // Reset to empty state for new questions
+            setSelectedAnswer(null);
+            setTextResponse('');
+        }
+    }, [question?.survey_index, existingAnswer]);
 
     if (!question) return null;
 
-    // Dynamic question type detection based on survey_type or strType
+    console.log(selectedAnswer);
+
     const getQuestionType = () => {
         // First check survey_type (most reliable)
         if (question.survey_type !== undefined) {
