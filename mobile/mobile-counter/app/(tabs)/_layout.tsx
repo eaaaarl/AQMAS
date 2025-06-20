@@ -1,19 +1,17 @@
 import { Ionicons } from '@expo/vector-icons';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import * as NavigationBar from 'expo-navigation-bar';
-import { useEffect } from 'react';
 import { StatusBar, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import TellerInterface from '.';
-import Profile from './profile';
+import Profile from './setting';
 
 const TopTabs = createMaterialTopTabNavigator();
 
 export default function TabLayout() {
 
-    useEffect(() => {
+    /* useEffect(() => {
         NavigationBar.setButtonStyleAsync("dark");
-    }, [])
+    }, []) */
 
     return (
         <SafeAreaView className='flex-1 bg-white'>
@@ -36,7 +34,7 @@ export default function TabLayout() {
                     tabBarLabel: ({ focused, color, children }) => (
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                             <Ionicons
-                                name={children === 'Home' ? 'home' : 'person'}
+                                name={children === 'Home' ? 'home' : 'cog-outline'}
                                 size={16}
                                 color={color}
                             />
@@ -55,10 +53,10 @@ export default function TabLayout() {
                     }}
                 />
                 <TopTabs.Screen
-                    name="profile"
+                    name="Setting"
                     component={Profile}
                     options={{
-                        title: 'Profile',
+                        title: 'Setting',
                     }}
                 />
             </TopTabs.Navigator>

@@ -58,7 +58,6 @@ export default function SurveyResultsScreen() {
     const questionDetail = surveyQuestionDetail?.results || [];
     const isAllQuestionsAnswered = surveyQuestion?.length === surveyAnswers.length;
 
-    // Memoized shuffled questions - only shuffle once when component mounts and random is enabled
     const displayQuestions = useMemo(() => {
         if (!surveyQuestion?.length) return [];
 
@@ -160,7 +159,6 @@ export default function SurveyResultsScreen() {
         }
     };
 
-    // Helper function to get question type
     const getQuestionType = (question: SurveyQuestion) => {
         if (question.survey_type !== undefined) {
             switch (question.survey_type) {
@@ -324,13 +322,6 @@ interface RenderSurveyQuestionProps {
 
 export function RenderSurveyQuestion(props: RenderSurveyQuestionProps) {
     const { item, displayIndex, onPress, isAnswered, isRandomized, currentAnswer, questionType } = props;
-
-    // Helper function to truncate text for display
-    // const truncateText = (text: string, maxLength: number = 50) => {
-    //     if (text.length <= maxLength) return text;
-    //     return text.substring(0, maxLength) + '...';
-    // };
-
     return (
         <TouchableOpacity onPress={onPress} className="mb-4">
             <View className={`p-6 rounded-lg bg-white border shadow-sm ${isAnswered ? 'border-green-200 bg-green-50' : 'border-gray-200'
@@ -424,16 +415,7 @@ interface RenderSurveyQuestionModalProps {
     questionDetail: SurveyResult[];
     onClose: () => void;
     onAnswerSubmit: (answer: SurveyQuestionDetailPayload) => void;
-    existingAnswer?: SurveyQuestionDetailPayload; // Add existing answer prop
-}
-
-interface RenderSurveyQuestionModalProps {
-    visible: boolean;
-    question: SurveyQuestion | null;
-    questionDetail: SurveyResult[];
-    onClose: () => void;
-    onAnswerSubmit: (answer: SurveyQuestionDetailPayload) => void;
-    existingAnswer?: SurveyQuestionDetailPayload; // Add existing answer prop
+    existingAnswer?: SurveyQuestionDetailPayload;
 }
 
 export function RenderSurveyQuestionModal(props: RenderSurveyQuestionModalProps) {
@@ -442,7 +424,6 @@ export function RenderSurveyQuestionModal(props: RenderSurveyQuestionModalProps)
     const [textResponse, setTextResponse] = useState<string>('');
 
     useEffect(() => {
-        // Pre-populate with existing answer if available
         if (existingAnswer && question) {
             const questionType = getQuestionType();
 
@@ -454,15 +435,14 @@ export function RenderSurveyQuestionModal(props: RenderSurveyQuestionModalProps)
                 setTextResponse('');
             }
         } else {
-            // Reset to empty state for new questions
             setSelectedAnswer(null);
             setTextResponse('');
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [question?.survey_index, existingAnswer]);
 
     if (!question) return null;
 
-    console.log(selectedAnswer);
 
     const getQuestionType = () => {
         // First check survey_type (most reliable)
