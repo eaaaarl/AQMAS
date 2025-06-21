@@ -116,7 +116,7 @@ export const useQueue = () => {
 
     setCustomerNameError(null);
     setShowCustomerName(false);
-    setTimeout(() => callCreateQueue(), 100);
+    await callCreateQueue();
   };
 
   const handleCancelType = () => {
@@ -135,13 +135,11 @@ export const useQueue = () => {
 
     setShowCustomerType(false);
 
-    setTimeout(async () => {
-      if (showAskCustomerName && !customerName.trim()) {
-        setShowCustomerName(true);
-      } else {
-        await callCreateQueue();
-      }
-    }, 100);
+    if (showAskCustomerName && !customerName.trim()) {
+      setShowCustomerName(true);
+    } else {
+      await callCreateQueue();
+    }
   };
 
   const handleOpenConfirmationToast = () => {
@@ -203,8 +201,6 @@ export const useQueue = () => {
 
       await createQueue(mainQueuePayload).unwrap();
       console.log("✅ Main queue entry created successfully");
-
-      await new Promise((resolve) => setTimeout(resolve, 100));
 
       console.log("📋 Creating queue details...");
       const queueDetailsPayload = selectedTransactions.map((service) => ({

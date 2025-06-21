@@ -1,5 +1,3 @@
-
-
 import { router, Stack } from 'expo-router'
 import React from 'react'
 import { Text, TouchableOpacity } from 'react-native'
@@ -14,19 +12,26 @@ export default function ConfigLayout() {
                     title: "Developer Settings",
                     presentation: 'modal',
                     headerStyle: {
-                        backgroundColor: '#f8f9fa',
+                        backgroundColor: '#f9fafb',
                     },
                     headerTitleStyle: {
-                        fontWeight: 'bold',
-                        color: '#333',
+                        fontWeight: '600',
+                        color: '#111827',
+                        fontSize: 18,
                     },
                     headerLeft: () => null,
                     headerRight: () => (
                         <TouchableOpacity
                             onPress={() => router.back()}
-                            style={{ padding: 8 }}
+                            style={{
+                                paddingHorizontal: 12,
+                                paddingVertical: 8,
+                                backgroundColor: '#eff6ff',
+                                borderRadius: 8,
+                            }}
+                            activeOpacity={0.7}
                         >
-                            <Text style={{ color: '#007AFF', fontSize: 16 }}>Done</Text>
+                            <Text style={{ color: '#2563eb', fontWeight: '500', fontSize: 16 }}>Done</Text>
                         </TouchableOpacity>
                     ),
                     animationTypeForReplace: 'push',
