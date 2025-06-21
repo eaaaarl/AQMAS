@@ -125,6 +125,7 @@ export default function SurveyResultsScreen() {
             }
 
             const res = await createSurveyInfo(payload)
+
             const payloadDetail: SurveyQuestionDetailPayload[] = surveyAnswers.map((sv) => ({
                 repondent_index: res.data?.answerId,
                 choice_index: sv.choice_index,
@@ -140,6 +141,7 @@ export default function SurveyResultsScreen() {
                 text1: 'Thank you for your feedback!',
                 text2: 'Your survey has been submitted successfully'
             })
+
             setOpenCustomerForm(false);
             setCustomerFormData({
                 name: '',
