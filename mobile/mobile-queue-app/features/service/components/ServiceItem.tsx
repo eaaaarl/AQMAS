@@ -13,7 +13,7 @@ export const ServiceItem = ({ service, isSelected, onPress, cardWidth, isLoading
     <TouchableOpacity
         style={{ width: cardWidth }}
         className={`h-32 m-1 rounded-full items-center justify-center shadow-lg border border-gray-300
-      ${isSelected ? 'bg-red-500' : 'bg-gray-100'}`}
+      ${isSelected ? 'bg-blue-500' : 'bg-gray-100'}`}
         onPress={onPress}
         disabled={isLoading}
     >
