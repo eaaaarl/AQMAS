@@ -1,5 +1,7 @@
-import React from 'react';
+import { OfflineIndicator, useGlobalError } from '@/features/error';
+import React, { useState } from 'react';
 import {
+    RefreshControl,
     SafeAreaView,
     ScrollView,
     StatusBar,
@@ -44,21 +46,39 @@ const InfoRow: React.FC<InfoRowProps> = ({ label, value }) => (
 );
 
 export default function SettingsScreen() {
+    const [refreshing, setRefreshing] = useState(false);
+    const { hasConnectionError } = useGlobalError();
     const {
         empInformation,
         settings,
+        handleRefresh,
         handleLogout,
         updateCustomerType,
         updateService,
     } = useSettings();
 
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await handleRefresh();
+        setRefreshing(false);
+    };
+
     return (
         <SafeAreaView className="flex-1 bg-gray-50">
             <StatusBar barStyle="dark-content" backgroundColor="#f9fafb" />
+            <OfflineIndicator isOffline={hasConnectionError} />
             <ScrollView
                 className="flex-1"
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingBottom: 20 }}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        colors={['#1c3f83']}
+                        tintColor="#1c3f83"
+                    />
+                }
             >
                 <View className="px-5 py-6 mx-4">
                     {/* Counter User Information Section */}

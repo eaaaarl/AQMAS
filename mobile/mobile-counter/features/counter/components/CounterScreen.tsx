@@ -1,24 +1,46 @@
-import React from 'react';
-import { ScrollView, StatusBar, Text, TouchableOpacity, View } from "react-native";
+import { OfflineIndicator, useGlobalError } from '@/features/error';
+import React, { useState } from 'react';
+import { RefreshControl, ScrollView, StatusBar, Text, TouchableOpacity, View } from "react-native";
 import { useCounter } from '../hooks';
 
 export default function CounterScreen() {
+  const [refreshing, setRefreshing] = useState(false);
+  const { hasConnectionError } = useGlobalError();
   const {
     config,
     roleName,
     counterNo,
     currentTime,
     currentTicket,
+    handleRefresh,
     handleNext,
     handleRecall,
     handleFinished,
     handleSkip
   } = useCounter();
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await handleRefresh();
+    setRefreshing(false);
+  };
+
   return (
     <View className="flex-1 bg-gray-50">
       <StatusBar barStyle="light-content" backgroundColor="#1c3f83" />
-      <ScrollView className="flex-1 p-4" showsVerticalScrollIndicator={false}>
+      <OfflineIndicator isOffline={hasConnectionError} />
+      <ScrollView 
+        className="flex-1 p-4" 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#1c3f83']}
+            tintColor="#1c3f83"
+          />
+        }
+      >
         <View className="bg-white rounded-2xl shadow-lg overflow-hidden">
 
           <View style={{ backgroundColor: '#1c3f83' }} className="px-6 py-4">

@@ -7,17 +7,17 @@ import { Ticket } from '../types';
 
 export const useCounter = () => {
   // GET CONFIG
-  const { data: config } = useGetConfigQuery();
+  const { data: config, refetch: refetchConfig } = useGetConfigQuery();
 
   // GET STATE EMPLOYEE INFORMATION
   const emp = useAppSelector((state) => state.employee);
 
   // GET EMPLOYEE INFORMATION 
-  const { data: empInfo } = useGetEmployeeInfoQuery({ empId: emp.employee_id as number });
+  const { data: empInfo, refetch: refetchEmpInfo } = useGetEmployeeInfoQuery({ empId: emp.employee_id as number });
   const empInformation = empInfo?.results || [];
 
   // GET EMPLOYEE ROLE BY EMPLOYEE ID
-  const { data: empRole } = useGetEmployeeRoleQuery({ emp_id: empInformation?.[0]?.employee_id });
+  const { data: empRole, refetch: refetchEmpRole } = useGetEmployeeRoleQuery({ emp_id: empInformation?.[0]?.employee_id });
 
   // GET ROLE NAME
   const roleName = empRole?.[0]?.role_name;
@@ -45,6 +45,18 @@ export const useCounter = () => {
 
     return () => clearInterval(timer);
   }, []);
+
+  const handleRefresh = async () => {
+    try {
+      await Promise.all([
+        refetchConfig(),
+        refetchEmpInfo(),
+        refetchEmpRole()
+      ]);
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+    }
+  };
 
   const handleNext = () => {
     Alert.alert('Next', 'Moving to next customer');
@@ -79,6 +91,7 @@ export const useCounter = () => {
     counterNo,
     currentTime,
     currentTicket,
+    handleRefresh,
     handleNext,
     handleRecall,
     handleFinished,

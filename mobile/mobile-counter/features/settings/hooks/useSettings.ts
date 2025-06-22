@@ -9,7 +9,7 @@ import { SettingsState } from '../types';
 export const useSettings = () => {
   const dispatch = useAppDispatch();
   const emp = useAppSelector((state) => state.employee);
-  const { data: empInfo } = useGetEmployeeInfoQuery({ empId: emp.employee_id as number });
+  const { data: empInfo, refetch: refetchEmpInfo } = useGetEmployeeInfoQuery({ empId: emp.employee_id as number });
   const empInformation = empInfo?.results || [];
 
   const [settings, setSettings] = useState<SettingsState>({
@@ -23,6 +23,14 @@ export const useSettings = () => {
       credit: true,
     },
   });
+
+  const handleRefresh = async () => {
+    try {
+      await refetchEmpInfo();
+    } catch (error) {
+      console.error('Error refreshing employee data:', error);
+    }
+  };
 
   const handleLogout = async () => {
     Alert.alert(
@@ -74,6 +82,7 @@ export const useSettings = () => {
   return {
     empInformation,
     settings,
+    handleRefresh,
     handleLogout,
     updateCustomerType,
     updateService,
