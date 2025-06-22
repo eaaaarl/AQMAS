@@ -14,13 +14,13 @@ const database_1 = require("../infrastructure/database/database");
 const CustomErrors_1 = require("../libs/CustomErrors");
 class CustomerRepository {
     constructor() {
+        this.tableName = 'customer_type';
         this.database = database_1.db;
     }
     getAllCustomerType(is_show) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const customer = yield this.database('customer_type').select('*').where('is_show', is_show);
-                return customer;
+                return yield this.database(this.tableName).select('*').where('is_show', is_show);
             }
             catch (error) {
                 console.error('Error at getAllCustomerType', error);
@@ -31,8 +31,7 @@ class CustomerRepository {
     getAllCustomerTypes() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const customer = yield this.database('customer_type').select('*');
-                return customer;
+                return yield this.database(this.tableName).select('*');
             }
             catch (error) {
                 console.error('Error at getAllCustomerTypes', error);

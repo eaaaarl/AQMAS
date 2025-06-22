@@ -34,14 +34,24 @@ export default function TabLayout() {
           },
           tabBarLabel: ({ focused, color, children }) => (
             <View
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 5,
+              }}
             >
               <Ionicons
                 name={children === 'Home' ? 'home' : 'cog-outline'}
                 size={16}
                 color={color}
               />
-              <Text style={{ color, fontWeight: 'bold', fontSize: 14 }}>
+              <Text
+                style={{
+                  color,
+                  fontWeight: 'bold',
+                  fontSize: 14,
+                }}
+              >
                 {children}
               </Text>
             </View>

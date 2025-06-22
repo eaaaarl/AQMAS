@@ -8,33 +8,59 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const dotenv_1 = __importDefault(require("dotenv"));
 const app_1 = require("./infrastructure/express-server/app");
 const database_1 = require("./infrastructure/database/database");
-dotenv_1.default.config();
+const app_config_1 = require("./config/core/app.config");
+const logger_1 = require("./infrastructure/logger/logger");
+let server;
 const initializeServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        // Database connection check
         try {
             yield database_1.db.raw('SELECT 1');
-            console.log('Database connected successfully!');
+            logger_1.logger.info('Database connected successfully!');
         }
         catch (error) {
-            console.error('Failed to connect to the database \n', error);
+            logger_1.logger.error('Failed to connect to the database:', { error: error.message });
             process.exit(1);
         }
+        // Initialize Express app
         const app = (0, app_1.startApp)();
-        const port = parseInt('3005');
-        app.listen(port, '0.0.0.0', () => {
-            console.log(`Server is running on port ${port}`);
+        // Start server
+        server = app.listen(app_config_1.appConfig.server.port, app_config_1.appConfig.server.host, () => {
+            logger_1.logger.info(`Server is running on ${app_config_1.appConfig.server.host}:${app_config_1.appConfig.server.port}`);
+            logger_1.logger.info(`Environment: ${app_config_1.appConfig.server.environment}`);
         });
     }
     catch (error) {
-        console.error('Failed to start the server', error);
+        logger_1.logger.error('Failed to start the server:', { error: error.message });
         process.exit(1);
     }
 });
+const shutdown = (signal) => {
+    logger_1.logger.warn(`${signal} received, shutting down gracefully.`);
+    if (server) {
+        server.close(() => {
+            logger_1.logger.info('Server closed.');
+            process.exit(0);
+        });
+    }
+    else {
+        process.exit(0);
+    }
+};
+// Handle uncaught exceptions
+process.on('uncaughtException', error => {
+    logger_1.logger.error('Uncaught Exception:', { error: error.message, stack: error.stack });
+    shutdown('uncaughtException');
+});
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+    logger_1.logger.error('Unhandled Rejection at:', { promise, reason });
+    shutdown('unhandledRejection');
+});
+// Graceful shutdown
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
 initializeServer();
