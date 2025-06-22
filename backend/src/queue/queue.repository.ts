@@ -25,7 +25,7 @@ export class QueueRepository {
         trans_status: payload.transStatus,
         single_trans_only: payload.singleTransOnly,
         customer_name: payload.customerName,
-        trans_date: getTransDate()
+        trans_date: getTransDate(),
       });
       return newQueue;
     } catch (error) {
@@ -40,7 +40,7 @@ export class QueueRepository {
       const dataToInsert = payload.map(p => ({
         trans_id: p.trans_id,
         service_id: p.service_id,
-        trans_date: getTransDate()
+        trans_date: getTransDate(),
       }));
 
       const insertedIds = await db('queue_detail').insert(dataToInsert);
@@ -85,17 +85,17 @@ export class QueueRepository {
     }
   }
 
- async countByServiceCount({ service_id }: queueByServiceCountDTO) {
-  try {
-    const result = await this.database('queue_detail as qd')
-      .count('* as count')
-      .where('qd.service_id', service_id)
-      .andWhereRaw('DATE(qd.trans_date) = CURDATE()') // ← Critical fix here
-      .first();
-    return Number(result?.count) || 0;
-  } catch (error) {
-    console.error('Database error in countByServiceCount:', error);
-    throw new DatabaseErrors('Failed to countQueueAllService method at Repository Layer');
+  async countByServiceCount({ service_id }: queueByServiceCountDTO) {
+    try {
+      const result = await this.database('queue_detail as qd')
+        .count('* as count')
+        .where('qd.service_id', service_id)
+        .andWhereRaw('DATE(qd.trans_date) = CURDATE()')
+        .first();
+      return Number(result?.count) || 0;
+    } catch (error) {
+      console.error('Database error in countByServiceCount:', error);
+      throw new DatabaseErrors('Failed to countQueueAllService method at Repository Layer');
+    }
   }
-}
 }

@@ -32,7 +32,7 @@ class QueueRepository {
                     trans_status: payload.transStatus,
                     single_trans_only: payload.singleTransOnly,
                     customer_name: payload.customerName,
-                    trans_date: (0, DateMoment_1.getTransDate)()
+                    trans_date: (0, DateMoment_1.getTransDate)(),
                 });
                 return newQueue;
             }
@@ -49,7 +49,7 @@ class QueueRepository {
                 const dataToInsert = payload.map(p => ({
                     trans_id: p.trans_id,
                     service_id: p.service_id,
-                    trans_date: (0, DateMoment_1.getTransDate)()
+                    trans_date: (0, DateMoment_1.getTransDate)(),
                 }));
                 const insertedIds = yield db('queue_detail').insert(dataToInsert);
                 const newQueueDetails = yield db('queue_detail').whereIn('trans_id', insertedIds);
@@ -99,7 +99,7 @@ class QueueRepository {
                 const result = yield this.database('queue_detail as qd')
                     .count('* as count')
                     .where('qd.service_id', service_id)
-                    .andWhereRaw('DATE(qd.trans_date) = CURDATE()') // ← Critical fix here
+                    .andWhereRaw('DATE(qd.trans_date) = CURDATE()')
                     .first();
                 return Number(result === null || result === void 0 ? void 0 : result.count) || 0;
             }
