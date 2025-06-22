@@ -6,7 +6,7 @@ export const handleAuthError = (error: any): AuthError => {
     status: error?.status,
     data: error?.data,
     message: error?.message,
-    originalStatus: error?.originalStatus
+    originalStatus: error?.originalStatus,
   });
 
   let errorMessage = 'Failed to login, please try again';
@@ -18,7 +18,8 @@ export const handleAuthError = (error: any): AuthError => {
     errorMessage = 'Network error - check your connection';
     errorTitle = 'Connection Error';
   } else if (error?.status === 'TIMEOUT_ERROR') {
-    errorMessage = 'Request timed out. Please check your connection and try again';
+    errorMessage =
+      'Request timed out. Please check your connection and try again';
     errorTitle = 'Timeout Error';
   } else if (error?.status === 'PARSING_ERROR') {
     errorMessage = 'Server response error';
@@ -38,7 +39,7 @@ export const handleAuthError = (error: any): AuthError => {
   return {
     status: error?.status || 'UNKNOWN',
     message: errorMessage,
-    title: errorTitle
+    title: errorTitle,
   };
 };
 
@@ -52,4 +53,4 @@ export const isAuthError = (error: any): boolean => {
 
 export const isServerError = (error: any): boolean => {
   return error?.status === 500 || error?.status === 'PARSING_ERROR';
-}; 
+};

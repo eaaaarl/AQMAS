@@ -3,4 +3,4 @@ export interface TabConfig {
   title: string;
   icon: string;
   component: React.ComponentType<any>;
-} 
+}

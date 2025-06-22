@@ -1,4 +1,4 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore } from '@reduxjs/toolkit';
 import {
   FLUSH,
   PAUSE,
@@ -7,13 +7,13 @@ import {
   PURGE,
   REGISTER,
   REHYDRATE,
-} from "redux-persist";
+} from 'redux-persist';
 
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import rootReducer, { apis, apisReducersPath } from "./reducer";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import rootReducer, { apis, apisReducersPath } from './reducer';
 
 const persistConfig = {
-  key: "root",
+  key: 'root',
   version: 1,
   storage: AsyncStorage,
   blacklist: [...apisReducersPath],
@@ -25,13 +25,13 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
   reducer: persistedReducer,
-  middleware: (getDefaultMiddleware) =>
+  middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
         ignoredPaths: apisReducersPath,
       },
-    }).concat(apis.map((api) => api.middleware)),
+    }).concat(apis.map(api => api.middleware)),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

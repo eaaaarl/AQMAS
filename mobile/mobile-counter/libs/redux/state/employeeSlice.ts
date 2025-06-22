@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface EmployeeState {
   employee_id: number | string;
@@ -16,22 +16,22 @@ interface EmployeeState {
 }
 
 const initialState: EmployeeState = {
-  employee_id: "",
-  birthday: "",
-  civil_status: "",
-  employee_addr: "",
-  employee_no: "",
-  employee_pin: "",
-  first_name: "",
-  gender: "",
+  employee_id: '',
+  birthday: '',
+  civil_status: '',
+  employee_addr: '',
+  employee_no: '',
+  employee_pin: '',
+  first_name: '',
+  gender: '',
   is_active: false,
-  last_name: "",
-  mid_name: "",
-  picture: "",
+  last_name: '',
+  mid_name: '',
+  picture: '',
 };
 
 export const employeeSlice = createSlice({
-  name: "employee",
+  name: 'employee',
   initialState,
   reducers: {
     setEmployee: (state, action: PayloadAction<EmployeeState>) => {
@@ -40,7 +40,7 @@ export const employeeSlice = createSlice({
         ...action.payload,
       };
     },
-    removeEmployee: (state) => {
+    removeEmployee: state => {
       return initialState;
     },
   },

@@ -6,15 +6,11 @@ export const validateLoginForm = (data: LoginFormData): LoginFormErrors => {
   // Employee ID validation
   if (!data.employeeId.trim()) {
     errors.employeeId = 'Employee number is required';
-  } else if (data.employeeId.trim().length < 3) {
-    errors.employeeId = 'Employee number must be at least 3 characters';
   }
 
   // PIN validation
   if (!data.pin.trim()) {
     errors.pin = 'PIN is required';
-  } else if (data.pin.trim().length < 4) {
-    errors.pin = 'PIN must be at least 4 characters';
   } else if (!/^\d+$/.test(data.pin.trim())) {
     errors.pin = 'PIN must contain only numbers';
   }
@@ -34,4 +30,4 @@ export const formatEmployeeId = (value: string): string => {
 export const formatPin = (value: string): string => {
   // Remove any non-numeric characters
   return value.replace(/[^0-9]/g, '');
-}; 
+};

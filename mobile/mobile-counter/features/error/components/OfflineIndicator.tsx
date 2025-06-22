@@ -6,15 +6,17 @@ interface OfflineIndicatorProps {
   isOffline: boolean;
 }
 
-export const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({ isOffline }) => {
+export const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({
+  isOffline,
+}) => {
   if (!isOffline) return null;
 
   return (
-    <View className="bg-red-500 px-3 py-2 flex-row items-center justify-center">
+    <View className="flex-row items-center justify-center bg-red-500 px-3 py-2">
       <Ionicons name="wifi-outline" size={16} color="white" />
-      <Text className="text-white text-sm font-medium ml-2">
+      <Text className="ml-2 text-sm font-medium text-white">
         No Internet Connection
       </Text>
     </View>
   );
-}; 
+};

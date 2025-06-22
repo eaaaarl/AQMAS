@@ -26,20 +26,26 @@ features/auth/
 ## Key Components
 
 ### LoginForm Component
+
 A reusable form component that handles:
+
 - Employee ID and PIN input
 - Form validation
 - Password visibility toggle
 - Loading states
 
 ### useAuth Hook
+
 Manages authentication state and provides:
+
 - `login(formData)` - Handle user login
 - `logout()` - Handle user logout
 - `isLoading` - Loading state
 
 ### useEmployeeData Hook
+
 Manages employee data fetching:
+
 - Employee information
 - Employee roles
 - Automatic caching and refetching
@@ -47,34 +53,36 @@ Manages employee data fetching:
 ## Usage Examples
 
 ### Basic Login
+
 ```tsx
 import { useAuth, LoginForm } from '@/features/auth';
 
 function LoginScreen() {
   const { login, isLoading } = useAuth();
-  
-  const handleLogin = async (formData) => {
+
+  const handleLogin = async formData => {
     await login(formData);
   };
-  
-  return (
-    <LoginForm onSubmit={handleLogin} isLoading={isLoading} />
-  );
+
+  return <LoginForm onSubmit={handleLogin} isLoading={isLoading} />;
 }
 ```
 
 ### Employee Data
+
 ```tsx
 import { useEmployeeData } from '@/features/auth';
 
 function EmployeeProfile() {
   const { employeeInfo, employeeRoles, isLoading } = useEmployeeData();
-  
+
   if (isLoading) return <LoadingSpinner />;
-  
+
   return (
     <View>
-      <Text>{employeeInfo?.first_name} {employeeInfo?.last_name}</Text>
+      <Text>
+        {employeeInfo?.first_name} {employeeInfo?.last_name}
+      </Text>
       <Text>Role: {employeeRoles[0]?.role_name}</Text>
     </View>
   );
@@ -84,6 +92,7 @@ function EmployeeProfile() {
 ## State Management
 
 The auth feature uses Redux with the following slices:
+
 - `authSlice` - Authentication state (isAuthenticated, employee, roles, etc.)
 - `employeeSlice` - Legacy employee state (maintained for backward compatibility)
 
@@ -96,6 +105,7 @@ The auth feature uses Redux with the following slices:
 ## Error Handling
 
 Centralized error handling with specific error types:
+
 - Network errors
 - Authentication errors
 - Server errors
@@ -104,7 +114,8 @@ Centralized error handling with specific error types:
 ## Validation
 
 Form validation includes:
+
 - Required field validation
 - Employee ID format validation
 - PIN format validation (numeric only)
-- Minimum length requirements 
+- Minimum length requirements
