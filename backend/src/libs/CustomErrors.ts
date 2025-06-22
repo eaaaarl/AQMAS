@@ -3,7 +3,7 @@ export class CustomErrors extends Error {
     public message: string,
     public statusCode: number,
     public code?: string,
-    public details?: any
+    public details?: any,
   ) {
     super(message);
     this.name = this.constructor.name;

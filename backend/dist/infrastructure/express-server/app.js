@@ -12,6 +12,7 @@ const config_route_1 = require("../../config/config.route");
 const queue_route_1 = require("../../queue/queue.route");
 const errorHandler_1 = require("../middleware/errorHandler");
 const customer_route_1 = require("../../customer/customer.route");
+const CustomErrors_1 = require("../../libs/CustomErrors");
 const startApp = () => {
     const app = (0, express_1.default)();
     //Security Middleware
@@ -28,6 +29,10 @@ const startApp = () => {
     app.use(config_route_1.configRoute);
     app.use('/queue', queue_route_1.queueRoute);
     app.use('/customer', customer_route_1.customerRoute);
+    // Handle 404 - Not Found
+    app.use((req, res, next) => {
+        next(new CustomErrors_1.NotFoundError(`The requested resource for ${req.method} on ${req.originalUrl} was not found.`));
+    });
     //Error Handler
     app.use(errorHandler_1.errorHandler);
     return app;

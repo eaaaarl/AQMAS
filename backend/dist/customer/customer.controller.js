@@ -13,13 +13,16 @@ exports.CustomerController = void 0;
 class CustomerController {
     constructor(customerService) {
         this.customerService = customerService;
+        // Bind the original method to maintain API compatibility
         this.getAllCustomerType = this.getAllCustomerType.bind(this);
     }
+    // Keep the original method name and response format to maintain API compatibility
     getAllCustomerType(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { is_show } = req.query;
                 const allCustomerTypes = yield this.customerService.getAllCustomerType(is_show !== undefined ? Number(is_show) : undefined);
+                // Maintain the original response format: direct array response
                 res.status(200).json(allCustomerTypes);
             }
             catch (error) {
