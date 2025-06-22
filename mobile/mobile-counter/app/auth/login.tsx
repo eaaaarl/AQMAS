@@ -1,10 +1,9 @@
 import { useEmployeeLoginMutation } from '@/features/auth/api/authApi';
 import { useAppDispatch } from '@/libs/redux/hooks';
-import { setEmployee } from '@/libs/redux/state/employeeSlice';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 export default function Login() {
@@ -38,68 +37,69 @@ export default function Login() {
     };
 
     const handleLogin = async () => {
-        if (!validateForm()) {
-            return;
-        }
-
-        try {
-
-            const res = await employeeLogin({ id: empId, pin: empPin }).unwrap();
-
-            dispatch(setEmployee({ employee_id: res.employeeId }))
-
-            if (res.ghError === 1001) {
-                Toast.show({
-                    type: 'error',
-                    text1: 'Login Failed',
-                    text2: res.message || 'Invalid credentials'
-                });
-                return;
-            }
-
-            Toast.show({
-                type: 'success',
-                text1: 'Login Successful',
-                text2: res.message || 'Welcome back!'
-            });
-            setEmpId('')
-            setEmpPin('')
-            router.push('/(tabs)')
-        } catch (error: any) {
-            console.log('Login ERROR Details:', {
-                error,
-                status: error?.status,
-                data: error?.data,
-                message: error?.message,
-                originalStatus: error?.originalStatus
-            });
-
-            let errorMessage = 'Failed to login, please try again';
-            let errorTitle = 'Login Failed';
-
-            if (error?.data?.message) {
-                errorMessage = error.data.message;
-            } else if (error?.status === 'FETCH_ERROR') {
-                errorMessage = 'Network error - check your connection';
-                errorTitle = 'Connection Error';
-            } else if (error?.status === 'PARSING_ERROR') {
-                errorMessage = 'Server response error';
-            } else if (error?.status === 401) {
-                errorMessage = 'Invalid employee number or PIN';
-            } else if (error?.status === 404) {
-                errorMessage = 'Employee not found';
-            } else if (error?.status === 500) {
-                errorMessage = 'Server error. Please try again later';
-            } else if (error?.originalStatus === 401) {
-                errorMessage = 'Invalid credentials';
-            }
-
-            Toast.show({
-                type: 'error',
-                text1: errorTitle,
-                text2: errorMessage
-            });
-        }
+        router.push('/(tabs)')
+        /*  if (!validateForm()) {
+             return;
+         }
+ 
+         try {
+ 
+             const res = await employeeLogin({ id: empId, pin: empPin }).unwrap();
+ 
+             dispatch(setEmployee({ employee_id: res.employeeId }))
+ 
+             if (res.ghError === 1001) {
+                 Toast.show({
+                     type: 'error',
+                     text1: 'Login Failed',
+                     text2: res.message || 'Invalid credentials'
+                 });
+                 return;
+             }
+ 
+             Toast.show({
+                 type: 'success',
+                 text1: 'Login Successful',
+                 text2: res.message || 'Welcome back!'
+             });
+             setEmpId('')
+             setEmpPin('')
+             router.push('/(tabs)')
+         } catch (error: any) {
+             console.log('Login ERROR Details:', {
+                 error,
+                 status: error?.status,
+                 data: error?.data,
+                 message: error?.message,
+                 originalStatus: error?.originalStatus
+             });
+ 
+             let errorMessage = 'Failed to login, please try again';
+             let errorTitle = 'Login Failed';
+ 
+             if (error?.data?.message) {
+                 errorMessage = error.data.message;
+             } else if (error?.status === 'FETCH_ERROR') {
+                 errorMessage = 'Network error - check your connection';
+                 errorTitle = 'Connection Error';
+             } else if (error?.status === 'PARSING_ERROR') {
+                 errorMessage = 'Server response error';
+             } else if (error?.status === 401) {
+                 errorMessage = 'Invalid employee number or PIN';
+             } else if (error?.status === 404) {
+                 errorMessage = 'Employee not found';
+             } else if (error?.status === 500) {
+                 errorMessage = 'Server error. Please try again later';
+             } else if (error?.originalStatus === 401) {
+                 errorMessage = 'Invalid credentials';
+             }
+ 
+             Toast.show({
+                 type: 'error',
+                 text1: errorTitle,
+                 text2: errorMessage
+             });
+         } */
     };
 
     return (
@@ -164,7 +164,7 @@ export default function Login() {
                             } items-center`}
                     >
                         <Text className="text-white font-medium">
-                            {isLoading ? 'Logging in...' : 'Login'}
+                            {isLoading ? <ActivityIndicator size="small" color="#fff" /> : 'Login'}
                         </Text>
                     </TouchableOpacity>
                 </View>

@@ -1,12 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import {
-    FLUSH,
-    PAUSE,
-    PERSIST,
-    persistReducer,
-    PURGE,
-    REGISTER,
-    REHYDRATE,
+  FLUSH,
+  PAUSE,
+  PERSIST,
+  persistReducer,
+  PURGE,
+  REGISTER,
+  REHYDRATE,
 } from "redux-persist";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -33,6 +33,7 @@ export const store = configureStore({
       },
     }).concat(apis.map((api) => api.middleware)),
 });
+
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 
