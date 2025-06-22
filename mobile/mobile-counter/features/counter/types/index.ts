@@ -13,4 +13,4 @@ export interface Ticket {
 export interface CounterState {
   currentTicket: Ticket;
   currentTime: Date;
-} 
+}

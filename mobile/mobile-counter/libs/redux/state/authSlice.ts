@@ -1,5 +1,5 @@
-import { AuthState, Employee, RoleInfo } from "@/features/auth/types";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { AuthState, Employee, RoleInfo } from '@/features/auth/types';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: AuthState = {
   isAuthenticated: false,
@@ -10,7 +10,7 @@ const initialState: AuthState = {
 };
 
 export const authSlice = createSlice({
-  name: "auth",
+  name: 'auth',
   initialState,
   reducers: {
     setAuthenticated: (state, action: PayloadAction<boolean>) => {
@@ -30,13 +30,13 @@ export const authSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
-    logout: (state) => {
+    logout: state => {
       state.isAuthenticated = false;
       state.employee = null;
       state.roles = [];
       state.error = null;
     },
-    clearError: (state) => {
+    clearError: state => {
       state.error = null;
     },
   },
@@ -52,4 +52,4 @@ export const {
   clearError,
 } = authSlice.actions;
 
-export const authReducer = authSlice.reducer; 
+export const authReducer = authSlice.reducer;

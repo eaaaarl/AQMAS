@@ -69,4 +69,4 @@ export interface AuthError {
   status: string | number;
   message: string;
   title?: string;
-} 
+}

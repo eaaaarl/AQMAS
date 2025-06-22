@@ -8,8 +8,10 @@ import { SettingsState } from '../types';
 
 export const useSettings = () => {
   const dispatch = useAppDispatch();
-  const emp = useAppSelector((state) => state.employee);
-  const { data: empInfo, refetch: refetchEmpInfo } = useGetEmployeeInfoQuery({ empId: emp.employee_id as number });
+  const emp = useAppSelector(state => state.employee);
+  const { data: empInfo, refetch: refetchEmpInfo } = useGetEmployeeInfoQuery({
+    empId: emp.employee_id as number,
+  });
   const empInformation = empInfo?.results || [];
 
   const [settings, setSettings] = useState<SettingsState>({
@@ -33,33 +35,32 @@ export const useSettings = () => {
   };
 
   const handleLogout = async () => {
-    Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
+    Alert.alert('Logout', 'Are you sure you want to logout?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Logout',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            dispatch(removeEmployee());
+            router.push('/auth/login');
+          } catch (error) {
+            console.error('Error during logout:', error);
+            dispatch(removeEmployee());
+            router.push('/auth/login');
+          }
         },
-        {
-          text: 'Logout',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              dispatch(removeEmployee());
-              router.push('/auth/login');
-            } catch (error) {
-              console.error('Error during logout:', error);
-              dispatch(removeEmployee());
-              router.push('/auth/login');
-            }
-          },
-        },
-      ]
-    );
+      },
+    ]);
   };
 
-  const updateCustomerType = (type: keyof SettingsState['customerTypes'], value: boolean) => {
+  const updateCustomerType = (
+    type: keyof SettingsState['customerTypes'],
+    value: boolean
+  ) => {
     setSettings(prev => ({
       ...prev,
       customerTypes: {
@@ -69,7 +70,10 @@ export const useSettings = () => {
     }));
   };
 
-  const updateService = (service: keyof SettingsState['services'], value: boolean) => {
+  const updateService = (
+    service: keyof SettingsState['services'],
+    value: boolean
+  ) => {
     setSettings(prev => ({
       ...prev,
       services: {
@@ -87,4 +91,4 @@ export const useSettings = () => {
     updateCustomerType,
     updateService,
   };
-}; 
+};

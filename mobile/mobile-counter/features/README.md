@@ -70,23 +70,23 @@ feature-name/
 ### Importing Components
 
 ```typescript
-import { CounterScreen } from "@/features/counter";
-import { SettingsScreen } from "@/features/settings";
-import { TabLayout } from "@/features/navigation";
+import { CounterScreen } from '@/features/counter';
+import { SettingsScreen } from '@/features/settings';
+import { TabLayout } from '@/features/navigation';
 ```
 
 ### Using Hooks
 
 ```typescript
-import { useCounter } from "@/features/counter/hooks";
-import { useSettings } from "@/features/settings/hooks";
+import { useCounter } from '@/features/counter/hooks';
+import { useSettings } from '@/features/settings/hooks';
 ```
 
 ### Using Types
 
 ```typescript
-import { Ticket } from "@/features/counter/types";
-import { SettingsState } from "@/features/settings/types";
+import { Ticket } from '@/features/counter/types';
+import { SettingsState } from '@/features/settings/types';
 ```
 
 ## Adding New Features

@@ -1,4 +1,7 @@
-import { useGetEmployeeInfoQuery, useGetEmployeeRoleQuery } from '@/features/auth/api/authApi';
+import {
+  useGetEmployeeInfoQuery,
+  useGetEmployeeRoleQuery,
+} from '@/features/auth/api/authApi';
 import { useGetConfigQuery } from '@/features/config/api/configApi';
 import { useAppSelector } from '@/libs/redux/hooks';
 import { useEffect, useState } from 'react';
@@ -10,14 +13,18 @@ export const useCounter = () => {
   const { data: config, refetch: refetchConfig } = useGetConfigQuery();
 
   // GET STATE EMPLOYEE INFORMATION
-  const emp = useAppSelector((state) => state.employee);
+  const emp = useAppSelector(state => state.employee);
 
-  // GET EMPLOYEE INFORMATION 
-  const { data: empInfo, refetch: refetchEmpInfo } = useGetEmployeeInfoQuery({ empId: emp.employee_id as number });
+  // GET EMPLOYEE INFORMATION
+  const { data: empInfo, refetch: refetchEmpInfo } = useGetEmployeeInfoQuery({
+    empId: emp.employee_id as number,
+  });
   const empInformation = empInfo?.results || [];
 
   // GET EMPLOYEE ROLE BY EMPLOYEE ID
-  const { data: empRole, refetch: refetchEmpRole } = useGetEmployeeRoleQuery({ emp_id: empInformation?.[0]?.employee_id });
+  const { data: empRole, refetch: refetchEmpRole } = useGetEmployeeRoleQuery({
+    emp_id: empInformation?.[0]?.employee_id,
+  });
 
   // GET ROLE NAME
   const roleName = empRole?.[0]?.role_name;
@@ -35,7 +42,7 @@ export const useCounter = () => {
     skipped: 0,
     bestTime: '',
     worstTime: '',
-    remaining: 16
+    remaining: 16,
   });
 
   useEffect(() => {
@@ -48,11 +55,7 @@ export const useCounter = () => {
 
   const handleRefresh = async () => {
     try {
-      await Promise.all([
-        refetchConfig(),
-        refetchEmpInfo(),
-        refetchEmpRole()
-      ]);
+      await Promise.all([refetchConfig(), refetchEmpInfo(), refetchEmpRole()]);
     } catch (error) {
       console.error('Error refreshing data:', error);
     }
@@ -71,7 +74,7 @@ export const useCounter = () => {
     setCurrentTicket(prev => ({
       ...prev,
       finished: prev.finished + 1,
-      remaining: prev.remaining - 1
+      remaining: prev.remaining - 1,
     }));
   };
 
@@ -80,7 +83,7 @@ export const useCounter = () => {
     setCurrentTicket(prev => ({
       ...prev,
       skipped: prev.skipped + 1,
-      remaining: prev.remaining - 1
+      remaining: prev.remaining - 1,
     }));
   };
 
@@ -95,6 +98,6 @@ export const useCounter = () => {
     handleNext,
     handleRecall,
     handleFinished,
-    handleSkip
+    handleSkip,
   };
-}; 
+};

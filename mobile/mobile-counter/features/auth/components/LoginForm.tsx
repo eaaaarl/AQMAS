@@ -1,6 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { ActivityIndicator, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { LoginFormData } from '../types';
 import { formatEmployeeId, formatPin } from '../utils/validation';
 
@@ -9,10 +15,13 @@ interface LoginFormProps {
   isLoading: boolean;
 }
 
-export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading }) => {
+export const LoginForm: React.FC<LoginFormProps> = ({
+  onSubmit,
+  isLoading,
+}) => {
   const [formData, setFormData] = useState<LoginFormData>({
     employeeId: '',
-    pin: ''
+    pin: '',
   });
   const [showPassword, setShowPassword] = useState(false);
 
@@ -23,19 +32,21 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading }) => 
   const isFormValid = formData.employeeId.trim() && formData.pin.trim();
 
   return (
-    <View className="space-y-4 gap-5">
+    <View className="gap-5 space-y-4">
       <View>
-        <Text className="text-gray-700 mb-1">Employee No.</Text>
-        <View className="flex-row items-center bg-white border border-gray-200 rounded-lg px-4 py-3">
+        <Text className="mb-1 text-gray-700">Employee No.</Text>
+        <View className="flex-row items-center rounded-lg border border-gray-200 bg-white px-4 py-3">
           <Ionicons name="person" size={18} color="#6b7280" />
           <TextInput
-            className="flex-1 ml-2 text-gray-700 p-2"
+            className="ml-2 flex-1 p-2 text-gray-700"
             placeholder="Enter your employee no"
             value={formData.employeeId}
-            onChangeText={(value) => setFormData(prev => ({
-              ...prev,
-              employeeId: formatEmployeeId(value)
-            }))}
+            onChangeText={value =>
+              setFormData(prev => ({
+                ...prev,
+                employeeId: formatEmployeeId(value),
+              }))
+            }
             keyboardType="default"
             autoCapitalize="none"
             editable={!isLoading}
@@ -44,17 +55,19 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading }) => 
       </View>
 
       <View>
-        <Text className="text-gray-700 mb-1">PIN</Text>
-        <View className="flex-row items-center bg-white border border-gray-200 rounded-lg px-4 py-3">
+        <Text className="mb-1 text-gray-700">PIN</Text>
+        <View className="flex-row items-center rounded-lg border border-gray-200 bg-white px-4 py-3">
           <Ionicons name="lock-closed" size={18} color="#6b7280" />
           <TextInput
-            className="flex-1 ml-2 text-gray-700 p-2"
+            className="ml-2 flex-1 p-2 text-gray-700"
             placeholder="Enter your PIN"
             value={formData.pin}
-            onChangeText={(value) => setFormData(prev => ({
-              ...prev,
-              pin: formatPin(value)
-            }))}
+            onChangeText={value =>
+              setFormData(prev => ({
+                ...prev,
+                pin: formatPin(value),
+              }))
+            }
             secureTextEntry={!showPassword}
             keyboardType="numeric"
             editable={!isLoading}
@@ -64,7 +77,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading }) => 
             disabled={isLoading}
           >
             <Ionicons
-              name={showPassword ? "eye-off" : "eye"}
+              name={showPassword ? 'eye-off' : 'eye'}
               size={18}
               color="#6b7280"
             />
@@ -75,18 +88,16 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading }) => 
       <TouchableOpacity
         onPress={handleSubmit}
         disabled={isLoading || !isFormValid}
-        className={`p-4 rounded-lg ${
-          isLoading || !isFormValid
-            ? 'bg-blue-400'
-            : 'bg-blue-600'
+        className={`rounded-lg p-4 ${
+          isLoading || !isFormValid ? 'bg-blue-400' : 'bg-blue-600'
         } items-center`}
       >
         {isLoading ? (
           <ActivityIndicator size="small" color="#fff" />
         ) : (
-          <Text className="text-white font-medium">Login</Text>
+          <Text className="font-medium text-white">Login</Text>
         )}
       </TouchableOpacity>
     </View>
   );
-}; 
+};
