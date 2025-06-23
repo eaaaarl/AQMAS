@@ -10,15 +10,8 @@ export interface InfoRowProps {
 }
 
 export interface SettingsState {
-  customerTypes: {
-    seniorCitizen: boolean;
-    vip: boolean;
-    regularCustomer: boolean;
-  };
-  services: {
-    cash: boolean;
-    credit: boolean;
-  };
+  customerTypes: { [typeName: string]: boolean };
+  services: { [serviceName: string]: boolean };
 }
 
 export interface DeveloperSettings {

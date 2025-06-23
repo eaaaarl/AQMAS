@@ -1,7 +1,10 @@
+import { useEmployeeData } from '@/features/auth';
+import { useGetEmployeeRoleTaskQuery } from '@/features/auth/api/authApi';
+import { useGetCustomersGroupQuery } from '@/features/customer/api/customerApi';
 import { OfflineIndicator, useGlobalError } from '@/features/error';
 import { useSettings } from '@/features/settings/hooks/useSettings';
 import { InfoRowProps, SettingRowProps } from '@/features/settings/types';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -59,13 +62,47 @@ export default function SettingsScreen() {
     handleLogout,
     updateCustomerType,
     updateService,
+    setCustomerTypes,
+    setServices,
   } = useSettings();
 
   const onRefresh = async () => {
     setRefreshing(true);
     await handleRefresh();
+    await refetchCustomerGroups();
+    await refetchEmployeeRoleTask();
     setRefreshing(false);
   };
+
+  const { employeeRoleDefault, employeeRoles } = useEmployeeData();
+
+  const { data: customerGroups, refetch: refetchCustomerGroups } =
+    useGetCustomersGroupQuery({
+      customerGroupId:
+        employeeRoleDefault?.[0]?.customer_group_id ??
+        employeeRoles?.[0]?.customer_group_id,
+    });
+
+  const { data: employeeRoleTask, refetch: refetchEmployeeRoleTask } =
+    useGetEmployeeRoleTaskQuery({
+      customerGroup:
+        employeeRoleDefault?.[0]?.customer_group_id ??
+        employeeRoles?.[0]?.customer_group_id,
+    });
+
+  useEffect(() => {
+    if (customerGroups) {
+      setCustomerTypes(customerGroups.map(g => g.type_name));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [customerGroups]);
+
+  useEffect(() => {
+    if (employeeRoleTask) {
+      setServices(employeeRoleTask.map(t => t.service_name));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [employeeRoleTask]);
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
@@ -118,31 +155,24 @@ export default function SettingsScreen() {
               <SectionHeader title="Queue only by selected customer type" />
 
               <View className="space-y-1">
-                <SettingRow
-                  label="Senior Citizens"
-                  value={settings.customerTypes.seniorCitizen}
-                  onValueChange={value =>
-                    updateCustomerType('seniorCitizen', value)
-                  }
-                />
-
+                {customerGroups?.map(group => (
+                  <SettingRow
+                    key={group.type_id}
+                    label={group.type_name}
+                    value={
+                      settings.customerTypes[
+                        group.type_name as keyof typeof settings.customerTypes
+                      ] ?? false
+                    }
+                    onValueChange={value =>
+                      updateCustomerType(
+                        group.type_name as keyof typeof settings.customerTypes,
+                        value
+                      )
+                    }
+                  />
+                ))}
                 <View className="mx-1 h-px bg-gray-100" />
-
-                <SettingRow
-                  label="VIP Customers"
-                  value={settings.customerTypes.vip}
-                  onValueChange={value => updateCustomerType('vip', value)}
-                />
-
-                <View className="mx-1 h-px bg-gray-100" />
-
-                <SettingRow
-                  label="Regular Customers"
-                  value={settings.customerTypes.regularCustomer}
-                  onValueChange={value =>
-                    updateCustomerType('regularCustomer', value)
-                  }
-                />
               </View>
             </View>
 
@@ -151,19 +181,24 @@ export default function SettingsScreen() {
               <SectionHeader title="Queue only by selected service" />
 
               <View className="space-y-1">
-                <SettingRow
-                  label="Cash"
-                  value={settings.services.cash}
-                  onValueChange={value => updateService('cash', value)}
-                />
-
+                {employeeRoleTask?.map(task => (
+                  <SettingRow
+                    key={task.service_id}
+                    label={task.service_name}
+                    value={
+                      settings.services[
+                        task.service_name as keyof typeof settings.services
+                      ] ?? false
+                    }
+                    onValueChange={value =>
+                      updateService(
+                        task.service_name as keyof typeof settings.services,
+                        value
+                      )
+                    }
+                  />
+                ))}
                 <View className="mx-1 h-px bg-gray-100" />
-
-                <SettingRow
-                  label="Credit"
-                  value={settings.services.credit}
-                  onValueChange={value => updateService('credit', value)}
-                />
               </View>
             </View>
 

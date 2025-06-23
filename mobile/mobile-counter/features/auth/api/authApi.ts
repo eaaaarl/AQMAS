@@ -4,6 +4,7 @@ import {
   AuthPayload,
   AuthResponse,
   EmployeeResponse,
+  EmployeeRoleTaskService,
   RoleInfo,
 } from '../types';
 
@@ -79,6 +80,17 @@ export const authApi = createApi({
       }),
       providesTags: ['Role'],
     }),
+
+    getEmployeeRoleTask: builder.query<
+      EmployeeRoleTaskService[],
+      { customerGroup: number }
+    >({
+      query: ({ customerGroup }) => ({
+        url: `/employee/role/${customerGroup}/tasks`,
+        method: 'GET',
+      }),
+      providesTags: ['Role'],
+    }),
   }),
 });
 
@@ -87,4 +99,5 @@ export const {
   useGetEmployeeInfoQuery,
   useGetEmployeeRoleQuery,
   useGetEmployeeRoleDefaultQuery,
+  useGetEmployeeRoleTaskQuery,
 } = authApi;

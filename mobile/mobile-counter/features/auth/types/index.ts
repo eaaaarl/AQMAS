@@ -61,3 +61,19 @@ export interface AuthError {
   message: string;
   title?: string;
 }
+
+// Employee Role Task
+export interface EmployeeRoleTaskService {
+  service_id: number;
+  service_name: string;
+  button_caption: string;
+  priority_level: number;
+  service_format: string;
+  is_active: BufferLike;
+  header_id: number;
+}
+
+interface BufferLike {
+  type: 'Buffer';
+  data: [0 | 1];
+}

@@ -16,16 +16,12 @@ export const useSettings = () => {
   const empInformation = empInfo?.results || [];
 
   const [settings, setSettings] = useState<SettingsState>({
-    customerTypes: {
-      seniorCitizen: true,
-      vip: true,
-      regularCustomer: true,
-    },
-    services: {
-      cash: true,
-      credit: true,
-    },
+    customerTypes: {},
+    services: {},
   });
+
+  console.log(settings.customerTypes);
+  console.log(settings.services);
 
   const handleRefresh = async () => {
     try {
@@ -84,6 +80,26 @@ export const useSettings = () => {
     }));
   };
 
+  // Set all customer types (replace with new set, removing any not present)
+  const setCustomerTypes = (types: string[]) => {
+    setSettings(prev => ({
+      ...prev,
+      customerTypes: Object.fromEntries(
+        types.map(type => [type, prev.customerTypes[type] ?? true])
+      ),
+    }));
+  };
+
+  // Set all services (replace with new set, removing any not present)
+  const setServices = (services: string[]) => {
+    setSettings(prev => ({
+      ...prev,
+      services: Object.fromEntries(
+        services.map(service => [service, prev.services[service] ?? true])
+      ),
+    }));
+  };
+
   return {
     empInformation,
     settings,
@@ -91,5 +107,7 @@ export const useSettings = () => {
     handleLogout,
     updateCustomerType,
     updateService,
+    setCustomerTypes,
+    setServices,
   };
 };

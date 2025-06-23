@@ -1,9 +1,9 @@
 import { RootState } from '@/libs/redux/store';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { CustomerGroup } from './interface';
+import { Ticket } from './interface';
 
-export const customerApi = createApi({
-  reducerPath: 'customerApi',
+export const queueApi = createApi({
+  reducerPath: 'queueApi',
   baseQuery: async (args, api, extraOptions) => {
     const state = api.getState() as RootState;
 
@@ -40,19 +40,19 @@ export const customerApi = createApi({
     });
     return baseQuery(adjustedArgs, api, extraOptions);
   },
-  tagTypes: ['CustomerGroup'],
+  tagTypes: ['Queue'],
   endpoints: builder => ({
-    getCustomersGroup: builder.query<
-      CustomerGroup[],
-      { customerGroupId: number }
+    getQueue: builder.query<
+      Ticket,
+      { service_id: number[]; type_id: number[] }
     >({
-      query: ({ customerGroupId }) => ({
-        url: `/customer/group/${customerGroupId}`,
+      query: ({ service_id, type_id }) => ({
+        url: `/queue/available?DATE(queue.trans_date)=DATE(NOW())&employee_id=IS NULL&queue_detail.service_id=IN(${service_id})&queue.type_id=IN (${type_id})`,
         method: 'GET',
       }),
-      providesTags: ['CustomerGroup'],
+      providesTags: ['Queue'],
     }),
   }),
 });
 
-export const { useGetCustomersGroupQuery } = customerApi;
+export const { useGetQueueQuery } = queueApi;

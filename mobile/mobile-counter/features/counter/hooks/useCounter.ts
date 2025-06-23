@@ -2,8 +2,11 @@ import {
   useGetEmployeeInfoQuery,
   useGetEmployeeRoleDefaultQuery,
   useGetEmployeeRoleQuery,
+  useGetEmployeeRoleTaskQuery,
 } from '@/features/auth/api/authApi';
 import { useGetConfigQuery } from '@/features/config/api/configApi';
+import { useGetCustomersGroupQuery } from '@/features/customer/api/customerApi';
+import { useGetQueueQuery } from '@/features/queue/api/queueApi';
 import { useAppSelector } from '@/libs/redux/hooks';
 import { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
@@ -48,6 +51,21 @@ export const useCounter = () => {
   // GET COUNTER NO
   const counterNo = empRole?.[0]?.counter_no ?? empRoleDefault?.[0]?.counter_no;
 
+  // GET EMPLOYEE ROLE TASK
+  const { refetch: refetchEmpRoleTask } = useGetEmployeeRoleTaskQuery({
+    customerGroup:
+      empRoleDefault?.[0]?.customer_group_id ??
+      empRole?.[0]?.customer_group_id ??
+      0,
+  });
+  // GET CUSTOMER GROUP
+  const { refetch: refetchCustomerGroup } = useGetCustomersGroupQuery({
+    customerGroupId:
+      empRoleDefault?.[0]?.customer_group_id ??
+      empRole?.[0]?.customer_group_id ??
+      0,
+  });
+
   const [currentTime, setCurrentTime] = useState(new Date());
 
   const [currentTicket, setCurrentTicket] = useState<Ticket>({
@@ -77,11 +95,21 @@ export const useCounter = () => {
         refetchEmpInfo(),
         refetchEmpRole(),
         refetchEmpRoleDefault(),
+        refetchEmpRoleTask(),
+        refetchCustomerGroup(),
       ]);
     } catch (error) {
       console.error('Error refreshing data:', error);
     }
   };
+
+  const { data: queue, refetch: refetchQueue } = useGetQueueQuery(
+    {
+      service_id: [1, 2, 3],
+      type_id: [3, 1],
+    },
+    { skip: !emp.employee_id }
+  );
 
   const handleNext = () => {
     Alert.alert('Next', 'Moving to next customer');
