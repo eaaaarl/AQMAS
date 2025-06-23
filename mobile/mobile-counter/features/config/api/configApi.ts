@@ -4,7 +4,7 @@ import { ConfigResponse } from './interface';
 export const configApi = createApi({
   reducerPath: 'configApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://192.168.1.27:4000',
+    baseUrl: 'http://192.168.1.13:4000',
     timeout: 10000, // 10 second timeout
     prepareHeaders: (headers, { getState }) => {
       headers.set('Content-Type', 'application/json');

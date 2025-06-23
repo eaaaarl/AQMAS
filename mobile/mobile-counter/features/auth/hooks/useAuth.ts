@@ -1,8 +1,5 @@
 import { useAppDispatch } from '@/libs/redux/hooks';
-import {
-  logout as logoutAction,
-  setEmployee,
-} from '@/libs/redux/state/authSlice';
+import { removeEmployee, setEmployee } from '@/libs/redux/state/employeeSlice';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import Toast from 'react-native-toast-message';
@@ -36,7 +33,6 @@ export const useAuth = () => {
         id: formData.employeeId,
         pin: formData.pin,
       }).unwrap();
-
       if (res.ghError === 1001) {
         Toast.show({
           type: 'error',
@@ -46,21 +42,10 @@ export const useAuth = () => {
         return { success: false, error: res.message };
       }
 
-      // Set employee in Redux store
       dispatch(
         setEmployee({
           employee_id: res.employeeId,
           employee_no: formData.employeeId,
-          first_name: '',
-          last_name: '',
-          mid_name: '',
-          birthday: null,
-          employee_addr: '',
-          civil_status: '',
-          gender: '',
-          picture: null,
-          employee_pin: '',
-          is_active: { type: 'boolean', data: [1] },
         })
       );
 
@@ -90,7 +75,7 @@ export const useAuth = () => {
   };
 
   const logout = () => {
-    dispatch(logoutAction());
+    dispatch(removeEmployee());
     router.push('/auth/login');
   };
 
