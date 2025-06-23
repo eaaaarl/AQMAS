@@ -38,6 +38,14 @@ export const authApi = createApi({
 
     getEmployeeRole: builder.query<RoleInfo[], { emp_id: number }>({
       query: ({ emp_id }) => ({
+        url: `/employee/role?NOW()=BETWEEN date_from AND date_to&employee_schedule.employee_id=${emp_id}`,
+        method: 'GET',
+      }),
+      providesTags: ['Role'],
+    }),
+
+    getEmployeeRoleDefault: builder.query<RoleInfo[], { emp_id: number }>({
+      query: ({ emp_id }) => ({
         url: `/employee/role?default_sched=TRUE&employee_schedule.employee_id=${emp_id}&limit=1`,
         method: 'GET',
       }),
@@ -50,4 +58,5 @@ export const {
   useEmployeeLoginMutation,
   useGetEmployeeInfoQuery,
   useGetEmployeeRoleQuery,
+  useGetEmployeeRoleDefaultQuery,
 } = authApi;

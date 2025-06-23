@@ -9,6 +9,7 @@ import { SettingsState } from '../types';
 export const useSettings = () => {
   const dispatch = useAppDispatch();
   const emp = useAppSelector(state => state.employee);
+
   const { data: empInfo, refetch: refetchEmpInfo } = useGetEmployeeInfoQuery({
     empId: emp.employee_id as number,
   });

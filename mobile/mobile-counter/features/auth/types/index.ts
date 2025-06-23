@@ -44,15 +44,6 @@ export interface RoleInfo {
   customer_group_id: number;
 }
 
-// Auth State Types
-export interface AuthState {
-  isAuthenticated: boolean;
-  employee: Employee | null;
-  roles: RoleInfo[];
-  isLoading: boolean;
-  error: string | null;
-}
-
 // Form Types
 export interface LoginFormData {
   employeeId: string;
