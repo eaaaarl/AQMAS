@@ -1,9 +1,9 @@
 import { RootState } from '@/libs/redux/store';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { ConfigResponse } from './interface';
+import { Ticket } from './interface';
 
-export const configApi = createApi({
-  reducerPath: 'configApi',
+export const queueApi = createApi({
+  reducerPath: 'queueApi',
   baseQuery: async (args, api, extraOptions) => {
     const state = api.getState() as RootState;
 
@@ -40,14 +40,19 @@ export const configApi = createApi({
     });
     return baseQuery(adjustedArgs, api, extraOptions);
   },
+  tagTypes: ['Queue'],
   endpoints: builder => ({
-    getConfig: builder.query<ConfigResponse[], void>({
-      query: () => ({
-        url: `/config?SectionName='Broadcast'&KeyName='Caller_Title'`,
+    getQueue: builder.query<
+      Ticket,
+      { service_id: number[]; type_id: number[] }
+    >({
+      query: ({ service_id, type_id }) => ({
+        url: `/queue/available?DATE(queue.trans_date)=DATE(NOW())&employee_id=IS NULL&queue_detail.service_id=IN(${service_id})&queue.type_id=IN (${type_id})`,
         method: 'GET',
       }),
+      providesTags: ['Queue'],
     }),
   }),
 });
 
-export const { useGetConfigQuery } = configApi;
+export const { useGetQueueQuery } = queueApi;

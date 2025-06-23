@@ -1,15 +1,3 @@
-export interface SettingsState {
-  customerTypes: {
-    seniorCitizen: boolean;
-    vip: boolean;
-    regularCustomer: boolean;
-  };
-  services: {
-    cash: boolean;
-    credit: boolean;
-  };
-}
-
 export interface SettingRowProps {
   label: string;
   value: boolean;
@@ -18,5 +6,15 @@ export interface SettingRowProps {
 
 export interface InfoRowProps {
   label: string;
-  value: string;
+  value: string | number | undefined;
+}
+
+export interface SettingsState {
+  customerTypes: { [typeName: string]: boolean };
+  services: { [serviceName: string]: boolean };
+}
+
+export interface DeveloperSettings {
+  ipAddress: string;
+  port: string;
 }

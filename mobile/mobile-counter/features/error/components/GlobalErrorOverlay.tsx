@@ -39,7 +39,7 @@ export const GlobalErrorOverlay: React.FC<GlobalErrorOverlayProps> = ({
           </Text>
 
           {/* Action Buttons */}
-          <View className="space-y-3">
+          <View className="gap-3">
             <TouchableOpacity
               onPress={onRetry}
               style={{ backgroundColor: '#1c3f83' }}

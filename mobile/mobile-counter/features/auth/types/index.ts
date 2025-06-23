@@ -44,15 +44,6 @@ export interface RoleInfo {
   customer_group_id: number;
 }
 
-// Auth State Types
-export interface AuthState {
-  isAuthenticated: boolean;
-  employee: Employee | null;
-  roles: RoleInfo[];
-  isLoading: boolean;
-  error: string | null;
-}
-
 // Form Types
 export interface LoginFormData {
   employeeId: string;
@@ -69,4 +60,20 @@ export interface AuthError {
   status: string | number;
   message: string;
   title?: string;
+}
+
+// Employee Role Task
+export interface EmployeeRoleTaskService {
+  service_id: number;
+  service_name: string;
+  button_caption: string;
+  priority_level: number;
+  service_format: string;
+  is_active: BufferLike;
+  header_id: number;
+}
+
+interface BufferLike {
+  type: 'Buffer';
+  data: [0 | 1];
 }
