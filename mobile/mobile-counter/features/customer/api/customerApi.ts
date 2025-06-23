@@ -1,9 +1,8 @@
 import { RootState } from '@/libs/redux/store';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { ConfigResponse } from './interface';
 
-export const configApi = createApi({
-  reducerPath: 'configApi',
+export const customerApi = createApi({
+  reducerPath: 'customerApi',
   baseQuery: async (args, api, extraOptions) => {
     const state = api.getState() as RootState;
 
@@ -41,13 +40,8 @@ export const configApi = createApi({
     return baseQuery(adjustedArgs, api, extraOptions);
   },
   endpoints: builder => ({
-    getConfig: builder.query<ConfigResponse[], void>({
-      query: () => ({
-        url: `/config?SectionName='Broadcast'&KeyName='Caller_Title'`,
-        method: 'GET',
-      }),
+    getCustomers: builder.query({
+      query: () => '/customers',
     }),
   }),
 });
-
-export const { useGetConfigQuery } = configApi;
