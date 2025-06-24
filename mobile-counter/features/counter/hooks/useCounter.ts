@@ -9,9 +9,7 @@ import { useGetCustomersGroupQuery } from '@/features/customer/api/customerApi';
 import { useGetQueueQuery } from '@/features/queue/api/queueApi';
 import { useSettings } from '@/features/settings/hooks/useSettings';
 import { useAppSelector } from '@/libs/redux/hooks';
-import { useEffect, useState } from 'react';
-import { Alert } from 'react-native';
-import { Ticket } from '../types';
+import { useEffect, useMemo, useState } from 'react';
 
 export const useCounter = () => {
   // GET CONFIG
@@ -70,20 +68,22 @@ export const useCounter = () => {
   // Get settings
   const { settings } = useSettings();
 
-  const [currentTime, setCurrentTime] = useState(new Date());
+  // GET QUEUE - Move this before the useEffect that calls refetchQueue
+  const queryParams = useMemo(
+    () => ({
+      service_id: settings?.services ?? [],
+      type_id: settings?.customerTypes ?? [],
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [settings?.services?.join(','), settings?.customerTypes?.join(',')]
+  );
 
-  const [currentTicket, setCurrentTicket] = useState<Ticket>({
-    number: 'CR1RE',
-    customerName: 'EARL1',
-    service: 'CREDIT',
-    customerType: 'REGULAR CUSTOMER II',
-    finished: 0,
-    skipped: 0,
-    bestTime: '',
-    worstTime: '',
-    remaining: 16,
+  // GET QUEUE
+  const { data: queue, refetch: QueueRefetch } = useGetQueueQuery(queryParams, {
+    skip: !settings?.services || !settings?.customerTypes,
   });
 
+  const [currentTime, setCurrentTime] = useState(new Date());
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -94,54 +94,20 @@ export const useCounter = () => {
 
   const handleRefresh = async () => {
     try {
-      await Promise.all([
+      const refetchPromises = [
         refetchConfig(),
         refetchEmpInfo(),
         refetchEmpRole(),
         refetchEmpRoleDefault(),
         refetchEmpRoleTask(),
         refetchCustomerGroup(),
-        refetchQueue(),
-      ]);
+        QueueRefetch(),
+      ];
+
+      await Promise.all(refetchPromises);
     } catch (error) {
       console.error('Error refreshing data:', error);
     }
-  };
-
-  const { data: queue, refetch: refetchQueue } = useGetQueueQuery(
-    {
-      service_id: settings?.services ?? [],
-      type_id: settings?.customerTypes ?? [],
-    },
-    { skip: !emp.employee_id }
-  );
-
-  console.log(queue);
-
-  const handleNext = () => {
-    Alert.alert('Next', 'Moving to next customer');
-  };
-
-  const handleRecall = () => {
-    Alert.alert('Recall', 'Recalling current customer');
-  };
-
-  const handleFinished = () => {
-    Alert.alert('Finished', 'Marking customer as finished');
-    setCurrentTicket(prev => ({
-      ...prev,
-      finished: prev.finished + 1,
-      remaining: prev.remaining - 1,
-    }));
-  };
-
-  const handleSkip = () => {
-    Alert.alert('Skip', 'Skipping current customer');
-    setCurrentTicket(prev => ({
-      ...prev,
-      skipped: prev.skipped + 1,
-      remaining: prev.remaining - 1,
-    }));
   };
 
   return {
@@ -150,11 +116,8 @@ export const useCounter = () => {
     roleName,
     counterNo,
     currentTime,
-    currentTicket,
     handleRefresh,
-    handleNext,
-    handleRecall,
-    handleFinished,
-    handleSkip,
+    queue,
+    QueueRefetch,
   };
 };

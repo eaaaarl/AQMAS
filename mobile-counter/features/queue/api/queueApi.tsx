@@ -1,6 +1,6 @@
 import { RootState } from '@/libs/redux/store';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Ticket } from './interface';
+import { QueueDetail, Ticket } from './interface';
 
 export const queueApi = createApi({
   reducerPath: 'queueApi',
@@ -42,12 +42,61 @@ export const queueApi = createApi({
   },
   tagTypes: ['Queue'],
   endpoints: builder => ({
+    callQueue: builder.mutation<
+      { message: string },
+      { ticketNo: string; employeeId: number; counterNo: number }
+    >({
+      query: ({ counterNo, employeeId, ticketNo }) => ({
+        url: `/queue/call/${ticketNo}`,
+        method: 'PUT',
+        body: {
+          employeeId,
+          counterNo,
+        },
+      }),
+      invalidatesTags: ['Queue'],
+    }),
+
+    callQueueFinish: builder.mutation<void, { ticketNo: string }>({
+      query: ({ ticketNo }) => ({
+        url: `/queue/finish/${ticketNo}`,
+        method: 'PUT',
+      }),
+    }),
+
+    callQueueRecall: builder.mutation<void, { ticketNo: string }>({
+      query: ({ ticketNo }) => ({
+        url: `/queue/recall/${ticketNo}`,
+        method: 'PUT',
+      }),
+    }),
+
     getQueue: builder.query<
       Ticket,
       { service_id: number[]; type_id: number[] }
     >({
-      query: ({ service_id, type_id }) => ({
-        url: `/queue/available?DATE(queue.trans_date)=DATE(NOW())&employee_id=IS NULL&queue_detail.service_id=IN(${service_id})&queue.type_id=IN (${type_id})`,
+      query: ({ service_id, type_id }) => {
+        const serviceIds = service_id.length > 0 ? service_id.join(',') : '';
+        const typeIds = type_id.length > 0 ? type_id.join(',') : '';
+        return {
+          url: `/queue/available?DATE(queue.trans_date)=DATE(NOW())&employee_id=IS NULL&queue_detail.service_id=IN (${serviceIds})&queue.type_id=IN (${typeIds})`,
+          method: 'GET',
+        };
+      },
+      providesTags: ['Queue'],
+    }),
+
+    getQueueDetailEmpId: builder.query<QueueDetail[], { employee_id: number }>({
+      query: ({ employee_id }) => ({
+        url: `/queue/detail/${employee_id}`,
+        method: 'GET',
+      }),
+      providesTags: ['Queue'],
+    }),
+
+    getQueueQueued: builder.query<Ticket, { employeeId: number }>({
+      query: ({ employeeId }) => ({
+        url: `/queue/queued/${employeeId}`,
         method: 'GET',
       }),
       providesTags: ['Queue'],
@@ -55,4 +104,11 @@ export const queueApi = createApi({
   }),
 });
 
-export const { useGetQueueQuery } = queueApi;
+export const {
+  useGetQueueQuery,
+  useGetQueueDetailEmpIdQuery,
+  useCallQueueMutation,
+  useCallQueueFinishMutation,
+  useCallQueueRecallMutation,
+  useGetQueueQueuedQuery,
+} = queueApi;

@@ -92,6 +92,7 @@ export default function SettingsScreen() {
 
   useEffect(() => {
     if (customerGroups) {
+      // Initialize with all customer types enabled by default
       setCustomerTypes(customerGroups.map(g => g.type_id));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -99,6 +100,7 @@ export default function SettingsScreen() {
 
   useEffect(() => {
     if (employeeRoleTask) {
+      // Initialize with all services enabled by default
       setServices(employeeRoleTask.map(t => t.service_id));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -150,9 +152,30 @@ export default function SettingsScreen() {
               </View>
             </View>
 
+            {/* Queue Settings Summary */}
+            <View className="mb-6 rounded-2xl bg-white p-5 shadow-sm">
+              <SectionHeader title="Queue Settings Summary" />
+
+              <View className="space-y-1">
+                <InfoRow
+                  label="Enabled Customer Types"
+                  value={`${settings.customerTypes.length} of ${customerGroups?.length || 0}`}
+                />
+                <View className="mx-1 h-px bg-gray-100" />
+                <InfoRow
+                  label="Enabled Services"
+                  value={`${settings.services.length} of ${employeeRoleTask?.length || 0}`}
+                />
+              </View>
+            </View>
+
             {/* Customer Type Settings */}
             <View className="mb-6 rounded-2xl bg-white p-5 shadow-sm">
               <SectionHeader title="Queue only by selected customer type" />
+              <Text className="mb-4 text-sm text-gray-600">
+                All customer types are enabled by default. Disable the types you
+                don&apos;t want to see in your queue.
+              </Text>
 
               <View className="space-y-1">
                 {customerGroups?.map(group => (
@@ -172,6 +195,10 @@ export default function SettingsScreen() {
             {/* Service Settings */}
             <View className="mb-8 rounded-2xl bg-white p-5 shadow-sm">
               <SectionHeader title="Queue only by selected service" />
+              <Text className="mb-4 text-sm text-gray-600">
+                All services are enabled by default. Disable the services you
+                don&apos;t want to see in your queue.
+              </Text>
 
               <View className="space-y-1">
                 {employeeRoleTask?.map(task => (
