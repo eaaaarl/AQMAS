@@ -1,28 +1,24 @@
 import { useGetEmployeeInfoQuery } from '@/features/auth/api/authApi';
 import { useAppDispatch, useAppSelector } from '@/libs/redux/hooks';
 import { removeEmployee } from '@/libs/redux/state/employeeSlice';
+import {
+  setCustomerTypes,
+  setServices,
+  updateCustomerType,
+  updateService,
+} from '@/libs/redux/state/settingsSlice';
 import { router } from 'expo-router';
-import { useState } from 'react';
 import { Alert } from 'react-native';
-import { SettingsState } from '../types';
 
 export const useSettings = () => {
   const dispatch = useAppDispatch();
   const emp = useAppSelector(state => state.employee);
+  const settings = useAppSelector(state => state.settings);
 
   const { data: empInfo, refetch: refetchEmpInfo } = useGetEmployeeInfoQuery({
     empId: emp.employee_id as number,
   });
   const empInformation = empInfo?.results || [];
-
-  const [settings, setSettings] = useState<SettingsState>({
-    customerTypes: [],
-    services: [],
-  });
-
-  console.log('settings', settings);
-  console.log('settigs services', settings.services);
-  console.log('settigs customerTypes', settings.customerTypes);
 
   const handleRefresh = async () => {
     try {
@@ -55,46 +51,20 @@ export const useSettings = () => {
     ]);
   };
 
-  const updateCustomerType = (
-    type: keyof SettingsState['customerTypes'],
-    value: boolean
-  ) => {
-    setSettings(prev => ({
-      ...prev,
-      customerTypes: {
-        ...prev.customerTypes,
-        [type]: value,
-      },
-    }));
+  const updateCustomerTypeHandler = (typeId: number, value: boolean) => {
+    dispatch(updateCustomerType({ typeId, enabled: value }));
   };
 
-  const updateService = (
-    service: keyof SettingsState['services'],
-    value: boolean
-  ) => {
-    setSettings(prev => ({
-      ...prev,
-      services: {
-        ...prev.services,
-        [service]: value,
-      },
-    }));
+  const updateServiceHandler = (serviceId: number, value: boolean) => {
+    dispatch(updateService({ serviceId, enabled: value }));
   };
 
-  // Set all customer types (replace with new set, removing any not present)
-  const setCustomerTypes = (types: number[]) => {
-    setSettings(prev => ({
-      ...prev,
-      customerTypes: types,
-    }));
+  const setCustomerTypesHandler = (types: number[]) => {
+    dispatch(setCustomerTypes(types));
   };
 
-  // Set all services (replace with new set, removing any not present)
-  const setServices = (services: number[]) => {
-    setSettings(prev => ({
-      ...prev,
-      services: services,
-    }));
+  const setServicesHandler = (services: number[]) => {
+    dispatch(setServices(services));
   };
 
   return {
@@ -102,9 +72,9 @@ export const useSettings = () => {
     settings,
     handleRefresh,
     handleLogout,
-    updateCustomerType,
-    updateService,
-    setCustomerTypes,
-    setServices,
+    updateCustomerType: updateCustomerTypeHandler,
+    updateService: updateServiceHandler,
+    setCustomerTypes: setCustomerTypesHandler,
+    setServices: setServicesHandler,
   };
 };

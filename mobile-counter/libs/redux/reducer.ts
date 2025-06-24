@@ -5,10 +5,14 @@ import { queueApi } from '@/features/queue/api/queueApi';
 import { combineReducers } from '@reduxjs/toolkit';
 import { configReducer } from './state/configSlice';
 import { employeeReducer } from './state/employeeSlice';
+import { queueReducer } from './state/queueSlice';
+import { settingsReducer } from './state/settingsSlice';
 
 const rootReducer = combineReducers({
   employee: employeeReducer,
   config: configReducer,
+  settings: settingsReducer,
+  queue: queueReducer,
 
   [authApi.reducerPath]: authApi.reducer,
   [configApi.reducerPath]: configApi.reducer,

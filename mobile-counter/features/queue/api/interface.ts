@@ -9,3 +9,9 @@ export interface Ticket {
 export interface ServiceButton {
   button_caption: string;
 }
+
+export interface QueueDetail {
+  trans_status: number;
+  trans_time: string;
+  trans_sec: string | null | number | undefined;
+}

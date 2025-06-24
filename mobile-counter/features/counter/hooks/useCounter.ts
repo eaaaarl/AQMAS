@@ -9,9 +9,11 @@ import { useGetCustomersGroupQuery } from '@/features/customer/api/customerApi';
 import { useGetQueueQuery } from '@/features/queue/api/queueApi';
 import { useSettings } from '@/features/settings/hooks/useSettings';
 import { useAppSelector } from '@/libs/redux/hooks';
-import { useEffect, useState } from 'react';
-import { Alert } from 'react-native';
-import { Ticket } from '../types';
+import { useEffect, useMemo, useState } from 'react';
+
+// Enhanced useCounter hook with better data management
+
+// Enhanced useCounter hook with better data management
 
 export const useCounter = () => {
   // GET CONFIG
@@ -27,6 +29,7 @@ export const useCounter = () => {
     },
     { skip: !emp.employee_id }
   );
+
   const empInformation = empInfo?.results || [];
 
   // GET EMPLOYEE ROLE DEFAULT BY EMPLOYEE ID
@@ -59,6 +62,7 @@ export const useCounter = () => {
       empRole?.[0]?.customer_group_id ??
       0,
   });
+
   // GET CUSTOMER GROUP
   const { refetch: refetchCustomerGroup } = useGetCustomersGroupQuery({
     customerGroupId:
@@ -70,78 +74,76 @@ export const useCounter = () => {
   // Get settings
   const { settings } = useSettings();
 
-  const [currentTime, setCurrentTime] = useState(new Date());
+  // GET QUEUE - Move this before the useEffect that calls refetchQueue
+  const queryParams = useMemo(
+    () => ({
+      service_id: settings?.services ?? [],
+      type_id: settings?.customerTypes ?? [],
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [settings?.services?.join(','), settings?.customerTypes?.join(',')]
+  );
 
-  const [currentTicket, setCurrentTicket] = useState<Ticket>({
-    number: 'CR1RE',
-    customerName: 'EARL1',
-    service: 'CREDIT',
-    customerType: 'REGULAR CUSTOMER II',
-    finished: 0,
-    skipped: 0,
-    bestTime: '',
-    worstTime: '',
-    remaining: 16,
+  // GET QUEUE with better caching control
+  const {
+    data: queue,
+    refetch: QueueRefetch,
+    isFetching: isQueueFetching,
+  } = useGetQueueQuery(queryParams, {
+    skip: !settings?.services || !settings?.customerTypes,
+    // Force refetch every time to avoid stale data
+    refetchOnMountOrArgChange: true,
+    // Don't use cached data for this critical query
+    refetchOnFocus: true,
   });
+
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
-
     return () => clearInterval(timer);
   }, []);
 
   const handleRefresh = async () => {
     try {
-      await Promise.all([
-        refetchConfig(),
-        refetchEmpInfo(),
-        refetchEmpRole(),
-        refetchEmpRoleDefault(),
-        refetchEmpRoleTask(),
-        refetchCustomerGroup(),
-        refetchQueue(),
-      ]);
+      // Execute refetches in sequence for better reliability
+      await refetchConfig();
+      await refetchEmpInfo();
+      await refetchEmpRole();
+      await refetchEmpRoleDefault();
+      await refetchEmpRoleTask();
+      await refetchCustomerGroup();
+
+      // Queue refetch should be last and wait for completion
+      const queueResult = await QueueRefetch();
+
+      console.log('Refreshed queue data:', queueResult.data);
+
+      return queueResult;
     } catch (error) {
       console.error('Error refreshing data:', error);
+      throw error;
     }
   };
 
-  const { data: queue, refetch: refetchQueue } = useGetQueueQuery(
-    {
-      service_id: settings?.services ?? [],
-      type_id: settings?.customerTypes ?? [],
-    },
-    { skip: !emp.employee_id }
-  );
-
-  console.log(queue);
-
-  const handleNext = () => {
-    Alert.alert('Next', 'Moving to next customer');
+  // Force refresh queue data specifically
+  const forceRefreshQueue = async () => {
+    try {
+      const result = await QueueRefetch();
+      console.log('Force refreshed queue:', result.data);
+      return result;
+    } catch (error) {
+      console.error('Error force refreshing queue:', error);
+      throw error;
+    }
   };
 
-  const handleRecall = () => {
-    Alert.alert('Recall', 'Recalling current customer');
-  };
-
-  const handleFinished = () => {
-    Alert.alert('Finished', 'Marking customer as finished');
-    setCurrentTicket(prev => ({
-      ...prev,
-      finished: prev.finished + 1,
-      remaining: prev.remaining - 1,
-    }));
-  };
-
-  const handleSkip = () => {
-    Alert.alert('Skip', 'Skipping current customer');
-    setCurrentTicket(prev => ({
-      ...prev,
-      skipped: prev.skipped + 1,
-      remaining: prev.remaining - 1,
-    }));
+  // Get the best available queue data
+  const getAvailableQueue = (freshQueue = null, queueQueuedData = null) => {
+    // Priority: freshQueue -> queue -> queueQueuedData (for skipped tickets)
+    return freshQueue || queue || queueQueuedData;
   };
 
   return {
@@ -150,11 +152,11 @@ export const useCounter = () => {
     roleName,
     counterNo,
     currentTime,
-    currentTicket,
     handleRefresh,
-    handleNext,
-    handleRecall,
-    handleFinished,
-    handleSkip,
+    queue,
+    QueueRefetch,
+    forceRefreshQueue,
+    getAvailableQueue,
+    isQueueFetching,
   };
 };

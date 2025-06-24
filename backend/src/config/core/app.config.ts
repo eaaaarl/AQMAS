@@ -33,6 +33,6 @@ export const appConfig: AppConfig = {
     port: parseInt(process.env.DB_PORT || '3306', 10),
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'aqmas_db',
+    database: process.env.DB_NAME || 'acmas',
   },
-}; 
+};
