@@ -4,6 +4,22 @@ import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import Toast from 'react-native-toast-message';
 
+// Validation functions
+const validateIpAddress = (ip: string): boolean => {
+  if (!ip.trim()) return false;
+
+  const ipRegex =
+    /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+  return ipRegex.test(ip.trim());
+};
+
+const validatePort = (port: string): boolean => {
+  if (!port.trim()) return false;
+
+  const portNum = parseInt(port.trim(), 10);
+  return !isNaN(portNum) && portNum >= 1 && portNum <= 65535;
+};
+
 export const useDeveloperSetting = () => {
   const dispatch = useAppDispatch();
   const currentConfig = useAppSelector(state => state.config);
@@ -21,6 +37,24 @@ export const useDeveloperSetting = () => {
 
   const handleSave = () => {
     try {
+      if (!validateIpAddress(ipAddress)) {
+        Toast.show({
+          type: 'error',
+          text1: 'Invalid IP Address',
+          text2: 'Please enter a valid IP address (e.g., 192.168.1.1)',
+        });
+        return;
+      }
+
+      if (!validatePort(port)) {
+        Toast.show({
+          type: 'error',
+          text1: 'Invalid Port',
+          text2: 'Please enter a valid port number (1-65535)',
+        });
+        return;
+      }
+
       dispatch(setConfig({ ipAddress, port }));
       Toast.show({
         type: 'success',
