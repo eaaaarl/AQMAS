@@ -13,7 +13,6 @@ interface QueueData {
 }
 
 interface QueueState {
-  // Current active queue (when ticket is called)
   employeeId?: number;
   counterNo?: number;
   ticketNo?: string;
@@ -21,7 +20,6 @@ interface QueueState {
   services?: QueueService[];
   customerType?: string;
 
-  // Queued data (next ticket waiting to be called)
   queuedData?: QueueData | null;
 }
 

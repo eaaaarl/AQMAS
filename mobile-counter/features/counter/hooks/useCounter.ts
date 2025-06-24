@@ -11,6 +11,10 @@ import { useSettings } from '@/features/settings/hooks/useSettings';
 import { useAppSelector } from '@/libs/redux/hooks';
 import { useEffect, useMemo, useState } from 'react';
 
+// Enhanced useCounter hook with better data management
+
+// Enhanced useCounter hook with better data management
+
 export const useCounter = () => {
   // GET CONFIG
   const { data: config, refetch: refetchConfig } = useGetConfigQuery();
@@ -25,6 +29,7 @@ export const useCounter = () => {
     },
     { skip: !emp.employee_id }
   );
+
   const empInformation = empInfo?.results || [];
 
   // GET EMPLOYEE ROLE DEFAULT BY EMPLOYEE ID
@@ -57,6 +62,7 @@ export const useCounter = () => {
       empRole?.[0]?.customer_group_id ??
       0,
   });
+
   // GET CUSTOMER GROUP
   const { refetch: refetchCustomerGroup } = useGetCustomersGroupQuery({
     customerGroupId:
@@ -78,36 +84,66 @@ export const useCounter = () => {
     [settings?.services?.join(','), settings?.customerTypes?.join(',')]
   );
 
-  // GET QUEUE
-  const { data: queue, refetch: QueueRefetch } = useGetQueueQuery(queryParams, {
+  // GET QUEUE with better caching control
+  const {
+    data: queue,
+    refetch: QueueRefetch,
+    isFetching: isQueueFetching,
+  } = useGetQueueQuery(queryParams, {
     skip: !settings?.services || !settings?.customerTypes,
+    // Force refetch every time to avoid stale data
+    refetchOnMountOrArgChange: true,
+    // Don't use cached data for this critical query
+    refetchOnFocus: true,
   });
 
   const [currentTime, setCurrentTime] = useState(new Date());
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
-
     return () => clearInterval(timer);
   }, []);
 
   const handleRefresh = async () => {
     try {
-      const refetchPromises = [
-        refetchConfig(),
-        refetchEmpInfo(),
-        refetchEmpRole(),
-        refetchEmpRoleDefault(),
-        refetchEmpRoleTask(),
-        refetchCustomerGroup(),
-        QueueRefetch(),
-      ];
+      // Execute refetches in sequence for better reliability
+      await refetchConfig();
+      await refetchEmpInfo();
+      await refetchEmpRole();
+      await refetchEmpRoleDefault();
+      await refetchEmpRoleTask();
+      await refetchCustomerGroup();
 
-      await Promise.all(refetchPromises);
+      // Queue refetch should be last and wait for completion
+      const queueResult = await QueueRefetch();
+
+      console.log('Refreshed queue data:', queueResult.data);
+
+      return queueResult;
     } catch (error) {
       console.error('Error refreshing data:', error);
+      throw error;
     }
+  };
+
+  // Force refresh queue data specifically
+  const forceRefreshQueue = async () => {
+    try {
+      const result = await QueueRefetch();
+      console.log('Force refreshed queue:', result.data);
+      return result;
+    } catch (error) {
+      console.error('Error force refreshing queue:', error);
+      throw error;
+    }
+  };
+
+  // Get the best available queue data
+  const getAvailableQueue = (freshQueue = null, queueQueuedData = null) => {
+    // Priority: freshQueue -> queue -> queueQueuedData (for skipped tickets)
+    return freshQueue || queue || queueQueuedData;
   };
 
   return {
@@ -119,5 +155,8 @@ export const useCounter = () => {
     handleRefresh,
     queue,
     QueueRefetch,
+    forceRefreshQueue,
+    getAvailableQueue,
+    isQueueFetching,
   };
 };

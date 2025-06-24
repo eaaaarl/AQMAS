@@ -62,6 +62,7 @@ export const queueApi = createApi({
         url: `/queue/finish/${ticketNo}`,
         method: 'PUT',
       }),
+      invalidatesTags: ['Queue'],
     }),
 
     callQueueRecall: builder.mutation<void, { ticketNo: string }>({
@@ -69,6 +70,15 @@ export const queueApi = createApi({
         url: `/queue/recall/${ticketNo}`,
         method: 'PUT',
       }),
+      invalidatesTags: ['Queue'],
+    }),
+
+    callQueueSkip: builder.mutation<void, { ticketNo: string }>({
+      query: ({ ticketNo }) => ({
+        url: `/queue/skip/${ticketNo}`,
+        method: 'PUT',
+      }),
+      invalidatesTags: ['Queue'],
     }),
 
     getQueue: builder.query<
@@ -101,6 +111,14 @@ export const queueApi = createApi({
       }),
       providesTags: ['Queue'],
     }),
+
+    getQueueSkipped: builder.query<Ticket, { employeeId: number }>({
+      query: ({ employeeId }) => ({
+        url: `/queue/skipped/${employeeId}`,
+        method: 'GET',
+      }),
+      providesTags: ['Queue'],
+    }),
   }),
 });
 
@@ -111,4 +129,6 @@ export const {
   useCallQueueFinishMutation,
   useCallQueueRecallMutation,
   useGetQueueQueuedQuery,
+  useCallQueueSkipMutation,
+  useGetQueueSkippedQuery,
 } = queueApi;
