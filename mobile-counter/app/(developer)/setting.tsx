@@ -1,37 +1,12 @@
 import ConfigDisplay from '@/features/developer/components/ConfigDisplay';
-import { useAppDispatch, useAppSelector } from '@/libs/redux/hooks';
-import { setConfig } from '@/libs/redux/state/configSlice';
-import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useDeveloperSetting } from '@/features/developer/hooks/useDeveloperSetting';
+import React from 'react';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
 
 export default function Setting() {
-  const dispatch = useAppDispatch();
-  const currentConfig = useAppSelector(state => state.config);
-  const [ipAddress, setIpAddress] = useState('');
-  const [port, setPort] = useState('');
-
-  useEffect(() => {
-    if (currentConfig.ipAddress) {
-      setIpAddress(currentConfig.ipAddress);
-    }
-    if (currentConfig.port) {
-      setPort(currentConfig.port);
-    }
-  }, [currentConfig]);
-
-  const handleSave = () => {
-    dispatch(setConfig({ ipAddress, port }));
-    Toast.show({
-      type: 'success',
-      text1: 'Settings Saved',
-      text2: 'The new configuration has been applied.',
-    });
-    router.push('/auth/login');
-  };
-
+  const { currentConfig, ipAddress, port, setIpAddress, setPort, handleSave } =
+    useDeveloperSetting();
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       <View className="p-4">

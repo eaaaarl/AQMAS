@@ -7,6 +7,7 @@ import {
 import { useGetConfigQuery } from '@/features/config/api/configApi';
 import { useGetCustomersGroupQuery } from '@/features/customer/api/customerApi';
 import { useGetQueueQuery } from '@/features/queue/api/queueApi';
+import { useSettings } from '@/features/settings/hooks/useSettings';
 import { useAppSelector } from '@/libs/redux/hooks';
 import { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
@@ -66,6 +67,9 @@ export const useCounter = () => {
       0,
   });
 
+  // Get settings
+  const { settings } = useSettings();
+
   const [currentTime, setCurrentTime] = useState(new Date());
 
   const [currentTicket, setCurrentTicket] = useState<Ticket>({
@@ -97,6 +101,7 @@ export const useCounter = () => {
         refetchEmpRoleDefault(),
         refetchEmpRoleTask(),
         refetchCustomerGroup(),
+        refetchQueue(),
       ]);
     } catch (error) {
       console.error('Error refreshing data:', error);
@@ -105,11 +110,13 @@ export const useCounter = () => {
 
   const { data: queue, refetch: refetchQueue } = useGetQueueQuery(
     {
-      service_id: [1, 2, 3],
-      type_id: [3, 1],
+      service_id: settings?.services ?? [],
+      type_id: settings?.customerTypes ?? [],
     },
     { skip: !emp.employee_id }
   );
+
+  console.log(queue);
 
   const handleNext = () => {
     Alert.alert('Next', 'Moving to next customer');

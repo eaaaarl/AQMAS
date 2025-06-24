@@ -10,8 +10,8 @@ export interface InfoRowProps {
 }
 
 export interface SettingsState {
-  customerTypes: { [typeName: string]: boolean };
-  services: { [serviceName: string]: boolean };
+  customerTypes: number[];
+  services: number[];
 }
 
 export interface DeveloperSettings {

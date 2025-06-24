@@ -16,12 +16,13 @@ export const useSettings = () => {
   const empInformation = empInfo?.results || [];
 
   const [settings, setSettings] = useState<SettingsState>({
-    customerTypes: {},
-    services: {},
+    customerTypes: [],
+    services: [],
   });
 
-  console.log(settings.customerTypes);
-  console.log(settings.services);
+  console.log('settings', settings);
+  console.log('settigs services', settings.services);
+  console.log('settigs customerTypes', settings.customerTypes);
 
   const handleRefresh = async () => {
     try {
@@ -81,22 +82,18 @@ export const useSettings = () => {
   };
 
   // Set all customer types (replace with new set, removing any not present)
-  const setCustomerTypes = (types: string[]) => {
+  const setCustomerTypes = (types: number[]) => {
     setSettings(prev => ({
       ...prev,
-      customerTypes: Object.fromEntries(
-        types.map(type => [type, prev.customerTypes[type] ?? true])
-      ),
+      customerTypes: types,
     }));
   };
 
   // Set all services (replace with new set, removing any not present)
-  const setServices = (services: string[]) => {
+  const setServices = (services: number[]) => {
     setSettings(prev => ({
       ...prev,
-      services: Object.fromEntries(
-        services.map(service => [service, prev.services[service] ?? true])
-      ),
+      services: services,
     }));
   };
 

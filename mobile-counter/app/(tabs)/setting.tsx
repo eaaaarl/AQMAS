@@ -92,14 +92,14 @@ export default function SettingsScreen() {
 
   useEffect(() => {
     if (customerGroups) {
-      setCustomerTypes(customerGroups.map(g => g.type_name));
+      setCustomerTypes(customerGroups.map(g => g.type_id));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customerGroups]);
 
   useEffect(() => {
     if (employeeRoleTask) {
-      setServices(employeeRoleTask.map(t => t.service_name));
+      setServices(employeeRoleTask.map(t => t.service_id));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [employeeRoleTask]);
@@ -159,16 +159,9 @@ export default function SettingsScreen() {
                   <SettingRow
                     key={group.type_id}
                     label={group.type_name}
-                    value={
-                      settings.customerTypes[
-                        group.type_name as keyof typeof settings.customerTypes
-                      ] ?? false
-                    }
+                    value={settings.customerTypes.includes(group.type_id)}
                     onValueChange={value =>
-                      updateCustomerType(
-                        group.type_name as keyof typeof settings.customerTypes,
-                        value
-                      )
+                      updateCustomerType(group.type_id, value)
                     }
                   />
                 ))}
@@ -185,16 +178,9 @@ export default function SettingsScreen() {
                   <SettingRow
                     key={task.service_id}
                     label={task.service_name}
-                    value={
-                      settings.services[
-                        task.service_name as keyof typeof settings.services
-                      ] ?? false
-                    }
+                    value={settings.services.includes(task.service_id)}
                     onValueChange={value =>
-                      updateService(
-                        task.service_name as keyof typeof settings.services,
-                        value
-                      )
+                      updateService(task.service_id, value)
                     }
                   />
                 ))}
