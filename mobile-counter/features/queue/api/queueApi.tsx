@@ -4,7 +4,6 @@ import { QueueDetail, Ticket, TickitSkipped } from './interface';
 
 export const queueApi = createApi({
   reducerPath: 'queueApi',
-  keepUnusedDataFor: 0,
   baseQuery: async (args, api, extraOptions) => {
     const state = api.getState() as RootState;
 
@@ -142,4 +141,5 @@ export const {
   useCallQueueSkipMutation,
   useGetQueueSkippedQuery,
   useGetQueueByIDQuery,
+  useLazyGetQueueByIDQuery
 } = queueApi;
