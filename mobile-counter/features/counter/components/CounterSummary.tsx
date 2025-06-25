@@ -6,6 +6,8 @@ interface CounterSummaryProps {
   skippedCount: number;
   remainingCount: number;
   queue?: { remaining?: number };
+  bestTime?: string;
+  worstTime?: string;
 }
 
 export const CounterSummary: React.FC<CounterSummaryProps> = ({
@@ -13,6 +15,8 @@ export const CounterSummary: React.FC<CounterSummaryProps> = ({
   skippedCount,
   remainingCount,
   queue,
+  bestTime,
+  worstTime,
 }) => {
   return (
     <View className="px-6 pb-6">
@@ -34,11 +38,11 @@ export const CounterSummary: React.FC<CounterSummaryProps> = ({
         </View>
         <View className="flex-row items-center justify-between">
           <Text className="text-gray-600">Best Time</Text>
-          <Text className="text-gray-400">{'00:00:00'}</Text>
+          <Text className="text-gray-400">{bestTime}</Text>
         </View>
         <View className="flex-row items-center justify-between">
           <Text className="text-gray-600">Worst Time</Text>
-          <Text className="text-gray-400">{'00:00:00'}</Text>
+          <Text className="text-gray-400">{worstTime}</Text>
         </View>
         <View className="flex-row items-center justify-between border-t border-gray-200 pt-3">
           <Text className="font-medium text-gray-600">Remaining</Text>

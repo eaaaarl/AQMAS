@@ -1,5 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@/libs/redux/hooks';
 import { removeEmployee } from '@/libs/redux/state/employeeSlice';
+import { resetAll } from '@/libs/redux/state/queueSlice';
 import {
   setCustomerTypes,
   setServices,
@@ -25,10 +26,12 @@ export const useSettings = () => {
         onPress: async () => {
           try {
             dispatch(removeEmployee());
+            dispatch(resetAll());
             router.push('/auth/login');
           } catch (error) {
             console.error('Error during logout:', error);
             dispatch(removeEmployee());
+            dispatch(resetAll());
             router.push('/auth/login');
           }
         },

@@ -262,12 +262,42 @@ export default function CounterScreen() {
   const skippedCount =
     queueDetail?.filter(item => item.trans_status === 2).length ?? 0;
 
+  const completedTransactions = queueDetail?.filter(item =>
+    item.trans_status === 3 && item.trans_time !== null
+  ) ?? [];
+
+  // Convert time string (HH:MM:SS) to seconds
+  const timeToSeconds = (timeStr: string | null): number => {
+    if (!timeStr) return 0;
+    const [hours, minutes, seconds] = timeStr.split(':').map(Number);
+    return (hours * 3600) + (minutes * 60) + seconds;
+  };
+
+  let bestTime = '---';
+  let worstTime = '---';
+
+  if (completedTransactions.length > 0) {
+    let minSeconds = Number.MAX_SAFE_INTEGER;
+    let maxSeconds = -1;
+
+    completedTransactions.forEach(transaction => {
+      if (transaction.trans_time) {
+        const seconds = timeToSeconds(transaction.trans_time);
+        if (seconds < minSeconds) {
+          minSeconds = seconds;
+          bestTime = transaction.trans_time;
+        }
+        if (seconds > maxSeconds) {
+          maxSeconds = seconds;
+          worstTime = transaction.trans_time;
+        }
+      }
+    });
+  }
+
   // Display queue prioritizes active ticket over available queue
   const displayQueue =
     hasActiveTicket && persistedQueue?.ticketNo ? persistedQueue : queue;
-
-  // Indicates if there are queued tickets available to be served
-  const hasQueuedData = queueQueuedData && queueQueuedData.ticketNo;
 
   return (
     <View className="flex-1 bg-gray-50">
@@ -330,6 +360,8 @@ export default function CounterScreen() {
             skippedCount={skippedCount}
             remainingCount={remainingCount}
             queue={queue}
+            bestTime={bestTime}
+            worstTime={worstTime}
           />
         </View>
       </ScrollView>

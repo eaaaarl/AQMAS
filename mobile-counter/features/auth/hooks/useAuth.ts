@@ -1,5 +1,6 @@
 import { useAppDispatch } from '@/libs/redux/hooks';
 import { removeEmployee, setEmployee } from '@/libs/redux/state/employeeSlice';
+import { resetAll } from '@/libs/redux/state/queueSlice';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import Toast from 'react-native-toast-message';
@@ -76,6 +77,7 @@ export const useAuth = () => {
 
   const logout = () => {
     dispatch(removeEmployee());
+    dispatch(resetAll());
     router.push('/auth/login');
   };
 
