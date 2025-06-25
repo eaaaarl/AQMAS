@@ -141,4 +141,5 @@ export const {
   useCallQueueSkipMutation,
   useGetQueueSkippedQuery,
   useGetQueueByIDQuery,
+  useLazyGetQueueByIDQuery
 } = queueApi;

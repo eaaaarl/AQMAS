@@ -12,10 +12,10 @@ import { useGlobalError } from '@/features/error';
 import { TickitSkipped } from '@/features/queue/api/interface';
 import {
   useCallQueueSkipMutation,
-  useGetQueueByIDQuery,
   useGetQueueDetailEmpIdQuery,
   useGetQueueQueuedQuery,
-  useGetQueueSkippedQuery
+  useGetQueueSkippedQuery,
+  useLazyGetQueueByIDQuery
 } from '@/features/queue/api/queueApi';
 import { useAppDispatch, useAppSelector } from '@/libs/redux/hooks';
 import { resetQueue, setQueue, setSkippedTicket } from '@/libs/redux/state/queueSlice';
@@ -31,7 +31,6 @@ export default function CounterScreen() {
   const [hasActiveTicket, setHasActiveTicket] = useState(() => {
     return !!(persistedQueue?.ticketNo && persistedQueue.ticketNo !== '');
   });
-  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const { hasConnectionError } = useGlobalError();
 
   const {
@@ -70,14 +69,7 @@ export default function CounterScreen() {
       }
     );
 
-  const { data: queueByID } = useGetQueueByIDQuery(
-    { ticketNo: selectedTicketId || '' },
-    {
-      skip: !selectedTicketId,
-      refetchOnMountOrArgChange: true
-    }
-  );
-
+  const [getQueueByID] = useLazyGetQueueByIDQuery();
   const [callQueueSkip] = useCallQueueSkipMutation();
 
   const { data: queueDetail, refetch: queueDetailRefetch } =
@@ -218,41 +210,56 @@ export default function CounterScreen() {
     }
   };
 
+
   const OnReturnSkippedTicket = async (ticket: TickitSkipped) => {
-    await handleRecall(ticket.trans_id);
+    try {
+      await handleRecall(ticket.trans_id);
 
-    if (hasActiveTicket && persistedQueue?.ticketNo) {
-      await callQueueSkip({
-        ticketNo: persistedQueue.ticketNo,
+      if (hasActiveTicket && persistedQueue?.ticketNo) {
+        await callQueueSkip({
+          ticketNo: persistedQueue.ticketNo,
+        }).unwrap();
+      }
+
+      // Directly fetch the ticket details with the specific ticket number
+      const ticketDetailResult = await getQueueByID({
+        ticketNo: ticket.trans_id
       }).unwrap();
+
+      dispatch(setQueue({
+        employeeId: emp.employee_id as number,
+        counterNo: counterNo as unknown as number,
+        ticketNo: ticket.trans_id,
+        customerName: ticket.customer_name,
+        services: ticketDetailResult?.services ?? [], // Fresh data guaranteed
+        customerType: ticketDetailResult?.customerType ?? '',
+      }));
+
+      Toast.show({
+        type: 'success',
+        text1: 'Ticket Returned',
+        text2: hasActiveTicket ?
+          `Ticket ${ticket.trans_id} is now active and previous ticket was skipped.` :
+          `Ticket ${ticket.trans_id} is now active.`,
+        position: 'top',
+        visibilityTime: 2000,
+      });
+
+      setHasActiveTicket(true);
+      await handleRefresh();
+      await queueDetailRefetch();
+      await refetchQueueSkippedData();
+      setLastUpdated(new Date());
+
+    } catch (error) {
+      console.error('Error in OnReturnSkippedTicket:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to return ticket. Please try again.',
+        position: 'top',
+      });
     }
-
-    setSelectedTicketId(ticket.trans_id);
-    dispatch(setQueue({
-      employeeId: emp.employee_id as number,
-      counterNo: counterNo as unknown as number,
-      ticketNo: ticket.trans_id,
-      customerName: ticket.customer_name,
-      services: queueByID?.services ?? [],
-      customerType: queueByID?.customerType ?? '',
-    }))
-
-    Toast.show({
-      type: 'success',
-      text1: 'Ticket Returned',
-      text2: hasActiveTicket ?
-        `Ticket ${ticket.trans_id} is now active and previous ticket was skipped.` :
-        `Ticket ${ticket.trans_id} is now active.`,
-      position: 'top',
-      visibilityTime: 2000,
-    });
-
-    setHasActiveTicket(true);
-    await handleRefresh();
-    await queueDetailRefetch();
-    await refetchQueueSkippedData();
-    setLastUpdated(new Date());
-    setSelectedTicketId(null);
   };
 
   const finishedCount =
@@ -298,6 +305,7 @@ export default function CounterScreen() {
   // Display queue prioritizes active ticket over available queue
   const displayQueue =
     hasActiveTicket && persistedQueue?.ticketNo ? persistedQueue : queue;
+
 
   return (
     <View className="flex-1 bg-gray-50">
