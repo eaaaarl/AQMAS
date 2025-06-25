@@ -4,12 +4,21 @@ interface QueueService {
   button_caption: string;
 }
 
-interface QueueData {
+export interface QueueDData {
   ticketNo: string;
   customerName: string;
   services: QueueService[];
   customerType: string;
   remaining?: number;
+}
+
+export interface SkippedData {
+  trans_id: string;
+  trans_date: string;
+  customer_name: string;
+  time_start: string;
+  services?: QueueService[];
+  customerType?: string;
 }
 
 interface QueueState {
@@ -20,7 +29,8 @@ interface QueueState {
   services?: QueueService[];
   customerType?: string;
 
-  queuedData?: QueueData | null;
+  queuedData?: QueueDData | null;
+  skippedData?: SkippedData[] | null;
 }
 
 const initialState: QueueState = {
@@ -31,6 +41,7 @@ const initialState: QueueState = {
   services: undefined,
   customerType: undefined,
   queuedData: null,
+  skippedData: null,
 };
 
 export const queueSlice = createSlice({
@@ -56,8 +67,39 @@ export const queueSlice = createSlice({
       state.customerType = action.payload.customerType;
     },
 
-    setQueuedData: (state, action: PayloadAction<QueueData | null>) => {
+    setQueuedData: (state, action: PayloadAction<QueueDData | null>) => {
       state.queuedData = action.payload;
+    },
+
+    setSkippedData: (state, action: PayloadAction<SkippedData[] | null>) => {
+      state.skippedData = action.payload;
+    },
+
+    setSkippedTicket: (
+      state,
+      action: PayloadAction<{
+        trans_id: string;
+        trans_date: string;
+        customer_name: string;
+        time_start: string;
+        services: QueueService[];
+        customerType: string;
+      }>
+    ) => {
+      const newSkippedTicket = action.payload;
+      state.skippedData = state.skippedData || [];
+      state.skippedData.push(newSkippedTicket);
+    },
+
+    removeSkippedTicket: (
+      state,
+      action: PayloadAction<string> // trans_id of the ticket to remove
+    ) => {
+      if (state.skippedData) {
+        state.skippedData = state.skippedData.filter(
+          ticket => ticket.trans_id !== action.payload
+        );
+      }
     },
 
     resetQueue: state => {
@@ -73,6 +115,10 @@ export const queueSlice = createSlice({
       state.queuedData = null;
     },
 
+    resetSkippedData: state => {
+      state.skippedData = null;
+    },
+
     resetAll: state => {
       return initialState;
     },
@@ -81,8 +127,12 @@ export const queueSlice = createSlice({
 export const {
   setQueue,
   setQueuedData,
+  setSkippedData,
+  setSkippedTicket,
+  removeSkippedTicket,
   resetQueue,
   resetQueuedData,
+  resetSkippedData,
   resetAll,
 } = queueSlice.actions;
 

@@ -11,10 +11,6 @@ import { useSettings } from '@/features/settings/hooks/useSettings';
 import { useAppSelector } from '@/libs/redux/hooks';
 import { useEffect, useMemo, useState } from 'react';
 
-// Enhanced useCounter hook with better data management
-
-// Enhanced useCounter hook with better data management
-
 export const useCounter = () => {
   // GET CONFIG
   const { data: config, refetch: refetchConfig } = useGetConfigQuery();
@@ -128,26 +124,9 @@ export const useCounter = () => {
     }
   };
 
-  // Force refresh queue data specifically
-  const forceRefreshQueue = async () => {
-    try {
-      const result = await QueueRefetch();
-      console.log('Force refreshed queue:', result.data);
-      return result;
-    } catch (error) {
-      console.error('Error force refreshing queue:', error);
-      throw error;
-    }
-  };
-
-  // Get the best available queue data
-  const getAvailableQueue = (freshQueue = null, queueQueuedData = null) => {
-    // Priority: freshQueue -> queue -> queueQueuedData (for skipped tickets)
-    return freshQueue || queue || queueQueuedData;
-  };
-
   return {
     config,
+    emp,
     empInformation,
     roleName,
     counterNo,
@@ -155,8 +134,6 @@ export const useCounter = () => {
     handleRefresh,
     queue,
     QueueRefetch,
-    forceRefreshQueue,
-    getAvailableQueue,
     isQueueFetching,
   };
 };

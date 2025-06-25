@@ -14,9 +14,10 @@ module.exports = defineConfig([
       prettier: require('eslint-plugin-prettier'),
     },
     rules: {
-      'prettier/prettier': 'error',
+      'prettier/prettier': 'off',
       'arrow-body-style': 'off',
       'prefer-arrow-callback': 'off',
+      'eol-last': 'off',
     },
   },
   // Disable ESLint rules that conflict with Prettier

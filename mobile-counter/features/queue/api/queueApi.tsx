@@ -1,9 +1,10 @@
 import { RootState } from '@/libs/redux/store';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { QueueDetail, Ticket } from './interface';
+import { QueueDetail, Ticket, TickitSkipped } from './interface';
 
 export const queueApi = createApi({
   reducerPath: 'queueApi',
+  keepUnusedDataFor: 0,
   baseQuery: async (args, api, extraOptions) => {
     const state = api.getState() as RootState;
 
@@ -96,6 +97,14 @@ export const queueApi = createApi({
       providesTags: ['Queue'],
     }),
 
+    getQueueByID: builder.query<Ticket, { ticketNo: string }>({
+      query: ({ ticketNo }) => ({
+        url: `/queue/${ticketNo}`,
+        method: 'GET',
+      }),
+      providesTags: ['Queue'],
+    }),
+
     getQueueDetailEmpId: builder.query<QueueDetail[], { employee_id: number }>({
       query: ({ employee_id }) => ({
         url: `/queue/detail/${employee_id}`,
@@ -112,13 +121,14 @@ export const queueApi = createApi({
       providesTags: ['Queue'],
     }),
 
-    getQueueSkipped: builder.query<Ticket, { employeeId: number }>({
+    getQueueSkipped: builder.query<TickitSkipped[], { employeeId: number }>({
       query: ({ employeeId }) => ({
         url: `/queue/skipped/${employeeId}`,
         method: 'GET',
       }),
       providesTags: ['Queue'],
     }),
+
   }),
 });
 
@@ -131,4 +141,5 @@ export const {
   useGetQueueQueuedQuery,
   useCallQueueSkipMutation,
   useGetQueueSkippedQuery,
+  useGetQueueByIDQuery,
 } = queueApi;

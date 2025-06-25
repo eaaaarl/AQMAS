@@ -35,7 +35,7 @@ export const useEmployeeData = (employeeId?: string) => {
   );
 
   return {
-    employeeInfo: employeeInfo?.results?.[0] || null,
+    employeeInfo: employeeInfo?.results || [],
     employeeRoles: employeeRoles || [],
     employeeRoleDefault: employeeRoleDefault || [],
     isLoading: isLoadingEmployee || isLoadingRoles || isLoadingRoleDefault,
