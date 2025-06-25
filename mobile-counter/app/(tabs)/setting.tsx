@@ -56,9 +56,7 @@ export default function SettingsScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const { hasConnectionError } = useGlobalError();
   const {
-    empInformation,
     settings,
-    handleRefresh,
     handleLogout,
     updateCustomerType,
     updateService,
@@ -66,29 +64,46 @@ export default function SettingsScreen() {
     setServices,
   } = useSettings();
 
+  const {
+    employeeRoleDefault,
+    employeeRoles,
+    employeeInfo: empInformation,
+  } = useEmployeeData();
+
+  const { data: customerGroups, refetch: refetchCustomerGroups } =
+    useGetCustomersGroupQuery(
+      {
+        customerGroupId:
+          employeeRoleDefault?.[0]?.customer_group_id ??
+          employeeRoles?.[0]?.customer_group_id,
+      },
+      {
+        skip:
+          !employeeRoleDefault?.[0]?.customer_group_id &&
+          !employeeRoles?.[0]?.customer_group_id,
+      }
+    );
+
+  const { data: employeeRoleTask, refetch: refetchEmployeeRoleTask } =
+    useGetEmployeeRoleTaskQuery(
+      {
+        customerGroup:
+          employeeRoleDefault?.[0]?.customer_group_id ??
+          employeeRoles?.[0]?.customer_group_id,
+      },
+      {
+        skip:
+          !employeeRoleDefault?.[0]?.customer_group_id &&
+          !employeeRoles?.[0]?.customer_group_id,
+      }
+    );
+
   const onRefresh = async () => {
     setRefreshing(true);
-    await handleRefresh();
     await refetchCustomerGroups();
     await refetchEmployeeRoleTask();
     setRefreshing(false);
   };
-
-  const { employeeRoleDefault, employeeRoles } = useEmployeeData();
-
-  const { data: customerGroups, refetch: refetchCustomerGroups } =
-    useGetCustomersGroupQuery({
-      customerGroupId:
-        employeeRoleDefault?.[0]?.customer_group_id ??
-        employeeRoles?.[0]?.customer_group_id,
-    });
-
-  const { data: employeeRoleTask, refetch: refetchEmployeeRoleTask } =
-    useGetEmployeeRoleTaskQuery({
-      customerGroup:
-        employeeRoleDefault?.[0]?.customer_group_id ??
-        employeeRoles?.[0]?.customer_group_id,
-    });
 
   useEffect(() => {
     if (customerGroups) {

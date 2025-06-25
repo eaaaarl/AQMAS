@@ -15,3 +15,10 @@ export interface QueueDetail {
   trans_time: string;
   trans_sec: string | null | number | undefined;
 }
+
+export interface TickitSkipped {
+  trans_id: string;
+  trans_date: string;
+  customer_name: string;
+  time_start: string;
+}

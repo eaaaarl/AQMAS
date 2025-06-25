@@ -1,4 +1,3 @@
-import { useGetEmployeeInfoQuery } from '@/features/auth/api/authApi';
 import { useAppDispatch, useAppSelector } from '@/libs/redux/hooks';
 import { removeEmployee } from '@/libs/redux/state/employeeSlice';
 import {
@@ -12,21 +11,7 @@ import { Alert } from 'react-native';
 
 export const useSettings = () => {
   const dispatch = useAppDispatch();
-  const emp = useAppSelector(state => state.employee);
   const settings = useAppSelector(state => state.settings);
-
-  const { data: empInfo, refetch: refetchEmpInfo } = useGetEmployeeInfoQuery({
-    empId: emp.employee_id as number,
-  });
-  const empInformation = empInfo?.results || [];
-
-  const handleRefresh = async () => {
-    try {
-      await refetchEmpInfo();
-    } catch (error) {
-      console.error('Error refreshing employee data:', error);
-    }
-  };
 
   const handleLogout = async () => {
     Alert.alert('Logout', 'Are you sure you want to logout?', [
@@ -68,9 +53,7 @@ export const useSettings = () => {
   };
 
   return {
-    empInformation,
     settings,
-    handleRefresh,
     handleLogout,
     updateCustomerType: updateCustomerTypeHandler,
     updateService: updateServiceHandler,
