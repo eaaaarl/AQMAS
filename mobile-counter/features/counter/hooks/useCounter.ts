@@ -9,7 +9,7 @@ import { useGetCustomersGroupQuery } from '@/features/customer/api/customerApi';
 import { useGetQueueQuery } from '@/features/queue/api/queueApi';
 import { useSettings } from '@/features/settings/hooks/useSettings';
 import { useAppSelector } from '@/libs/redux/hooks';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 export const useCounter = () => {
   console.log('[useCounter] called');
@@ -27,7 +27,7 @@ export const useCounter = () => {
     { skip: !emp.employee_id }
   );
 
-  const empInformation = empInfo?.results || [];
+  const empInformation = useMemo(() => empInfo?.results || [], [empInfo]);
 
   // GET EMPLOYEE ROLE DEFAULT BY EMPLOYEE ID
   const { data: empRoleDefault, refetch: refetchEmpRoleDefault } =
@@ -46,26 +46,33 @@ export const useCounter = () => {
     { skip: !emp.employee_id }
   );
 
-  // GET ROLE NAME
-  const roleName = empRole?.[0]?.role_name ?? empRoleDefault?.[0]?.role_name;
+  // GET ROLE NAME AND COUNTER NO
+  const roleName = useMemo(
+    () => empRole?.[0]?.role_name ?? empRoleDefault?.[0]?.role_name,
+    [empRole, empRoleDefault]
+  );
 
-  // GET COUNTER NO
-  const counterNo = empRole?.[0]?.counter_no ?? empRoleDefault?.[0]?.counter_no;
+  const counterNo = useMemo(
+    () => empRole?.[0]?.counter_no ?? empRoleDefault?.[0]?.counter_no,
+    [empRole, empRoleDefault]
+  );
 
-  // GET EMPLOYEE ROLE TASK
-  const { refetch: refetchEmpRoleTask } = useGetEmployeeRoleTaskQuery({
-    customerGroup:
+  const customerGroupId = useMemo(
+    () =>
       empRoleDefault?.[0]?.customer_group_id ??
       empRole?.[0]?.customer_group_id ??
       0,
+    [empRoleDefault, empRole]
+  );
+
+  // GET EMPLOYEE ROLE TASK
+  const { refetch: refetchEmpRoleTask } = useGetEmployeeRoleTaskQuery({
+    customerGroup: customerGroupId,
   });
 
   // GET CUSTOMER GROUP
   const { refetch: refetchCustomerGroup } = useGetCustomersGroupQuery({
-    customerGroupId:
-      empRoleDefault?.[0]?.customer_group_id ??
-      empRole?.[0]?.customer_group_id ??
-      0,
+    customerGroupId,
   });
 
   // Get settings
@@ -77,8 +84,7 @@ export const useCounter = () => {
       service_id: settings?.services ?? [],
       type_id: settings?.customerTypes ?? [],
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [settings?.services?.join(','), settings?.customerTypes?.join(',')]
+    [settings?.services, settings?.customerTypes]
   );
 
   // GET QUEUE with better caching control
@@ -88,13 +94,11 @@ export const useCounter = () => {
     isFetching: isQueueFetching,
   } = useGetQueueQuery(queryParams, {
     skip: !settings?.services || !settings?.customerTypes,
-    // Force refetch every time to avoid stale data
     refetchOnMountOrArgChange: true,
-    // Don't use cached data for this critical query
     refetchOnFocus: true,
   });
 
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     try {
       // Execute refetches in sequence for better reliability
       await refetchConfig();
@@ -114,17 +118,40 @@ export const useCounter = () => {
       console.error('Error refreshing data:', error);
       throw error;
     }
-  };
-
-  return {
-    config,
-    emp,
-    empInformation,
-    roleName,
-    counterNo,
-    handleRefresh,
-    queue,
+  }, [
+    refetchConfig,
+    refetchEmpInfo,
+    refetchEmpRole,
+    refetchEmpRoleDefault,
+    refetchEmpRoleTask,
+    refetchCustomerGroup,
     QueueRefetch,
-    isQueueFetching,
-  };
+  ]);
+
+  const returnValue = useMemo(
+    () => ({
+      config,
+      emp,
+      empInformation,
+      roleName,
+      counterNo,
+      handleRefresh,
+      queue,
+      QueueRefetch,
+      isQueueFetching,
+    }),
+    [
+      config,
+      emp,
+      empInformation,
+      roleName,
+      counterNo,
+      handleRefresh,
+      queue,
+      QueueRefetch,
+      isQueueFetching,
+    ]
+  );
+
+  return returnValue;
 };

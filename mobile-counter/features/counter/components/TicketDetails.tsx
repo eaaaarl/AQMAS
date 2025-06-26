@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { Service } from '../types';
 
@@ -18,31 +18,37 @@ interface DetailItemProps {
   isLoading?: boolean;
 }
 
-const DetailItem: React.FC<DetailItemProps> = ({ label, value, isLoading }) => (
-  <View className="items-center">
-    <Text
-      className="mb-1 text-sm text-gray-500"
-      accessibilityRole="text"
-      accessibilityLabel={`${label} label`}
-    >
-      {label}
-    </Text>
-    {isLoading ? (
-      <ActivityIndicator size="small" color="#1c3f83" />
-    ) : (
-      <Text
-        style={{ color: '#1c3f83' }}
-        className="text-center font-medium"
-        accessibilityRole="text"
-        accessibilityLabel={`${label} value: ${Array.isArray(value) ? value.join(', ') : value || '---'}`}
-      >
-        {Array.isArray(value) ? value.join(', ') : value || '---'}
-      </Text>
-    )}
-  </View>
-);
+const DetailItem = memo<DetailItemProps>(({ label, value, isLoading }) => {
+  const displayValue = Array.isArray(value) ? value.join(', ') : value || '---';
 
-export const TicketDetails: React.FC<TicketDetailsProps> = ({
+  return (
+    <View className="items-center">
+      <Text
+        className="mb-1 text-sm text-gray-500"
+        accessibilityRole="text"
+        accessibilityLabel={`${label} label`}
+      >
+        {label}
+      </Text>
+      {isLoading ? (
+        <ActivityIndicator size="small" color="#1c3f83" />
+      ) : (
+        <Text
+          style={{ color: '#1c3f83' }}
+          className="text-center font-medium"
+          accessibilityRole="text"
+          accessibilityLabel={`${label} value: ${displayValue}`}
+        >
+          {displayValue}
+        </Text>
+      )}
+    </View>
+  );
+});
+
+DetailItem.displayName = 'DetailItem';
+
+export const TicketDetails = memo<TicketDetailsProps>(({
   hasActiveTicket,
   services,
   customerType,
@@ -52,6 +58,8 @@ export const TicketDetails: React.FC<TicketDetailsProps> = ({
 }) => {
   const serviceNames = hasActiveTicket ? services?.map((service: Service) => service.button_caption) : undefined;
 
+  const containerClassName = `mb-4 rounded-xl border border-gray-300 bg-gray-50 p-4 ${onPress ? 'active:opacity-70' : ''}`;
+
   return (
     <View
       className="px-6 pb-6"
@@ -60,7 +68,7 @@ export const TicketDetails: React.FC<TicketDetailsProps> = ({
       accessibilityLabel="Ticket details"
     >
       <View
-        className={`mb-4 rounded-xl border border-gray-300 bg-gray-50 p-4 ${onPress ? 'active:opacity-70' : ''}`}
+        className={containerClassName}
         onTouchEnd={onPress}
         accessibilityRole={onPress ? 'button' : 'none'}
       >
@@ -79,4 +87,6 @@ export const TicketDetails: React.FC<TicketDetailsProps> = ({
       </View>
     </View>
   );
-}; 
+});
+
+TicketDetails.displayName = 'TicketDetails'; 

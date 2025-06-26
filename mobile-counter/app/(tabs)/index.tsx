@@ -20,9 +20,17 @@ import {
 } from '@/features/queue/api/queueApi';
 import { useAppDispatch, useAppSelector } from '@/libs/redux/hooks';
 import { resetQueue, setQueue, setSkippedTicket } from '@/libs/redux/state/queueSlice';
-import { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, StatusBar, View } from 'react-native';
 import Toast from 'react-native-toast-message';
+
+const MemoizedCounterHeader = React.memo(CounterHeader);
+const MemoizedTicketDisplay = React.memo(TicketDisplay);
+const MemoizedActionButtons = React.memo(ActionButtons);
+const MemoizedTicketDetails = React.memo(TicketDetails);
+const MemoizedSkippedTickets = React.memo(SkippedTickets);
+const MemoizedCounterSummary = React.memo(CounterSummary);
+
 export default function CounterScreen() {
   console.log('[CounterScreen] called');
 
@@ -55,7 +63,6 @@ export default function CounterScreen() {
         refetchOnFocus: true,
       }
     );
-
   const { data: queueSkippedData, refetch: refetchQueueSkippedData } =
     useGetQueueSkippedQuery(
       {
@@ -103,52 +110,69 @@ export default function CounterScreen() {
     refetchQueueSkippedData,
   });
 
-  // Check if there's any queue data available
-  const hasQueueData = !!queue || !!queueQueuedData;
+  // Memoized values to prevent unnecessary re-renders
+  const hasQueueData = useMemo(() => !!queue || !!queueQueuedData, [queue, queueQueuedData]);
 
-  // Effect to check for active ticket changes
-  useEffect(() => {
-    const hasTicket = !!(persistedQueue?.ticketNo && persistedQueue.ticketNo !== '');
-    console.log('Setting hasActiveTicket:', {
-      hasTicket,
-      currentTicketNo: persistedQueue?.ticketNo,
-      previousState: hasActiveTicket
-    });
+  const displayQueue = useMemo(() =>
+    hasActiveTicket && persistedQueue?.ticketNo ? persistedQueue : queue,
+    [hasActiveTicket, persistedQueue, queue]
+  );
 
-    if (hasTicket !== hasActiveTicket) {
-      setHasActiveTicket(hasTicket);
-    }
-  }, [persistedQueue?.ticketNo, hasActiveTicket]);
+  const counters = useMemo(() => {
+    const finishedCount = queueDetail?.filter(item => item.trans_status === 3).length ?? 0;
+    const remainingCount = queueDetail?.filter(item => item.trans_status === 0).length ?? 0;
+    const skippedCount = queueDetail?.filter(item => item.trans_status === 2).length ?? 0;
 
-  useEffect(() => {
-    if (!persistedQueue?.ticketNo) {
-      console.log('Resetting hasActiveTicket on mount');
-      setHasActiveTicket(false);
-      dispatch(resetQueue());
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    return { finishedCount, remainingCount, skippedCount };
+  }, [queueDetail]);
 
-  useEffect(() => {
-    if (hasQueueData && !hasActiveTicket) {
-      Toast.show({
-        type: 'info',
-        text1: 'Queue Available',
-        text2: 'You can now call the next ticket.',
-        position: 'top',
-        visibilityTime: 2000,
+  const timeStats = useMemo(() => {
+    const completedTransactions = queueDetail?.filter(item =>
+      item.trans_status === 3 && item.trans_time !== null
+    ) ?? [];
+
+    // Convert time string (HH:MM:SS) to seconds
+    const timeToSeconds = (timeStr: string | null): number => {
+      if (!timeStr) return 0;
+      const [hours, minutes, seconds] = timeStr.split(':').map(Number);
+      return (hours * 3600) + (minutes * 60) + seconds;
+    };
+
+    let bestTime = '---';
+    let worstTime = '---';
+
+    if (completedTransactions.length > 0) {
+      let minSeconds = Number.MAX_SAFE_INTEGER;
+      let maxSeconds = -1;
+
+      completedTransactions.forEach(transaction => {
+        if (transaction.trans_time) {
+          const seconds = timeToSeconds(transaction.trans_time);
+          if (seconds < minSeconds) {
+            minSeconds = seconds;
+            bestTime = transaction.trans_time;
+          }
+          if (seconds > maxSeconds) {
+            maxSeconds = seconds;
+            worstTime = transaction.trans_time;
+          }
+        }
       });
     }
-  }, [hasQueueData, hasActiveTicket]);
 
-  const onRefresh = async () => {
+    return { bestTime, worstTime };
+  }, [queueDetail]);
+
+  // Memoized callbacks to prevent unnecessary re-renders
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await handleRefresh();
     await queueDetailRefetch();
     await refetchQueueSkippedData();
     setRefreshing(false);
-  };
+  }, [handleRefresh, queueDetailRefetch, refetchQueueSkippedData]);
 
-  const onHandleNext = async () => {
+  const onHandleNext = useCallback(async () => {
     try {
       // Get fresh data in parallel
       const [freshQueueResult, queuedDataResult] = await Promise.all([
@@ -165,9 +189,9 @@ export default function CounterScreen() {
     } catch (error) {
       console.error('Error in onHandleNext:', error);
     }
-  };
+  }, [QueueRefetch, refetchQueuedData, queue, handleNext]);
 
-  const onFinish = async () => {
+  const onFinish = useCallback(async () => {
     try {
       await handleFinish();
       setHasActiveTicket(false);
@@ -176,9 +200,9 @@ export default function CounterScreen() {
     } catch (error) {
       console.error('Error in onFinish:', error);
     }
-  };
+  }, [handleFinish, dispatch]);
 
-  const onSkip = async () => {
+  const onSkip = useCallback(async () => {
     try {
       // First skip the current ticket
       await handleSkip();
@@ -203,10 +227,9 @@ export default function CounterScreen() {
     } catch (error) {
       console.error('Error in onSkip:', error);
     }
-  };
+  }, [handleSkip, persistedQueue, dispatch, refetchQueueSkippedData]);
 
-
-  const OnReturnSkippedTicket = async (ticket: TickitSkipped) => {
+  const OnReturnSkippedTicket = useCallback(async (ticket: TickitSkipped) => {
     try {
       await handleRecall(ticket.trans_id);
 
@@ -254,52 +277,41 @@ export default function CounterScreen() {
         position: 'top',
       });
     }
-  };
+  }, [handleRecall, hasActiveTicket, persistedQueue?.ticketNo, callQueueSkip, getQueueByID, dispatch, emp.employee_id, counterNo, handleRefresh, queueDetailRefetch, refetchQueueSkippedData]);
 
-  const finishedCount =
-    queueDetail?.filter(item => item.trans_status === 3).length ?? 0;
-  const remainingCount =
-    queueDetail?.filter(item => item.trans_status === 0).length ?? 0;
-  const skippedCount =
-    queueDetail?.filter(item => item.trans_status === 2).length ?? 0;
-
-  const completedTransactions = queueDetail?.filter(item =>
-    item.trans_status === 3 && item.trans_time !== null
-  ) ?? [];
-
-  // Convert time string (HH:MM:SS) to seconds
-  const timeToSeconds = (timeStr: string | null): number => {
-    if (!timeStr) return 0;
-    const [hours, minutes, seconds] = timeStr.split(':').map(Number);
-    return (hours * 3600) + (minutes * 60) + seconds;
-  };
-
-  let bestTime = '---';
-  let worstTime = '---';
-
-  if (completedTransactions.length > 0) {
-    let minSeconds = Number.MAX_SAFE_INTEGER;
-    let maxSeconds = -1;
-
-    completedTransactions.forEach(transaction => {
-      if (transaction.trans_time) {
-        const seconds = timeToSeconds(transaction.trans_time);
-        if (seconds < minSeconds) {
-          minSeconds = seconds;
-          bestTime = transaction.trans_time;
-        }
-        if (seconds > maxSeconds) {
-          maxSeconds = seconds;
-          worstTime = transaction.trans_time;
-        }
-      }
+  // Effect to check for active ticket changes
+  useEffect(() => {
+    const hasTicket = !!(persistedQueue?.ticketNo && persistedQueue.ticketNo !== '');
+    console.log('Setting hasActiveTicket:', {
+      hasTicket,
+      currentTicketNo: persistedQueue?.ticketNo,
+      previousState: hasActiveTicket
     });
-  }
 
-  // Display queue prioritizes active ticket over available queue
-  const displayQueue =
-    hasActiveTicket && persistedQueue?.ticketNo ? persistedQueue : queue;
+    if (hasTicket !== hasActiveTicket) {
+      setHasActiveTicket(hasTicket);
+    }
+  }, [persistedQueue?.ticketNo, hasActiveTicket]);
 
+  useEffect(() => {
+    if (!persistedQueue?.ticketNo) {
+      console.log('Resetting hasActiveTicket on mount');
+      setHasActiveTicket(false);
+      dispatch(resetQueue());
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (hasQueueData && !hasActiveTicket) {
+      Toast.show({
+        type: 'info',
+        text1: 'Queue Available',
+        text2: 'You can now call the next ticket.',
+        position: 'top',
+        visibilityTime: 2000,
+      });
+    }
+  }, [hasQueueData, hasActiveTicket]);
 
   return (
     <View className="flex-1 bg-gray-50">
@@ -317,8 +329,8 @@ export default function CounterScreen() {
         }
       >
         <View className="overflow-hidden rounded-2xl bg-white shadow-lg">
-          <CounterHeader
-            config={config}
+          <MemoizedCounterHeader
+            config={config ?? []}
             counterNo={counterNo as unknown as number}
             roleName={roleName as string}
             currentTime={<CurrentTime style={{ color: 'white' }} />}
@@ -326,13 +338,13 @@ export default function CounterScreen() {
             hasConnectionError={hasConnectionError}
           />
 
-          <TicketDisplay
+          <MemoizedTicketDisplay
             ticketNo={displayQueue?.ticketNo as string}
             customerName={displayQueue?.customerName as string}
             hasActiveTicket={hasActiveTicket}
           />
 
-          <ActionButtons
+          <MemoizedActionButtons
             hasActiveTicket={hasActiveTicket}
             isCallingQueue={isCallingQueue}
             isRecallingQueue={isRecallingQueue}
@@ -345,24 +357,24 @@ export default function CounterScreen() {
             onSkip={onSkip}
           />
 
-          <TicketDetails
+          <MemoizedTicketDetails
             hasActiveTicket={hasActiveTicket}
             services={displayQueue?.services}
             customerType={displayQueue?.customerType}
           />
 
-          <SkippedTickets
+          <MemoizedSkippedTickets
             skippedData={queueSkippedData ?? []}
             onReturnTicket={OnReturnSkippedTicket}
           />
 
-          <CounterSummary
-            finishedCount={finishedCount}
-            skippedCount={skippedCount}
-            remainingCount={remainingCount}
+          <MemoizedCounterSummary
+            finishedCount={counters.finishedCount}
+            skippedCount={counters.skippedCount}
+            remainingCount={counters.remainingCount}
             queue={queue}
-            bestTime={bestTime}
-            worstTime={worstTime}
+            bestTime={timeStats.bestTime}
+            worstTime={timeStats.worstTime}
           />
         </View>
       </ScrollView>

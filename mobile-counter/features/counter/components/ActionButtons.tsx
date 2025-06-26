@@ -20,10 +20,10 @@ interface LoadingButtonProps {
   loadingText: string;
 }
 
-const LoadingButtonComponent: React.FC<LoadingButtonProps> = ({ 
-  isLoading, 
-  text, 
-  loadingText 
+const LoadingButtonComponent: React.FC<LoadingButtonProps> = ({
+  isLoading,
+  text,
+  loadingText
 }) => (
   isLoading ? (
     <View className="flex-row items-center justify-center">
