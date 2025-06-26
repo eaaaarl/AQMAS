@@ -26,22 +26,22 @@ const CounterSummaryComponent: React.FC<CounterSummaryProps> = ({
       <Text className="mb-4 text-center text-base font-semibold text-gray-700">
         Today&apos;s Summary
       </Text>
-      
+
       {/* Counts Section */}
       <View className="mb-6 flex-row justify-between">
         <View className="items-center">
           <MaterialCommunityIcons name="check-circle" size={24} color="#22c55e" />
-          <Text className="mt-1 text-xs text-gray-600">Finished</Text>
+          <Text className="mt-1 text-xs text-gray-600 font-bold">Finished</Text>
           <Text className="text-lg font-bold text-gray-800">{finishedCount}</Text>
         </View>
         <View className="items-center">
           <MaterialCommunityIcons name="skip-next-circle" size={24} color="#f59e0b" />
-          <Text className="mt-1 text-xs text-gray-600">Skipped</Text>
+          <Text className="mt-1 text-xs text-gray-600 font-bold">Skipped</Text>
           <Text className="text-lg font-bold text-gray-800">{skippedCount}</Text>
         </View>
         <View className="items-center">
           <MaterialCommunityIcons name="account-clock" size={24} color="#1c3f83" />
-          <Text className="mt-1 text-xs text-gray-600">Waiting</Text>
+          <Text className="mt-1 text-xs text-gray-600 font-bold">Waiting</Text>
           <Text className="text-lg font-bold text-gray-800">
             {queue?.remaining ? Number(queue.remaining) : remainingCount}
           </Text>
@@ -59,7 +59,7 @@ const CounterSummaryComponent: React.FC<CounterSummaryProps> = ({
             </View>
             <Text className="font-medium text-emerald-600">{bestTime || '-'}</Text>
           </View>
-          
+
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center">
               <MaterialCommunityIcons name="timer-sand" size={18} color="#dc2626" />
@@ -75,4 +75,4 @@ const CounterSummaryComponent: React.FC<CounterSummaryProps> = ({
 
 CounterSummaryComponent.displayName = 'CounterSummary';
 
-export const CounterSummary = memo(CounterSummaryComponent); 
+export const CounterSummary = memo(CounterSummaryComponent);  

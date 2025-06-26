@@ -282,7 +282,7 @@ export const useCounterActions = ({
         Toast.show({
           ...TOAST_CONFIG.SUCCESS,
           text1: 'Queue Recalled Successfully',
-          text2: `Ticket ${targetTicketNo} has been recalled.`,
+          text2: `Ticket ${targetTicketNo ?? persistedQueue?.ticketNo} has been recalled.`,
         });
 
         await refreshAll();

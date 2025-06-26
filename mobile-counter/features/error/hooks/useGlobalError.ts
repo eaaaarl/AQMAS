@@ -1,67 +1,66 @@
 import { useGetEmployeeInfoQuery } from '@/features/auth/api/authApi';
 import { useGetConfigQuery } from '@/features/config/api/configApi';
 import { useAppSelector } from '@/libs/redux/hooks';
-import { useEffect, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 export const useGlobalError = () => {
-  console.log('[useGlobalError] called');
   const [hasConnectionError, setHasConnectionError] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
 
-  // Get employee from Redux state
-  const emp = useAppSelector(state => state.employee);
+  const empId = useAppSelector(state => state.employee.employee_id);
 
-  // API queries that we'll monitor for errors
   const { error: configError, refetch: refetchConfig } = useGetConfigQuery();
   const { error: empInfoError, refetch: refetchEmpInfo } =
-    useGetEmployeeInfoQuery(
-      { empId: emp.employee_id as number },
-      { skip: !emp.employee_id }
-    );
+    useGetEmployeeInfoQuery({ empId: empId as number }, { skip: !empId });
 
-  // Check for connection errors
-  useEffect(() => {
-    const checkForConnectionError = () => {
-      const hasError =
-        (configError &&
-          'status' in configError &&
-          configError.status === 'FETCH_ERROR') ||
-        (empInfoError &&
-          'status' in empInfoError &&
-          empInfoError.status === 'FETCH_ERROR');
+  const connectionError = useMemo(() => {
+    const isConfigError =
+      configError &&
+      'status' in configError &&
+      configError.status === 'FETCH_ERROR';
 
-      setHasConnectionError(hasError || false);
-    };
+    const isEmpInfoError =
+      empInfoError &&
+      'status' in empInfoError &&
+      empInfoError.status === 'FETCH_ERROR';
 
-    checkForConnectionError();
+    return Boolean(isConfigError || isEmpInfoError);
   }, [configError, empInfoError]);
 
-  // Retry function to attempt reconnection
-  const handleRetry = async () => {
+  useMemo(() => {
+    setHasConnectionError(connectionError);
+  }, [connectionError]);
+
+  const handleRetry = useCallback(async () => {
     setIsRetrying(true);
+
     try {
-      await Promise.all([
-        refetchConfig(),
-        emp.employee_id ? refetchEmpInfo() : Promise.resolve(),
-      ]);
+      const refetchPromises = [refetchConfig()];
+
+      if (empId) {
+        refetchPromises.push(refetchEmpInfo() as any);
+      }
+
+      await Promise.all(refetchPromises);
       setHasConnectionError(false);
     } catch (error) {
       console.error('Retry failed:', error);
-      // Keep error state if retry fails
     } finally {
       setIsRetrying(false);
     }
-  };
+  }, [refetchConfig, refetchEmpInfo, empId]);
 
-  // Dismiss error (temporary)
-  const handleDismiss = () => {
+  const handleDismiss = useCallback(() => {
     setHasConnectionError(false);
-  };
+  }, []);
 
-  return {
-    hasConnectionError,
-    isRetrying,
-    handleRetry,
-    handleDismiss,
-  };
+  return useMemo(
+    () => ({
+      hasConnectionError,
+      isRetrying,
+      handleRetry,
+      handleDismiss,
+    }),
+    [hasConnectionError, isRetrying, handleRetry, handleDismiss]
+  );
 };

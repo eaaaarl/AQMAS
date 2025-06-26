@@ -11,7 +11,6 @@ import { router } from 'expo-router';
 import { Alert } from 'react-native';
 
 export const useSettings = () => {
-  console.log('[useSettings] called');
   const dispatch = useAppDispatch();
   const settings = useAppSelector(state => state.settings);
 

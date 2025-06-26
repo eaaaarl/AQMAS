@@ -3,11 +3,12 @@ import {
   ActionButtons,
   CounterHeader,
   CounterSummary,
+  CurrentDate,
+  CurrentTime,
   SkippedTickets,
   TicketDetails,
   TicketDisplay,
 } from '@/features/counter/components';
-import CurrentTime from '@/features/counter/components/CurrentTIme';
 import { useCounter, useCounterActions } from '@/features/counter/hooks';
 import { useGlobalError } from '@/features/error';
 import { TickitSkipped } from '@/features/queue/api/interface';
@@ -33,8 +34,7 @@ const MemoizedSkippedTickets = React.memo(SkippedTickets);
 const MemoizedCounterSummary = React.memo(CounterSummary);
 
 export default function CounterScreen() {
-  console.log('[CounterScreen] called');
-
+  console.log('CounterScreen called');
   const dispatch = useAppDispatch();
   const persistedQueue = useAppSelector(state => state.queue);
   const [refreshing, setRefreshing] = useState(false);
@@ -329,11 +329,12 @@ export default function CounterScreen() {
           />
         }
       >
-        <View className="overflow-hidden rounded-2xl bg-white shadow-lg">
+        <View className="overflow-hidden rounded-2xl bg-white shadow-lg my-2">
           <MemoizedCounterHeader
             config={config ?? []}
             counterNo={counterNo as unknown as number}
             roleName={roleName as string}
+            currentDate={<CurrentDate style={{ color: 'white' }} />}
             currentTime={<CurrentTime style={{ color: 'white' }} />}
             hasQueuedData={hasQueueData}
             hasConnectionError={hasConnectionError}

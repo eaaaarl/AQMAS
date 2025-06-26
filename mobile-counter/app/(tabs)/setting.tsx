@@ -6,6 +6,7 @@ import { useSettings } from '@/features/settings/hooks/useSettings';
 import { InfoRowProps, SettingRowProps } from '@/features/settings/types';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Image,
   KeyboardAvoidingView,
   Platform,
   RefreshControl,
@@ -184,9 +185,25 @@ const LogoutSection = React.memo<{
 ));
 LogoutSection.displayName = 'LogoutSection';
 
+const ProfileImage = React.memo<{
+  empInformation: any;
+}>(({ empInformation }) => (
+  <View className="mb-6 items-center">
+    <View className="h-24 w-24 overflow-hidden rounded-full">
+      <Image
+        source={require('@/assets/images/adaptive-icon.png')}
+        className="h-full w-full"
+        resizeMode="cover"
+      />
+    </View>
+    <Text className="mt-2 text-center text-lg font-semibold" style={{ color: '#1c3f83' }}>
+      {`${empInformation?.[0]?.first_name} ${empInformation?.[0]?.last_name}`}
+    </Text>
+  </View>
+));
+ProfileImage.displayName = 'ProfileImage';
 
 export default function SettingsScreen() {
-  console.log('[SettingsScreen] Called')
   const [refreshing, setRefreshing] = useState(false);
   const { hasConnectionError } = useGlobalError();
   const customerTypesInitialized = useRef(false);
@@ -207,7 +224,6 @@ export default function SettingsScreen() {
     employeeInfo: empInformation,
   } = useEmployeeData();
 
-  // Memoized customer group ID to prevent unnecessary re-renders
   const customerGroupId = useMemo(() =>
     employeeRoleDefault?.[0]?.customer_group_id ?? employeeRoles?.[0]?.customer_group_id,
     [employeeRoleDefault, employeeRoles]
@@ -293,6 +309,9 @@ export default function SettingsScreen() {
           }
         >
           <View className="mx-4 px-5 py-6">
+            {/* Profile Image Section */}
+            <ProfileImage empInformation={empInformation} />
+
             {/* Counter User Information Section */}
             <CounterInformationSection empInformation={empInformation} />
 
