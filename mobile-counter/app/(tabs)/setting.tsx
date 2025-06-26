@@ -4,7 +4,7 @@ import { useGetCustomersGroupQuery } from '@/features/customer/api/customerApi';
 import { OfflineIndicator, useGlobalError } from '@/features/error';
 import { useSettings } from '@/features/settings/hooks/useSettings';
 import { InfoRowProps, SettingRowProps } from '@/features/settings/types';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -17,6 +17,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+
 
 const SettingRow: React.FC<SettingRowProps> = ({
   label,
@@ -52,9 +53,15 @@ const InfoRow: React.FC<InfoRowProps> = ({ label, value }) => (
   </View>
 );
 
+let renderCount = 0;
+
 export default function SettingsScreen() {
+  console.log('SettingsScreen called:', ++renderCount);
+
   const [refreshing, setRefreshing] = useState(false);
   const { hasConnectionError } = useGlobalError();
+  const customerTypesInitialized = useRef(false);
+  const servicesInitialized = useRef(false);
   const {
     settings,
     handleLogout,
@@ -106,20 +113,18 @@ export default function SettingsScreen() {
   };
 
   useEffect(() => {
-    if (customerGroups) {
-      // Initialize with all customer types enabled by default
+    if (customerGroups && !customerTypesInitialized.current) {
       setCustomerTypes(customerGroups.map(g => g.type_id));
+      customerTypesInitialized.current = true;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [customerGroups]);
+  }, [customerGroups, setCustomerTypes]);
 
   useEffect(() => {
-    if (employeeRoleTask) {
-      // Initialize with all services enabled by default
+    if (employeeRoleTask && !servicesInitialized.current) {
       setServices(employeeRoleTask.map(t => t.service_id));
+      servicesInitialized.current = true;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [employeeRoleTask]);
+  }, [employeeRoleTask, setServices]);
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">

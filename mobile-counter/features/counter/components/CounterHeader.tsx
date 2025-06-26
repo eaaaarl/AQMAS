@@ -6,8 +6,7 @@ interface CounterHeaderProps {
   config: any;
   counterNo: string | number;
   roleName: string;
-  currentTime: Date;
-  lastUpdated: Date;
+  currentTime: React.ReactNode;
   hasQueuedData: boolean;
   hasConnectionError: boolean;
 }
@@ -17,7 +16,6 @@ export const CounterHeader: React.FC<CounterHeaderProps> = ({
   counterNo,
   roleName,
   currentTime,
-  lastUpdated,
   hasQueuedData,
   hasConnectionError,
 }) => {
@@ -40,28 +38,7 @@ export const CounterHeader: React.FC<CounterHeaderProps> = ({
         <View>
           <Text className="text-sm text-white/80">{roleName}</Text>
           <Text className="text-xl font-bold text-white">
-            {currentTime.toLocaleTimeString('en-PH', {
-              hour: '2-digit',
-              minute: '2-digit',
-              second: '2-digit',
-              hour12: true,
-            })}
-          </Text>
-          <Text className="text-sm text-white/80">
-            Today,{' '}
-            {currentTime.toLocaleDateString('en-PH', {
-              day: '2-digit',
-              month: 'long',
-              year: 'numeric',
-            })}
-          </Text>
-          <Text className="text-xs text-white/60">
-            Last updated:{' '}
-            {lastUpdated.toLocaleTimeString('en-PH', {
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: true,
-            })}
+            {currentTime}
           </Text>
         </View>
       </View>

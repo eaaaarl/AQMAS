@@ -4,6 +4,7 @@ import { useAppSelector } from '@/libs/redux/hooks';
 import { useEffect, useState } from 'react';
 
 export const useGlobalError = () => {
+  console.log('[useGlobalError] called');
   const [hasConnectionError, setHasConnectionError] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
 

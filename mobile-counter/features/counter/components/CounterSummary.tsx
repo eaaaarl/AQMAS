@@ -1,5 +1,5 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import React from 'react';
+import React, { memo } from 'react';
 import { Text, View } from 'react-native';
 
 interface CounterSummaryProps {
@@ -12,7 +12,7 @@ interface CounterSummaryProps {
   averageTime?: string;
 }
 
-export const CounterSummary: React.FC<CounterSummaryProps> = ({
+const CounterSummaryComponent: React.FC<CounterSummaryProps> = ({
   finishedCount,
   skippedCount,
   remainingCount,
@@ -71,4 +71,8 @@ export const CounterSummary: React.FC<CounterSummaryProps> = ({
       </View>
     </View>
   );
-}; 
+};
+
+CounterSummaryComponent.displayName = 'CounterSummary';
+
+export const CounterSummary = memo(CounterSummaryComponent); 

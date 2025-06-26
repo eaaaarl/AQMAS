@@ -6,6 +6,7 @@ import {
 } from '../api/authApi';
 
 export const useEmployeeData = (employeeId?: string) => {
+  console.log('[useEmployeeData] called');
   const currentEmployee = useAppSelector(state => state.employee);
 
   const empId = employeeId || currentEmployee.employee_id || 0;

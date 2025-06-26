@@ -34,6 +34,7 @@ export const useCounterActions = ({
   queueDetailRefetch,
   refetchQueueSkippedData,
 }: UseCounterActionsProps) => {
+  console.log('[useCounterActions] called');
   const dispatch = useAppDispatch();
   const [callQueue, { isLoading: isCallingQueue }] = useCallQueueMutation();
   const [callQueueFinish, { isLoading: isFinishingQueue }] =

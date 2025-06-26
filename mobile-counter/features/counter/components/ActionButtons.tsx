@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 
 interface ActionButtonsProps {
@@ -14,7 +14,33 @@ interface ActionButtonsProps {
   onSkip: () => void;
 }
 
-export const ActionButtons: React.FC<ActionButtonsProps> = ({
+interface LoadingButtonProps {
+  isLoading: boolean;
+  text: string;
+  loadingText: string;
+}
+
+const LoadingButtonComponent: React.FC<LoadingButtonProps> = ({ 
+  isLoading, 
+  text, 
+  loadingText 
+}) => (
+  isLoading ? (
+    <View className="flex-row items-center justify-center">
+      <ActivityIndicator size="small" color="white" className="mr-2" />
+      <Text className="text-center font-medium text-white">
+        {loadingText}
+      </Text>
+    </View>
+  ) : (
+    <Text className="text-center font-medium text-white">{text}</Text>
+  )
+);
+
+LoadingButtonComponent.displayName = 'LoadingButton';
+const LoadingButton = memo(LoadingButtonComponent);
+
+const ActionButtonsComponent: React.FC<ActionButtonsProps> = ({
   hasActiveTicket,
   isCallingQueue,
   isRecallingQueue,
@@ -37,27 +63,6 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   const isRecallEnabled = hasActiveTicket && !isRecallingQueue;
   const isFinishEnabled = hasActiveTicket && !isFinishingQueue;
   const isSkipEnabled = hasActiveTicket && !isSkippingQueue;
-  
-  const LoadingButton = ({ 
-    isLoading, 
-    text, 
-    loadingText 
-  }: { 
-    isLoading: boolean; 
-    text: string; 
-    loadingText: string;
-  }) => (
-    isLoading ? (
-      <View className="flex-row items-center justify-center">
-        <ActivityIndicator size="small" color="white" className="mr-2" />
-        <Text className="text-center font-medium text-white">
-          {loadingText}
-        </Text>
-      </View>
-    ) : (
-      <Text className="text-center font-medium text-white">{text}</Text>
-    )
-  );
 
   return (
     <View className="px-6 pb-6">
@@ -128,4 +133,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       </View>
     </View>
   );
-}; 
+};
+
+ActionButtonsComponent.displayName = 'ActionButtons';
+export const ActionButtons = memo(ActionButtonsComponent); 

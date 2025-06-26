@@ -9,9 +9,10 @@ import { useGetCustomersGroupQuery } from '@/features/customer/api/customerApi';
 import { useGetQueueQuery } from '@/features/queue/api/queueApi';
 import { useSettings } from '@/features/settings/hooks/useSettings';
 import { useAppSelector } from '@/libs/redux/hooks';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 export const useCounter = () => {
+  console.log('[useCounter] called');
   // GET CONFIG
   const { data: config, refetch: refetchConfig } = useGetConfigQuery();
 
@@ -93,15 +94,6 @@ export const useCounter = () => {
     refetchOnFocus: true,
   });
 
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
   const handleRefresh = async () => {
     try {
       // Execute refetches in sequence for better reliability
@@ -130,7 +122,6 @@ export const useCounter = () => {
     empInformation,
     roleName,
     counterNo,
-    currentTime,
     handleRefresh,
     queue,
     QueueRefetch,

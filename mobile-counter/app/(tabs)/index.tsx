@@ -7,6 +7,7 @@ import {
   TicketDetails,
   TicketDisplay,
 } from '@/features/counter/components';
+import CurrentTime from '@/features/counter/components/CurrentTIme';
 import { useCounter, useCounterActions } from '@/features/counter/hooks';
 import { useGlobalError } from '@/features/error';
 import { TickitSkipped } from '@/features/queue/api/interface';
@@ -19,25 +20,23 @@ import {
 } from '@/features/queue/api/queueApi';
 import { useAppDispatch, useAppSelector } from '@/libs/redux/hooks';
 import { resetQueue, setQueue, setSkippedTicket } from '@/libs/redux/state/queueSlice';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, StatusBar, View } from 'react-native';
 import Toast from 'react-native-toast-message';
-
 export default function CounterScreen() {
+  console.log('[CounterScreen] called');
+
   const dispatch = useAppDispatch();
   const persistedQueue = useAppSelector(state => state.queue);
   const [refreshing, setRefreshing] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState(new Date());
   const [hasActiveTicket, setHasActiveTicket] = useState(() => {
     return !!(persistedQueue?.ticketNo && persistedQueue.ticketNo !== '');
   });
   const { hasConnectionError } = useGlobalError();
-
   const {
     config,
     roleName,
     counterNo,
-    currentTime,
     queue,
     handleRefresh,
     QueueRefetch,
@@ -121,9 +120,7 @@ export default function CounterScreen() {
     }
   }, [persistedQueue?.ticketNo, hasActiveTicket]);
 
-  // Effect to reset active ticket state when component mounts
   useEffect(() => {
-    // Reset active ticket state on mount if no ticket in persistedQueue
     if (!persistedQueue?.ticketNo) {
       console.log('Resetting hasActiveTicket on mount');
       setHasActiveTicket(false);
@@ -131,7 +128,6 @@ export default function CounterScreen() {
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Effect to show toast when queue data changes
   useEffect(() => {
     if (hasQueueData && !hasActiveTicket) {
       Toast.show({
@@ -149,7 +145,6 @@ export default function CounterScreen() {
     await handleRefresh();
     await queueDetailRefetch();
     await refetchQueueSkippedData();
-    setLastUpdated(new Date());
     setRefreshing(false);
   };
 
@@ -249,7 +244,6 @@ export default function CounterScreen() {
       await handleRefresh();
       await queueDetailRefetch();
       await refetchQueueSkippedData();
-      setLastUpdated(new Date());
 
     } catch (error) {
       console.error('Error in OnReturnSkippedTicket:', error);
@@ -327,8 +321,7 @@ export default function CounterScreen() {
             config={config}
             counterNo={counterNo as unknown as number}
             roleName={roleName as string}
-            currentTime={currentTime}
-            lastUpdated={lastUpdated}
+            currentTime={<CurrentTime style={{ color: 'white' }} />}
             hasQueuedData={hasQueueData}
             hasConnectionError={hasConnectionError}
           />
