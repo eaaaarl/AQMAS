@@ -24,6 +24,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, StatusBar, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
+// Memoized components
 const MemoizedCounterHeader = React.memo(CounterHeader);
 const MemoizedTicketDisplay = React.memo(TicketDisplay);
 const MemoizedActionButtons = React.memo(ActionButtons);
@@ -47,7 +48,7 @@ export default function CounterScreen() {
     counterNo,
     queue,
     handleRefresh,
-    QueueRefetch,
+    queueRefetch,
     emp,
   } = useCounter();
 
@@ -176,7 +177,7 @@ export default function CounterScreen() {
     try {
       // Get fresh data in parallel
       const [freshQueueResult, queuedDataResult] = await Promise.all([
-        QueueRefetch(),
+        queueRefetch(),
         refetchQueuedData(),
       ]);
 
@@ -189,7 +190,7 @@ export default function CounterScreen() {
     } catch (error) {
       console.error('Error in onHandleNext:', error);
     }
-  }, [QueueRefetch, refetchQueuedData, queue, handleNext]);
+  }, [queueRefetch, refetchQueuedData, queue, handleNext]);
 
   const onFinish = useCallback(async () => {
     try {

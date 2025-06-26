@@ -184,11 +184,9 @@ const LogoutSection = React.memo<{
 ));
 LogoutSection.displayName = 'LogoutSection';
 
-let renderCount = 0;
 
 export default function SettingsScreen() {
-  console.log('SettingsScreen called:', ++renderCount);
-
+  console.log('[SettingsScreen] Called')
   const [refreshing, setRefreshing] = useState(false);
   const { hasConnectionError } = useGlobalError();
   const customerTypesInitialized = useRef(false);
