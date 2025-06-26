@@ -40,7 +40,7 @@ export const queueApi = createApi({
     });
     return baseQuery(adjustedArgs, api, extraOptions);
   },
-  tagTypes: ['Queue'],
+  tagTypes: ['ActiveQueue', 'QueueDetail', 'QueueSkipped', 'QueueQueued'],
   endpoints: builder => ({
     callQueue: builder.mutation<
       { message: string },
@@ -54,7 +54,7 @@ export const queueApi = createApi({
           counterNo,
         },
       }),
-      invalidatesTags: ['Queue'],
+      invalidatesTags: ['ActiveQueue', 'QueueDetail'],
     }),
 
     callQueueFinish: builder.mutation<void, { ticketNo: string }>({
@@ -62,7 +62,7 @@ export const queueApi = createApi({
         url: `/queue/finish/${ticketNo}`,
         method: 'PUT',
       }),
-      invalidatesTags: ['Queue'],
+      invalidatesTags: ['ActiveQueue', 'QueueDetail'],
     }),
 
     callQueueRecall: builder.mutation<void, { ticketNo: string }>({
@@ -70,7 +70,7 @@ export const queueApi = createApi({
         url: `/queue/recall/${ticketNo}`,
         method: 'PUT',
       }),
-      invalidatesTags: ['Queue'],
+      invalidatesTags: ['QueueSkipped', 'ActiveQueue'],
     }),
 
     callQueueSkip: builder.mutation<void, { ticketNo: string }>({
@@ -78,7 +78,7 @@ export const queueApi = createApi({
         url: `/queue/skip/${ticketNo}`,
         method: 'PUT',
       }),
-      invalidatesTags: ['Queue'],
+      invalidatesTags: ['QueueSkipped', 'ActiveQueue'],
     }),
 
     getQueue: builder.query<
@@ -93,7 +93,7 @@ export const queueApi = createApi({
           method: 'GET',
         };
       },
-      providesTags: ['Queue'],
+      providesTags: ['ActiveQueue'],
     }),
 
     getQueueByID: builder.query<Ticket, { ticketNo: string }>({
@@ -101,7 +101,7 @@ export const queueApi = createApi({
         url: `/queue/${ticketNo}`,
         method: 'GET',
       }),
-      providesTags: ['Queue'],
+      providesTags: ['ActiveQueue'],
     }),
 
     getQueueDetailEmpId: builder.query<QueueDetail[], { employee_id: number }>({
@@ -109,7 +109,7 @@ export const queueApi = createApi({
         url: `/queue/detail/${employee_id}`,
         method: 'GET',
       }),
-      providesTags: ['Queue'],
+      providesTags: ['QueueDetail'],
     }),
 
     getQueueQueued: builder.query<Ticket, { employeeId: number }>({
@@ -117,7 +117,7 @@ export const queueApi = createApi({
         url: `/queue/queued/${employeeId}`,
         method: 'GET',
       }),
-      providesTags: ['Queue'],
+      providesTags: ['QueueQueued'],
     }),
 
     getQueueSkipped: builder.query<TickitSkipped[], { employeeId: number }>({
@@ -125,7 +125,7 @@ export const queueApi = createApi({
         url: `/queue/skipped/${employeeId}`,
         method: 'GET',
       }),
-      providesTags: ['Queue'],
+      providesTags: ['QueueSkipped'],
     }),
 
   }),

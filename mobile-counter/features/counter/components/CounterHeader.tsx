@@ -1,9 +1,13 @@
 import { OfflineIndicator } from '@/features/error';
-import React from 'react';
+import React, { memo } from 'react';
 import { Text, View } from 'react-native';
 
+interface CounterConfig {
+  Value: string;
+}
+
 interface CounterHeaderProps {
-  config: any;
+  config: CounterConfig[];
   counterNo: string | number;
   roleName: string;
   currentTime: React.ReactNode;
@@ -11,7 +15,7 @@ interface CounterHeaderProps {
   hasConnectionError: boolean;
 }
 
-export const CounterHeader: React.FC<CounterHeaderProps> = ({
+export const CounterHeader = memo<CounterHeaderProps>(({
   config,
   counterNo,
   roleName,
@@ -44,4 +48,6 @@ export const CounterHeader: React.FC<CounterHeaderProps> = ({
       </View>
     </>
   );
-}; 
+});
+
+CounterHeader.displayName = 'CounterHeader';  
