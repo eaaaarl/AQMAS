@@ -18,7 +18,12 @@ export default function AuthLayout() {
         router.push('/(developer)/setting');
       }}
     >
-      <Stack screenOptions={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="login" options={{ headerShown: false }} />
+        <Stack.Screen name="not-registered" options={{ headerShown: false }} />
+        <Stack.Screen name="unauthorize" options={{ headerShown: false }} />
+        <Stack.Screen name="verification" options={{ headerShown: false }} />
+      </Stack>
     </TapDetector>
   );
 }

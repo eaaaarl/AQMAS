@@ -1,10 +1,12 @@
+import { useLazyCheckDeviceQuery, useRegisteredDeviceMutation } from '@/features/auth/api/deviceApi';
 import { useAppDispatch, useAppSelector } from '@/libs/redux/hooks';
 import { setConfig } from '@/libs/redux/state/configSlice';
+import * as Application from 'expo-application';
+import * as Device from 'expo-device';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import Toast from 'react-native-toast-message';
 
-// Validation functions
 const validateIpAddress = (ip: string): boolean => {
   if (!ip.trim()) return false;
 
@@ -25,6 +27,10 @@ export const useDeveloperSetting = () => {
   const currentConfig = useAppSelector(state => state.config);
   const [ipAddress, setIpAddress] = useState('');
   const [port, setPort] = useState('');
+  const [isCheckingDevice, setIsCheckingDevice] = useState(false);
+
+  const [checkDevice] = useLazyCheckDeviceQuery();
+  const [registerDevice] = useRegisteredDeviceMutation();
 
   useEffect(() => {
     if (currentConfig.ipAddress) {
@@ -35,7 +41,56 @@ export const useDeveloperSetting = () => {
     }
   }, [currentConfig]);
 
-  const handleSave = () => {
+  const checkDeviceRegistration = async () => {
+    setIsCheckingDevice(true);
+    try {
+      const androidId = Application.getAndroidId();
+      const deviceType = Device.osName === 'Android' ? 1 : 2;
+
+      const checkResponse = await checkDevice({
+        type: deviceType,
+        id: androidId
+      }).unwrap();
+
+
+      if (!checkResponse.registered) {
+        router.push('/auth/not-registered');
+      } else {
+        router.push('/auth/login');
+      }
+    } catch (error) {
+      console.error('Device check failed:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Connection Error',
+        text2: 'Failed to check device registration',
+      });
+    } finally {
+      setIsCheckingDevice(false);
+    }
+  };
+
+  const registerDeviceSilently = async () => {
+    try {
+      const androidId = Application.getAndroidId();
+      const deviceType = Device.osName === 'Android' ? 1 : 2;
+
+      const deviceInfo = {
+        id: androidId,
+        os: deviceType,
+        type: 1,
+      };
+
+      const res = await registerDevice(deviceInfo).unwrap();
+      console.log('Device registered silently', res);
+      return true;
+    } catch (error) {
+      console.error('Silent device registration failed:', error);
+      return false;
+    }
+  };
+
+  const handleSave = async () => {
     try {
       if (!validateIpAddress(ipAddress)) {
         Toast.show({
@@ -45,7 +100,6 @@ export const useDeveloperSetting = () => {
         });
         return;
       }
-
       if (!validatePort(port)) {
         Toast.show({
           type: 'error',
@@ -55,13 +109,18 @@ export const useDeveloperSetting = () => {
         return;
       }
 
+      // Save config first
       dispatch(setConfig({ ipAddress, port }));
+
       Toast.show({
         type: 'success',
         text1: 'Settings Saved',
         text2: 'The new configuration has been applied.',
       });
-      router.push('/auth/login');
+
+      // Then check device registration
+      await checkDeviceRegistration();
+
     } catch (error) {
       console.error('Error saving settings:', error);
       Toast.show({
@@ -79,5 +138,8 @@ export const useDeveloperSetting = () => {
     handleSave,
     setIpAddress,
     setPort,
+    isCheckingDevice,
+    registerDeviceSilently,
+    checkDevice
   };
 };

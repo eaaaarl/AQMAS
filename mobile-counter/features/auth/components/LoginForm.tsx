@@ -38,7 +38,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         <View className="flex-row items-center rounded-lg border border-gray-200 bg-white px-4 py-3">
           <Ionicons name="person" size={18} color="#6b7280" />
           <TextInput
-            className="ml-2 flex-1 p-2 text-gray-700"
+            className="ml-2 flex-1 p-2 text-black font-bold"
             placeholder="Enter your employee no"
             value={formData.employeeId}
             onChangeText={value =>
@@ -59,7 +59,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         <View className="flex-row items-center rounded-lg border border-gray-200 bg-white px-4 py-3">
           <Ionicons name="lock-closed" size={18} color="#6b7280" />
           <TextInput
-            className="ml-2 flex-1 p-2 text-gray-700"
+            className="ml-2 flex-1 p-2 text-black font-bold"
             placeholder="Enter your PIN"
             value={formData.pin}
             onChangeText={value =>
@@ -88,9 +88,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       <TouchableOpacity
         onPress={handleSubmit}
         disabled={isLoading || !isFormValid}
-        className={`rounded-lg p-4 ${
-          isLoading || !isFormValid ? 'bg-blue-400' : 'bg-blue-600'
-        } items-center`}
+        className={`rounded-lg p-4 ${isLoading || !isFormValid ? 'bg-blue-400' : 'bg-blue-600'
+          } items-center`}
       >
         {isLoading ? (
           <ActivityIndicator size="small" color="#fff" />
