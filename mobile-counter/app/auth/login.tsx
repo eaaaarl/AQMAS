@@ -4,32 +4,52 @@ import { useDeveloperSetting } from '@/features/developer/hooks/useDeveloperSett
 import * as Application from 'expo-application';
 import * as Device from 'expo-device';
 import { router } from 'expo-router';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { KeyboardAvoidingView, Platform, Text, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 
 export default function Login() {
   const { login, isLoading } = useAuth();
   const { checkDevice } = useDeveloperSetting();
 
-  const handleLogin = async (formData: any) => {
-    await login(formData);
-  };
-
-
-  useEffect(() => {
-    const checkDeviceData = async () => {
+  const checkDeviceRegistration = useCallback(async () => {
+    try {
       const androidId = Application.getAndroidId();
       const deviceType = Device.osName === 'Android' ? 1 : 2;
-      const res = await checkDevice({
+      const deviceCheck = await checkDevice({
         type: deviceType,
         id: androidId,
       }).unwrap();
-      if (res.registered === false) {
+
+      if (!deviceCheck.registered) {
         router.push('/auth/unauthorize');
       }
-    };
-    checkDeviceData();
+    } catch (error) {
+      console.error('Device check error:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Device Check Failed',
+        text2: 'Please try again or contact administrator',
+      });
+    }
   }, [checkDevice]);
+
+  useEffect(() => {
+    checkDeviceRegistration();
+  }, [checkDeviceRegistration]);
+
+  const handleLogin = async (formData: any) => {
+    try {
+      await login(formData);
+    } catch (error) {
+      console.error('Login error:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Login Failed',
+        text2: 'Please check your credentials and try again',
+      });
+    }
+  };
 
   return (
     <KeyboardAvoidingView
