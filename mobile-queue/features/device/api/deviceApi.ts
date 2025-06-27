@@ -1,5 +1,6 @@
 import { RootState } from "@/libs/redux/store";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { DeviceType } from "../constants";
 import { DeviceApi, DeviceInfo } from "../interface/device.interface";
 
 export const deviceApi = createApi({
@@ -67,7 +68,7 @@ export const deviceApi = createApi({
       { id: string; passcode: string }
     >({
       query: ({ id, passcode }) => ({
-        url: `/mobile-device/verify/${id}/0/${passcode}`,
+        url: `/mobile-device/verify/${id}/${DeviceType.KIOSK}/${passcode}`,
         method: "PUT",
       }),
       invalidatesTags: ["Device"],

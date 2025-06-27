@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 import * as ScreenOrientation from 'expo-screen-orientation';
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import { Provider } from "react-redux";
@@ -28,15 +28,14 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Provider store={reduxStore}>
         <PersistGate loading={null} persistor={persistor}>
-          <React.Fragment>
+          <>
             <Stack screenOptions={{ headerShown: false }}>
               <Stack.Screen name="(service)" options={{ headerShown: false }} />
               <Stack.Screen name="(survey)" options={{ headerShown: false }} />
               <Stack.Screen name="(developer)" options={{ headerShown: false }} />
             </Stack>
             <Toast />
-          </React.Fragment>
-
+          </>
         </PersistGate>
       </Provider>
     </GestureHandlerRootView>

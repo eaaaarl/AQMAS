@@ -50,7 +50,7 @@ export default function Setting() {
                                 value={ipAddress}
                                 onChangeText={setIpAddress}
                                 placeholder="e.g., 192.168.1.100"
-                                className="rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-base"
+                                className="rounded-lg border border-gray-300 bg-gray-50 font-bold text-black px-4 py-3 text-base"
                                 keyboardType="url"
                                 autoCapitalize="none"
                                 autoCorrect={false}
@@ -70,7 +70,7 @@ export default function Setting() {
                                 value={port}
                                 onChangeText={setPort}
                                 placeholder="e.g., 3000"
-                                className="rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-base"
+                                className="rounded-lg border text-black font-bold border-gray-300 bg-gray-50 px-4 py-3 text-base"
                                 keyboardType="numeric"
                                 placeholderTextColor="#9CA3AF"
                             />
