@@ -34,7 +34,6 @@ const MemoizedSkippedTickets = React.memo(SkippedTickets);
 const MemoizedCounterSummary = React.memo(CounterSummary);
 
 export default function CounterScreen() {
-  console.log('CounterScreen called');
   const dispatch = useAppDispatch();
   const persistedQueue = useAppSelector(state => state.queue);
   const [refreshing, setRefreshing] = useState(false);
@@ -64,6 +63,7 @@ export default function CounterScreen() {
         refetchOnFocus: true,
       }
     );
+    
   const { data: queueSkippedData, refetch: refetchQueueSkippedData } =
     useGetQueueSkippedQuery(
       {

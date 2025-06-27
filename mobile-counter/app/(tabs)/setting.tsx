@@ -4,9 +4,9 @@ import { useGetCustomersGroupQuery } from '@/features/customer/api/customerApi';
 import { OfflineIndicator, useGlobalError } from '@/features/error';
 import { useSettings } from '@/features/settings/hooks/useSettings';
 import { InfoRowProps, SettingRowProps } from '@/features/settings/types';
+import * as Application from 'expo-application';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Image,
   KeyboardAvoidingView,
   Platform,
   RefreshControl,
@@ -16,7 +16,7 @@ import {
   Switch,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 
 // Memoized components
@@ -185,23 +185,6 @@ const LogoutSection = React.memo<{
 ));
 LogoutSection.displayName = 'LogoutSection';
 
-const ProfileImage = React.memo<{
-  empInformation: any;
-}>(({ empInformation }) => (
-  <View className="mb-6 items-center">
-    <View className="h-24 w-24 overflow-hidden rounded-full">
-      <Image
-        source={require('@/assets/images/adaptive-icon.png')}
-        className="h-full w-full"
-        resizeMode="cover"
-      />
-    </View>
-    <Text className="mt-2 text-center text-lg font-semibold" style={{ color: '#1c3f83' }}>
-      {`${empInformation?.[0]?.first_name} ${empInformation?.[0]?.last_name}`}
-    </Text>
-  </View>
-));
-ProfileImage.displayName = 'ProfileImage';
 
 export default function SettingsScreen() {
   const [refreshing, setRefreshing] = useState(false);
@@ -287,6 +270,18 @@ export default function SettingsScreen() {
     }
   }, [employeeRoleTask, setServices]);
 
+
+  const androidId = Application.getAndroidId();
+  const deviceInfo = {
+    androidId,
+    name: Application.applicationName,
+    version: Application.nativeApplicationVersion,
+    buildId: Application.nativeBuildVersion,
+    versionCode: Application.nativeBuildVersion,
+    versionName: Application.nativeApplicationVersion,
+    packageName: Application.applicationId
+  };
+  console.log('deviceInfo', deviceInfo);
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       <StatusBar barStyle="dark-content" backgroundColor="#f9fafb" />
@@ -309,8 +304,6 @@ export default function SettingsScreen() {
           }
         >
           <View className="mx-4 px-5 py-6">
-            {/* Profile Image Section */}
-            <ProfileImage empInformation={empInformation} />
 
             {/* Counter User Information Section */}
             <CounterInformationSection empInformation={empInformation} />

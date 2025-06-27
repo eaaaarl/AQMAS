@@ -1,18 +1,23 @@
 import { NextFunction, Request, Response } from 'express';
 import { ServiceService } from './core/service/service.service';
+import { ResponseUtils } from '../libs/ResponseUtils';
+import { CustomErrors } from '../libs/CustomErrors';
 
 export class ServiceController {
   constructor(private readonly serviceService: ServiceService) {
     this.getService = this.getService.bind(this);
   }
 
-  async getService(req: Request, res: Response, next: NextFunction) {
+  async getService(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const service = await this.serviceService.getService();
-      res.status(200).json({ results: service });
+      const services = await this.serviceService.getService();
+      ResponseUtils.success(res, services, 'Services retrieved successfully');
     } catch (error) {
-      console.error('Error in ServiceController GetService:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      if (error instanceof CustomErrors) {
+        ResponseUtils.error(res, error.message, error.statusCode);
+        return;
+      }
+      next(error);
     }
   }
 }

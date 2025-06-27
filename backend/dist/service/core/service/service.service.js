@@ -10,6 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ServiceService = void 0;
+const CustomErrors_1 = require("../../../libs/CustomErrors");
+const logger_1 = require("../../../infrastructure/logger/logger");
 class ServiceService {
     constructor(serviceRepository) {
         this.serviceRepository = serviceRepository;
@@ -17,12 +19,18 @@ class ServiceService {
     getService() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const service = yield this.serviceRepository.getService();
-                return service;
+                const services = yield this.serviceRepository.getService();
+                if (!services.length) {
+                    throw new CustomErrors_1.CustomErrors('No services found', 404);
+                }
+                return services;
             }
             catch (error) {
-                console.error('Error fetching queer service:', error);
-                throw error;
+                if (error instanceof CustomErrors_1.CustomErrors) {
+                    throw error;
+                }
+                logger_1.logger.error('Error in ServiceService.getService:', { error });
+                throw new CustomErrors_1.CustomErrors('Failed to process service request', 500);
             }
         });
     }

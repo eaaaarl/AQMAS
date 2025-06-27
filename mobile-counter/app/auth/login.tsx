@@ -17,7 +17,7 @@ export default function Login() {
     >
       <View className="flex-1 justify-center px-8">
         <View className="mb-12 items-center">
-          <Text className="text-4xl font-bold text-gray-800">
+          <Text className="text-4xl font-bold text-gray-800 mt-4">
             Counter Portal
           </Text>
         </View>

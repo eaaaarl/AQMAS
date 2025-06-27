@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "@types/cors": "^2.8.18",
+    "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/moment-timezone": "^0.5.13",
     "@types/morgan": "^1.9.9",
