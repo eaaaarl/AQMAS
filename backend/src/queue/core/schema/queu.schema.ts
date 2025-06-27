@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const queueSchema = z.object({
   transId: z.string(),
-  trans_date: z.date().optional(),
+  //trans_date: z.date().optional(),
   typeId: z.number().optional(),
   transStatus: z.number().default(0),
   singleTransOnly: z.number().optional(),
@@ -17,7 +17,7 @@ export const queueDetailsSchema = z.object({
 
 export const queueCountQuerySchema = z.object({
   Date: z.string().optional(),
-  type_id: z.number().optional(),
+  type_id: z.string().optional(),
 });
 
 export const queueByServiceCountSchema = z.object({

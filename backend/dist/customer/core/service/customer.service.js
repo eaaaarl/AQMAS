@@ -14,7 +14,6 @@ class CustomerService {
     constructor(customerRepository) {
         this.customerRepository = customerRepository;
     }
-    // Keep the original method name to maintain API compatibility
     getAllCustomerType(is_show) {
         return __awaiter(this, void 0, void 0, function* () {
             if (is_show !== undefined) {

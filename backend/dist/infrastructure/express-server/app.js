@@ -9,7 +9,7 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const service_route_1 = require("../../service/service.route");
 const config_route_1 = require("../../config/config.route");
-const queue_route_1 = require("../../queue/queue.route");
+const queue_route_1 = __importDefault(require("../../queue/queue.route"));
 const errorHandler_1 = require("../middleware/errorHandler");
 const customer_route_1 = require("../../customer/customer.route");
 const CustomErrors_1 = require("../../libs/CustomErrors");
@@ -25,10 +25,10 @@ const startApp = () => {
     app.use(body_parser_1.default.urlencoded({ extended: true }));
     app.use(express_1.default.json());
     //Core Routes
-    app.use(service_route_1.serviceRoutes);
-    app.use(config_route_1.configRoute);
-    app.use('/queue', queue_route_1.queueRoute);
-    app.use('/customer', customer_route_1.customerRoute);
+    app.use('/api/v1/service', service_route_1.serviceRoutes);
+    app.use('/api/v1/config', config_route_1.configRoute);
+    app.use('/api/v1/queue', queue_route_1.default);
+    app.use('/api/v1/customer', customer_route_1.customerRoute);
     // Handle 404 - Not Found
     app.use((req, res, next) => {
         next(new CustomErrors_1.NotFoundError(`The requested resource for ${req.method} on ${req.originalUrl} was not found.`));

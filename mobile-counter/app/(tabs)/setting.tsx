@@ -4,6 +4,8 @@ import { useGetCustomersGroupQuery } from '@/features/customer/api/customerApi';
 import { OfflineIndicator, useGlobalError } from '@/features/error';
 import { useSettings } from '@/features/settings/hooks/useSettings';
 import { InfoRowProps, SettingRowProps } from '@/features/settings/types';
+import * as Application from 'expo-application';
+import * as Device from 'expo-device';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -15,7 +17,7 @@ import {
   Switch,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 
 // Memoized components
@@ -167,6 +169,50 @@ const ServiceSettingsSection = React.memo<{
 ));
 ServiceSettingsSection.displayName = 'ServiceSettingsSection';
 
+const DeviceInformationSection = React.memo(() => {
+  const deviceInfo = {
+    androidId: Application.getAndroidId(),
+    name: Application.applicationName,
+    version: Application.nativeApplicationVersion,
+    buildVersion: Application.nativeBuildVersion,
+    packageName: Application.applicationId,
+    deviceName: Device.osName
+  };
+
+  return (
+    <View className="mb-6 rounded-2xl bg-white p-5 shadow-sm">
+      <SectionHeader title="Device Information" />
+      <View className="space-y-1">
+        <InfoRow
+          label="Android ID"
+          value={deviceInfo.androidId || 'N/A'}
+        />
+        <Divider />
+        <InfoRow
+          label="App Name"
+          value={deviceInfo.name || 'N/A'}
+        />
+        <Divider />
+        <InfoRow
+          label="App Version"
+          value={deviceInfo.version || 'N/A'}
+        />
+        <Divider />
+        <InfoRow
+          label="Build Version"
+          value={deviceInfo.buildVersion || 'N/A'}
+        />
+        <Divider />
+        <InfoRow
+          label="Device Name"
+          value={deviceInfo.deviceName || 'N/A'}
+        />
+      </View>
+    </View>
+  );
+});
+DeviceInformationSection.displayName = 'DeviceInformationSection';
+
 const LogoutSection = React.memo<{
   onLogout: () => void;
 }>(({ onLogout }) => (
@@ -186,7 +232,6 @@ LogoutSection.displayName = 'LogoutSection';
 
 
 export default function SettingsScreen() {
-  console.log('[SettingsScreen] Called')
   const [refreshing, setRefreshing] = useState(false);
   const { hasConnectionError } = useGlobalError();
   const customerTypesInitialized = useRef(false);
@@ -207,7 +252,6 @@ export default function SettingsScreen() {
     employeeInfo: empInformation,
   } = useEmployeeData();
 
-  // Memoized customer group ID to prevent unnecessary re-renders
   const customerGroupId = useMemo(() =>
     employeeRoleDefault?.[0]?.customer_group_id ?? employeeRoles?.[0]?.customer_group_id,
     [employeeRoleDefault, employeeRoles]
@@ -293,10 +337,9 @@ export default function SettingsScreen() {
           }
         >
           <View className="mx-4 px-5 py-6">
-            {/* Counter User Information Section */}
+
             <CounterInformationSection empInformation={empInformation} />
 
-            {/* Queue Settings Summary */}
             <QueueSettingsSummarySection
               customerTypesCount={summaryData.customerTypesCount}
               servicesCount={summaryData.servicesCount}
@@ -304,7 +347,6 @@ export default function SettingsScreen() {
               totalEmployeeRoleTasks={summaryData.totalEmployeeRoleTasks}
             />
 
-            {/* Customer Type Settings */}
             {memoizedCustomerGroups.length > 0 && (
               <CustomerTypeSettingsSection
                 customerGroups={memoizedCustomerGroups}
@@ -313,7 +355,6 @@ export default function SettingsScreen() {
               />
             )}
 
-            {/* Service Settings */}
             {memoizedEmployeeRoleTasks.length > 0 && (
               <ServiceSettingsSection
                 employeeRoleTasks={memoizedEmployeeRoleTasks}
@@ -322,7 +363,8 @@ export default function SettingsScreen() {
               />
             )}
 
-            {/* Logout Button */}
+            <DeviceInformationSection />
+
             <LogoutSection onLogout={handleLogout} />
           </View>
         </ScrollView>

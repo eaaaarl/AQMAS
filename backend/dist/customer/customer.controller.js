@@ -10,20 +10,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CustomerController = void 0;
+const ResponseUtils_1 = require("../libs/ResponseUtils");
+const CustomErrors_1 = require("../libs/CustomErrors");
 class CustomerController {
     constructor(customerService) {
         this.customerService = customerService;
-        // Bind the original method to maintain API compatibility
         this.getAllCustomerType = this.getAllCustomerType.bind(this);
     }
-    // Keep the original method name and response format to maintain API compatibility
     getAllCustomerType(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { is_show } = req.query;
+                if (is_show !== undefined && !['0', '1'].includes(is_show)) {
+                    throw new CustomErrors_1.ValidationError('is_show parameter must be 0 or 1');
+                }
                 const allCustomerTypes = yield this.customerService.getAllCustomerType(is_show !== undefined ? Number(is_show) : undefined);
-                // Maintain the original response format: direct array response
-                res.status(200).json(allCustomerTypes);
+                ResponseUtils_1.ResponseUtils.success(res, allCustomerTypes, 'Customer types retrieved successfully');
             }
             catch (error) {
                 next(error);

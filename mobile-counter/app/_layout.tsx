@@ -17,7 +17,7 @@ function AppContent() {
   return (
     <React.Fragment>
       <Stack screenOptions={{ headerShown: false }} />
-      <Toast />
+      <Toast position="top" />
       <GlobalErrorOverlay
         isVisible={hasConnectionError}
         onRetry={handleRetry}

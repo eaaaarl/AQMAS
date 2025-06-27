@@ -9,12 +9,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.QueueController = void 0;
+exports.queueValidation = exports.QueueController = void 0;
+const ResponseUtils_1 = require("../libs/ResponseUtils");
+const validation_middleware_1 = require("../infrastructure/middleware/validation.middleware");
+const queu_schema_1 = require("./core/schema/queu.schema");
+const zod_1 = require("zod");
 class QueueController {
     constructor(queueService) {
         this.queueService = queueService;
         this.createQueue = this.createQueue.bind(this);
         this.createQueueDetail = this.createQueueDetail.bind(this);
+        this.createQueueWithDetail = this.createQueueWithDetail.bind(this);
         this.countQueue = this.countQueue.bind(this);
         this.countQueueAllService = this.countQueueAllService.bind(this);
         this.countByServiceCount = this.countByServiceCount.bind(this);
@@ -22,13 +27,8 @@ class QueueController {
     createQueue(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const payload = req.body;
-                console.log('BACKEND PAYLOAD', payload);
-                const newQueue = yield this.queueService.createQueue(payload);
-                res.status(200).json({
-                    success: true,
-                    data: newQueue,
-                });
+                const newQueue = yield this.queueService.createQueue(req.body);
+                ResponseUtils_1.ResponseUtils.created(res, newQueue, 'Queue created successfully');
             }
             catch (error) {
                 next(error);
@@ -38,13 +38,21 @@ class QueueController {
     createQueueDetail(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const payload = req.body;
-                console.log('BACKEND PAYLOAD', payload);
-                const newQueueDetail = yield this.queueService.createQueueDetail(payload);
-                res.status(200).json({
-                    success: true,
-                    data: newQueueDetail,
-                });
+                const newQueueDetail = yield this.queueService.createQueueDetail(req.body);
+                ResponseUtils_1.ResponseUtils.created(res, newQueueDetail, 'Queue details created successfully');
+            }
+            catch (error) {
+                next(error);
+            }
+        });
+    }
+    createQueueWithDetail(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { queue: queueData, details: queueDetailsData } = req.body;
+                console.log('BACKEND PAYLOAD', queueData, queueDetailsData);
+                const result = yield this.queueService.createQueueWithDetail(queueData, queueDetailsData);
+                ResponseUtils_1.ResponseUtils.created(res, result, 'Queue and details created successfully');
             }
             catch (error) {
                 next(error);
@@ -54,15 +62,8 @@ class QueueController {
     countQueue(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const query = req.query;
-                const [rawQueryKey] = Object.keys(query).filter(key => key.startsWith('DATE'));
-                const rawQueryValue = query[rawQueryKey];
-                const dateQuery = `${rawQueryKey}=${rawQueryValue}`;
-                const countQueue = yield this.queueService.countQueue({
-                    type_id: Number(query.type_id),
-                    Date: dateQuery,
-                });
-                res.status(200).json([{ count: countQueue }]);
+                const count = yield this.queueService.countQueue(req.query);
+                ResponseUtils_1.ResponseUtils.success(res, { count }, 'Queue count retrieved successfully');
             }
             catch (error) {
                 next(error);
@@ -72,8 +73,8 @@ class QueueController {
     countQueueAllService(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const countAllService = yield this.queueService.countQueueAllService();
-                res.status(200).json([{ count: countAllService }]);
+                const count = yield this.queueService.countQueueAllService();
+                ResponseUtils_1.ResponseUtils.success(res, { count }, 'All service queue count retrieved successfully');
             }
             catch (error) {
                 next(error);
@@ -83,9 +84,8 @@ class QueueController {
     countByServiceCount(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { service_id } = req.params;
-                const countByService = yield this.queueService.countByServiceCount({ service_id });
-                res.status(200).json([{ count: countByService }]);
+                const count = yield this.queueService.countByServiceCount(req.params);
+                ResponseUtils_1.ResponseUtils.success(res, { count }, 'Service queue count retrieved successfully');
             }
             catch (error) {
                 next(error);
@@ -94,3 +94,12 @@ class QueueController {
     }
 }
 exports.QueueController = QueueController;
+exports.queueValidation = {
+    createQueue: (0, validation_middleware_1.validateBody)(queu_schema_1.queueSchema),
+    createQueueDetail: (0, validation_middleware_1.validateBody)(queu_schema_1.queueDetailsSchema.array()),
+    createQueueWithDetail: (0, validation_middleware_1.validateBody)(zod_1.z.object({
+        queue: queu_schema_1.queueSchema,
+        details: queu_schema_1.queueDetailsSchema.array(),
+    })),
+    countByServiceCount: (0, validation_middleware_1.validateParams)(queu_schema_1.queueByServiceCountSchema),
+};

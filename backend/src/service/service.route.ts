@@ -3,6 +3,6 @@ import { serviceController } from './service.config';
 
 const router = express.Router();
 
-router.get('/service', serviceController.getService);
+router.get('/', serviceController.getService);
 
 export const serviceRoutes = router;

@@ -24,7 +24,7 @@ const DetailItem = memo<DetailItemProps>(({ label, value, isLoading }) => {
   return (
     <View className="items-center">
       <Text
-        className="mb-1 text-sm text-gray-500"
+        className="mb-1 text-sm text-gray-500 font-bold"
         accessibilityRole="text"
         accessibilityLabel={`${label} label`}
       >
@@ -74,7 +74,7 @@ export const TicketDetails = memo<TicketDetailsProps>(({
       >
         <View className="mb-4">
           <DetailItem
-            label="Service"
+            label="Services"
             value={serviceNames}
             isLoading={isLoading}
           />

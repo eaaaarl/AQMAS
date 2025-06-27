@@ -10,6 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ServiceController = void 0;
+const ResponseUtils_1 = require("../libs/ResponseUtils");
+const CustomErrors_1 = require("../libs/CustomErrors");
 class ServiceController {
     constructor(serviceService) {
         this.serviceService = serviceService;
@@ -18,12 +20,15 @@ class ServiceController {
     getService(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const service = yield this.serviceService.getService();
-                res.status(200).json({ results: service });
+                const services = yield this.serviceService.getService();
+                ResponseUtils_1.ResponseUtils.success(res, services, 'Services retrieved successfully');
             }
             catch (error) {
-                console.error('Error in ServiceController GetService:', error);
-                res.status(500).json({ error: 'Internal Server Error' });
+                if (error instanceof CustomErrors_1.CustomErrors) {
+                    ResponseUtils_1.ResponseUtils.error(res, error.message, error.statusCode);
+                    return;
+                }
+                next(error);
             }
         });
     }

@@ -1,12 +1,12 @@
 import { useAppSelector } from '@/libs/redux/hooks';
 import {
   useGetEmployeeInfoQuery,
+  useGetEmployeeProfileImageQuery,
   useGetEmployeeRoleDefaultQuery,
   useGetEmployeeRoleQuery,
 } from '../api/authApi';
 
 export const useEmployeeData = (employeeId?: string) => {
-  console.log('[useEmployeeData] called');
   const currentEmployee = useAppSelector(state => state.employee);
 
   const empId = employeeId || currentEmployee.employee_id || 0;
@@ -17,6 +17,11 @@ export const useEmployeeData = (employeeId?: string) => {
     error: employeeError,
     refetch: refetchEmployee,
   } = useGetEmployeeInfoQuery({ empId: empId as number }, { skip: !empId });
+
+  const { data: employeeProfileImage } = useGetEmployeeProfileImageQuery(
+    { imageUrl: employeeInfo?.results?.[0]?.picture || '' },
+    { skip: !employeeInfo?.results?.[0]?.picture }
+  );
 
   const {
     data: employeeRoles,
@@ -37,6 +42,7 @@ export const useEmployeeData = (employeeId?: string) => {
 
   return {
     employeeInfo: employeeInfo?.results || [],
+    employeeProfileImage: employeeProfileImage || null,
     employeeRoles: employeeRoles || [],
     employeeRoleDefault: employeeRoleDefault || [],
     isLoading: isLoadingEmployee || isLoadingRoles || isLoadingRoleDefault,

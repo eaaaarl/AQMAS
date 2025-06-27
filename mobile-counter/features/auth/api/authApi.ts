@@ -91,6 +91,18 @@ export const authApi = createApi({
       }),
       providesTags: ['Role'],
     }),
+
+    getEmployeeProfileImage: builder.query<Blob, { imageUrl: string }>({
+      query: ({ imageUrl }) => ({
+        url: `/${imageUrl}`,
+        method: 'GET',
+        responseHandler: 'blob',
+        headers: {
+          Accept: 'image/*',
+        },
+      }),
+    }),
+    
   }),
 });
 
@@ -100,4 +112,5 @@ export const {
   useGetEmployeeRoleQuery,
   useGetEmployeeRoleDefaultQuery,
   useGetEmployeeRoleTaskQuery,
+  useGetEmployeeProfileImageQuery,
 } = authApi;

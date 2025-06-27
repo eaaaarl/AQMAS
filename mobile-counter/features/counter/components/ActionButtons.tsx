@@ -78,7 +78,7 @@ const ActionButtonsComponent: React.FC<ActionButtonsProps> = ({
         >
           <LoadingButton
             isLoading={isCallingQueue}
-            text={hasQueuedData ? '→ Next' : '→ Check Queue'}
+            text={hasQueuedData ? '→ Next' : '→ Next'}
             loadingText="Calling..."
           />
         </TouchableOpacity>
