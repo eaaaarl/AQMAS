@@ -4,13 +4,14 @@ import { useDeveloperSetting } from '@/features/developer/hooks/useDeveloperSett
 import * as Application from 'expo-application';
 import * as Device from 'expo-device';
 import { router } from 'expo-router';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 export default function Login() {
   const { login, isLoading } = useAuth();
   const { checkDevice } = useDeveloperSetting();
+  const [isDeviceRegistered, setIsDeviceRegistered] = useState(false);
 
   const checkDeviceRegistration = useCallback(async () => {
     try {
@@ -21,11 +22,14 @@ export default function Login() {
         id: androidId,
       }).unwrap();
 
+      setIsDeviceRegistered(deviceCheck.registered);
+
       if (!deviceCheck.registered) {
         router.push('/auth/unauthorize');
       }
     } catch (error) {
       console.error('Device check error:', error);
+      setIsDeviceRegistered(false);
       Toast.show({
         type: 'error',
         text1: 'Device Check Failed',
@@ -63,7 +67,11 @@ export default function Login() {
           </Text>
         </View>
 
-        <LoginForm onSubmit={handleLogin} isLoading={isLoading} />
+        <LoginForm
+          onSubmit={handleLogin}
+          isLoading={isLoading}
+          isDeviceRegistered={isDeviceRegistered}
+        />
       </View>
     </KeyboardAvoidingView>
   );

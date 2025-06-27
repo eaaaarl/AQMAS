@@ -1,21 +1,50 @@
+import { useRegisteredDeviceMutation } from '@/features/auth/api/deviceApi';
+import * as Application from 'expo-application';
+import * as Device from 'expo-device';
 import { router } from 'expo-router';
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 
 export default function Unauthorize() {
+  const [registerDevice, { isLoading }] = useRegisteredDeviceMutation();
+
   const handleVerification = () => {
     router.push('/auth/verification');
   };
 
   const handleContactAdmin = () => {
-    // Handle contact admin logic
     console.log('Contact administrator');
   };
 
-  const handleTryAgain = () => {
-    // Handle try again logic - maybe go back to config
-    router.back();
+  const handleTryAgain = async () => {
+    try {
+      const deviceId = Application.getAndroidId();
+      const osType = Device.osName === 'Android' ? 1 : 2;
+
+      await registerDevice({
+        id: deviceId,
+        os: osType,
+        type: 1,
+      }).unwrap();
+
+
+      Toast.show({
+        type: 'success',
+        text1: 'Device registered.',
+        text2: 'Please contact your administrator to verify your device.',
+      });
+
+    } catch (error) {
+      console.error('Device registration error:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Registration failed',
+        text2: 'Please try again or contact administrator',
+      });
+      router.back();
+    }
   };
 
   return (
@@ -37,7 +66,6 @@ export default function Unauthorize() {
             </Text>
           </View>
 
-          {/* Status Card */}
           <View className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
             <View className="flex-row items-center mb-2">
               <View className="w-3 h-3 bg-red-500 rounded-full mr-3"></View>
@@ -71,10 +99,11 @@ export default function Unauthorize() {
 
             <TouchableOpacity
               onPress={handleTryAgain}
+              disabled={isLoading}
               className="border border-gray-300 py-3 px-6 rounded-lg"
             >
               <Text className="text-gray-700 text-center font-medium">
-                Try Again
+                {isLoading ? <ActivityIndicator size="small" color="gray" /> : 'Try Again'}
               </Text>
             </TouchableOpacity>
           </View>
