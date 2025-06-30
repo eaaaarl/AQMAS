@@ -15,9 +15,9 @@ export const deviceApi = createApi({
     const port = state.config?.port;
     const baseUrl = `http://${ipAddress}:${port}`;
 
-    // console.log("Using IP:", ipAddress);
-    // console.log("Using Port:", port);
-    // console.log("Constructed baseUrl:", baseUrl);
+    console.log("Using IP:", ipAddress);
+    console.log("Using Port:", port);
+    console.log("Constructed baseUrl:", baseUrl);
 
     let url: string;
     let adjustedArgs: any;

@@ -1,29 +1,36 @@
 import TapDetector from '@/components/TapsDetector';
 import { useCheckDeviceQuery } from '@/features/device/api/deviceApi';
 import { DeviceType } from '@/features/device/constants';
+import { useAppSelector } from '@/libs/redux/hooks';
+import { RootState } from '@/libs/redux/store';
 import * as Application from 'expo-application';
 import { router, Stack } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Platform } from 'react-native';
 
 export default function LayoutService() {
-    console.log("LayoutService");
     const deviceId = Platform.OS === 'android'
         ? Application.getAndroidId()
         : Application.applicationId || '';
 
+    const config = useAppSelector((state: RootState) => state.config);
     const { data: deviceStatus, isLoading, error } = useCheckDeviceQuery({
         id: deviceId,
         type: DeviceType.KIOSK
     });
 
     useEffect(() => {
+        if (!config.ipAddress || !config.port) {
+            router.replace('/(developer)/setting');
+            return;
+        }
+
         if (!isLoading) {
             if (!deviceStatus?.registered) {
                 router.replace('/(service)/unauthorize');
             }
         }
-    }, [deviceStatus, isLoading, error]);
+    }, [config.ipAddress, config.port, deviceStatus, isLoading, error]);
 
     return (
         <TapDetector
