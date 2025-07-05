@@ -24,11 +24,16 @@ const startApp = () => {
     app.use(body_parser_1.default.json());
     app.use(body_parser_1.default.urlencoded({ extended: true }));
     app.use(express_1.default.json());
-    //Core Routes
-    app.use('/api/v1/service', service_route_1.serviceRoutes);
-    app.use('/api/v1/config', config_route_1.configRoute);
-    app.use('/api/v1/queue', queue_route_1.default);
-    app.use('/api/v1/customer', customer_route_1.customerRoute);
+    // New Routes
+    // app.use('/api/v1/service', serviceRoutes);
+    // app.use('/api/v1/config', configRoute);
+    // app.use('/api/v1/queue', queueRoute);
+    // app.use('/api/v1/customer', customerRoute);
+    // Old Routes
+    app.use('/service', service_route_1.serviceRoutes);
+    app.use('/config', config_route_1.configRoute);
+    app.use('/queue', queue_route_1.default);
+    app.use('/customer', customer_route_1.customerRoute);
     // Handle 404 - Not Found
     app.use((req, res, next) => {
         next(new CustomErrors_1.NotFoundError(`The requested resource for ${req.method} on ${req.originalUrl} was not found.`));

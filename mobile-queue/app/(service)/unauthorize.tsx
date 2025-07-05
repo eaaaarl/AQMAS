@@ -37,13 +37,13 @@ export default function Unauthorize() {
       });
 
     } catch (error) {
-      console.error('Device registration error:', error);
+      console.log('Device registration error:', error);
       Toast.show({
         type: 'error',
         text1: 'Registration failed',
         text2: 'Please try again or contact administrator',
       });
-      router.back();
+      // router.back();
     }
   };
 

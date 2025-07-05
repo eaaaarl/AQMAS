@@ -24,11 +24,17 @@ export const startApp = () => {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(express.json());
 
-  //Core Routes
-  app.use('/api/v1/service', serviceRoutes);
-  app.use('/api/v1/config', configRoute);
-  app.use('/api/v1/queue', queueRoute);
-  app.use('/api/v1/customer', customerRoute);
+  // New Routes
+  // app.use('/api/v1/service', serviceRoutes);
+  // app.use('/api/v1/config', configRoute);
+  // app.use('/api/v1/queue', queueRoute);
+  // app.use('/api/v1/customer', customerRoute);
+
+  // Old Routes
+  app.use('/service', serviceRoutes);
+  app.use('/config', configRoute);
+  app.use('/queue', queueRoute);
+  app.use('/customer', customerRoute);
 
   // Handle 404 - Not Found
   app.use((req: Request, res: Response, next: NextFunction) => {
