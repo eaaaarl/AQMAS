@@ -22,7 +22,7 @@ export default function ConfigLayout() {
                     headerLeft: () => null,
                     headerRight: () => (
                         <TouchableOpacity
-                            onPress={() => router.back()}
+                            onPress={() => router.push('/(service)')}
                             style={{
                                 paddingHorizontal: 12,
                                 paddingVertical: 8,

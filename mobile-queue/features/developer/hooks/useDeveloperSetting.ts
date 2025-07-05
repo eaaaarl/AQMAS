@@ -121,7 +121,7 @@ export const useDeveloperSetting = () => {
         text2: "The new configuration has been applied.",
       });
 
-      await checkDeviceRegistration();
+      // await checkDeviceRegistration();
     } catch (error) {
       console.error("Error saving settings:", error);
       Toast.show({
