@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CustomerController = void 0;
-const ResponseUtils_1 = require("../libs/ResponseUtils");
 const CustomErrors_1 = require("../libs/CustomErrors");
 class CustomerController {
     constructor(customerService) {
@@ -25,7 +24,8 @@ class CustomerController {
                     throw new CustomErrors_1.ValidationError('is_show parameter must be 0 or 1');
                 }
                 const allCustomerTypes = yield this.customerService.getAllCustomerType(is_show !== undefined ? Number(is_show) : undefined);
-                ResponseUtils_1.ResponseUtils.success(res, allCustomerTypes, 'Customer types retrieved successfully');
+                // ResponseUtils.success(res, allCustomerTypes, 'Customer types retrieved successfully');
+                res.status(200).json(allCustomerTypes);
             }
             catch (error) {
                 next(error);

@@ -20,7 +20,8 @@ export class CustomerController {
         is_show !== undefined ? Number(is_show) : undefined,
       );
 
-      ResponseUtils.success(res, allCustomerTypes, 'Customer types retrieved successfully');
+      // ResponseUtils.success(res, allCustomerTypes, 'Customer types retrieved successfully');
+      res.status(200).json(allCustomerTypes);
     } catch (error) {
       next(error);
     }
