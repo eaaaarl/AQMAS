@@ -21,7 +21,8 @@ class ServiceController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const services = yield this.serviceService.getService();
-                ResponseUtils_1.ResponseUtils.success(res, services, 'Services retrieved successfully');
+                //ResponseUtils.success(res, services, 'Services retrieved successfully');
+                res.status(200).json({ results: services });
             }
             catch (error) {
                 if (error instanceof CustomErrors_1.CustomErrors) {
