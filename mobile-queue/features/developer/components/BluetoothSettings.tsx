@@ -25,11 +25,11 @@ export default function BluetoothSettings() {
 
     const renderDevice = ({ item, isPaired = false }: { item: any, isPaired: boolean }) => (
         <View className="flex-row items-center justify-between border-b border-gray-100 py-3">
-            <View className="flex-1">
+            <View className="flex-1 ml-4">
                 <Text className="font-medium text-gray-900">{item.name || 'Unknown Device'}</Text>
                 <Text className="text-sm text-gray-500">{item.address}</Text>
             </View>
-            <View className="space-x-4">
+            <View style={{ marginRight: 10 }}>
                 {isPaired ? (
                     <TouchableOpacity
                         onPress={() => connectToDevice(item)}
