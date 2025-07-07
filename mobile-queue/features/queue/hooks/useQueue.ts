@@ -3,7 +3,9 @@ import { useGetCustomerTypeQuery } from "@/features/customer/api/customerApi";
 import { CustomerTypeResponse } from "@/features/customer/api/interface";
 import { Service } from "@/features/service/api/interface";
 import { useAppDispatch } from "@/libs/redux/hooks";
+import EscPosEncoder from "@manhnd/esc-pos-encoder";
 import { useState } from "react";
+import RNBluetoothClassic from "react-native-bluetooth-classic";
 import Toast from "react-native-toast-message";
 import {
   queueApi,
@@ -40,6 +42,8 @@ export const useQueue = () => {
     showAskCustomerName,
     enabledSequenceByService,
     surveyMessage,
+    enabledPriority,
+    enabledPrintCustomerName,
   } = useConfig();
 
   const [createQueue, { isLoading: isLoadingQueue }] = useCreateQueueMutation();
@@ -167,6 +171,121 @@ export const useQueue = () => {
     }
   };
 
+  const getConnectedDevice = async () => {
+    try {
+      const devices = await RNBluetoothClassic.getConnectedDevices();
+      return devices.length > 0 ? devices[0] : null;
+    } catch (error) {
+      console.error("Error getting connected device:", error);
+      return null;
+    }
+  };
+
+  const thermalTicket = async (data: {
+    ticketNumber: string;
+    customerName: string;
+    service: string[];
+    customerType?: string;
+    dateTime?: string;
+  }) => {
+    const encoder = new EscPosEncoder();
+    //  const currentDateTime = new Date().toLocaleString();
+    const serviceName = data.service.length > 0 ? data.service.join(" | ") : "";
+
+    const result = encoder
+      .initialize()
+      .codepage("cp437")
+      .align("left")
+      // Header with timestamp
+      .size(0)
+      .line(`${data.dateTime}`)
+      .newline()
+      .align("center")
+      .raw([0x1d, 0x21, 0x66])
+      .bold(true)
+      .line(data.ticketNumber)
+      .raw([0x1d, 0x21, 0x00]) // Reset size after big text
+      .newline()
+      .align("center")
+      .size(0)
+      .line(`${enabledPrintCustomerName ? data.customerName : ""}`) // Fixed template literal
+      .line(`${serviceName}`)
+      .newline()
+      .size(0)
+      .line(`${enabledPriority ? "PRIORITY" : ""}`) // Fixed template literal
+      .line("- - - - - - - - - - - - - - - - - - - - - - - -")
+      .cut()
+      .encode();
+    return result;
+  };
+
+  const printThermalTicket = async (data: {
+    ticketNumber: string;
+    customerName: string;
+    service: string[];
+    customerType?: string;
+    dateTime?: string;
+  }) => {
+    try {
+      // Get connected device
+      const connectedDevice = await getConnectedDevice();
+
+      if (!connectedDevice) {
+        console.log(
+          "⚠️ No thermal printer connected. Ticket created but not printed."
+        );
+        Toast.show({
+          type: "info",
+          text1: "Ticket Created",
+          text2: "No printer connected. Ticket number: " + data.ticketNumber,
+          visibilityTime: 3000,
+        });
+        return;
+      }
+
+      console.log("🖨️ Printing thermal ticket...");
+
+      // Generate thermal ticket data
+      const thermalData = await thermalTicket(data);
+      const base64Data = btoa(
+        String.fromCharCode(...new Uint8Array(thermalData))
+      );
+
+      // Send to printer
+      const result = await RNBluetoothClassic.writeToDevice(
+        connectedDevice.address,
+        base64Data,
+        "base64"
+      );
+
+      if (result) {
+        console.log("✅ Thermal ticket printed successfully");
+        Toast.show({
+          type: "success",
+          text1: "Ticket Printed",
+          text2: `Ticket ${data.ticketNumber} printed successfully`,
+          visibilityTime: 2000,
+        });
+      } else {
+        console.log("❌ Failed to print thermal ticket");
+        Toast.show({
+          type: "error",
+          text1: "Print Failed",
+          text2: "Could not print ticket. Please check printer connection.",
+          visibilityTime: 3000,
+        });
+      }
+    } catch (error: any) {
+      console.error("❌ Thermal printing error:", error);
+      Toast.show({
+        type: "error",
+        text1: "Print Error",
+        text2: "Error printing ticket: " + error.message,
+        visibilityTime: 3000,
+      });
+    }
+  };
+
   const callCreateQueue = async () => {
     try {
       if (
@@ -189,7 +308,6 @@ export const useQueue = () => {
         throw new Error("Failed to generate ticket number");
       }
 
-      console.log("🎫 Creating main queue entry...");
       const mainQueuePayload = {
         customerName: customerName ?? "",
         transId: ticket,
@@ -200,18 +318,28 @@ export const useQueue = () => {
       };
 
       await createQueue(mainQueuePayload).unwrap();
-      console.log("✅ Main queue entry created successfully");
 
-      console.log("📋 Creating queue details...");
       const queueDetailsPayload = selectedTransactions.map((service) => ({
         trans_id: ticket,
         service_id: service?.service_id,
       }));
 
       await createQueueDetails(queueDetailsPayload).unwrap();
-      console.log("✅ Queue details created successfully");
 
       await handleSuccessFlow(ticket);
+
+      await printThermalTicket({
+        ticketNumber: ticket,
+        customerName: customerName || "",
+        service: selectedTransactions.map((sv) => sv.service_name),
+        dateTime: new Date().toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      });
     } catch (error) {
       console.error("❌ Queue creation process failed:", error);
       await handleErrorFlow(error);
@@ -334,6 +462,7 @@ export const useQueue = () => {
           text2: "Please try again in a moment. The system is updating.",
           visibilityTime: 4000,
         });
+        resetFormState();
       } else {
         Toast.show({
           type: "error",
@@ -341,6 +470,7 @@ export const useQueue = () => {
           text2: "Please contact administrator",
           visibilityTime: 5000,
         });
+        resetFormState();
       }
 
       // Reset form state on error

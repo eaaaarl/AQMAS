@@ -18,6 +18,15 @@ export default {
       },
       edgeToEdgeEnabled: true,
       package: "com.eaaaarl.mobilequeueapp",
+      permissions: [
+        "android.permission.BLUETOOTH",
+        "android.permission.BLUETOOTH_ADMIN",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.BLUETOOTH_SCAN",
+        "android.permission.BLUETOOTH_ADVERTISE",
+      ],
     },
     web: {
       bundler: "metro",
@@ -50,6 +59,14 @@ export default {
         },
       ],
       "expo-web-browser",
+      [
+        "with-rn-bluetooth-classic",
+        {
+          peripheralUsageDescription:
+            "Allow myDevice to check bluetooth peripheral info",
+          alwaysUsageDescription: "Allow myDevice to always use bluetooth info",
+        },
+      ],
     ],
     experiments: {
       typedRoutes: true,

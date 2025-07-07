@@ -52,6 +52,19 @@ export const useConfig = () => {
 
   const enabledTicket = ticket === "1";
 
+  const printPriority = configData?.find(
+    (config) =>
+      config.SectionName === "Kiosk" && config.KeyName === "Print_Priority"
+  )?.Value;
+
+  const enabledPriority = printPriority === "1";
+
+  const printCustomerName = configData?.find(
+    (config) =>
+      config.SectionName === "Kiosk" && config.KeyName === "Print_Customer_Name"
+  )?.Value;
+
+  const enabledPrintCustomerName = printCustomerName === "1";
   return {
     configData,
     isConfigsLoading,
@@ -63,5 +76,7 @@ export const useConfig = () => {
     enabledSurvey,
     surveyMessage,
     enabledTicket,
+    enabledPriority,
+    enabledPrintCustomerName,
   };
 };
