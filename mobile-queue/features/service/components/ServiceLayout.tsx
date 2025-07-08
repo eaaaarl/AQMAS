@@ -12,7 +12,7 @@ interface ServiceLayoutProps {
   // Layout props
   cardWidth: number;
   isLandscape: boolean;
-  
+
   // Service display props
   shouldShowAllServices: boolean;
   showMore: boolean;
@@ -21,15 +21,15 @@ interface ServiceLayoutProps {
   additionalServices: Service[];
   paginatedServices: Service[];
   selectedTransactions: Service[];
-  
+
   // Loading and error states
   isLoadingMutation: boolean;
   refreshing: boolean;
-  
+
   // Pagination props
   currentPage: number;
   totalPages: number;
-  
+
   // Event handlers
   onRefresh: () => void;
   onServicePress: (service: Service) => void;
@@ -38,7 +38,7 @@ interface ServiceLayoutProps {
   onPrintReceipt: () => void;
   onPrevPage: () => void;
   onNextPage: () => void;
-  
+
   // Configuration
   enabledSurvey: boolean;
 }
@@ -70,11 +70,11 @@ export const ServiceLayout: React.FC<ServiceLayoutProps> = ({
     if (shouldShowAllServices) {
       return paginatedServices;
     }
-    
+
     if (showMore) {
       return additionalServices;
     }
-    
+
     return mainServices;
   };
 
@@ -113,7 +113,7 @@ export const ServiceLayout: React.FC<ServiceLayoutProps> = ({
               cardWidth={cardWidth}
               isLandscape={isLandscape}
             />
-            
+
             {!shouldShowAllServices && (
               <ServiceNavigation
                 showMore={showMore}
