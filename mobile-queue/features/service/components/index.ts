@@ -5,5 +5,6 @@ export { ServiceItem } from './ServiceItem';
 export { ServiceLayout } from './ServiceLayout';
 export { ServiceModals } from './ServiceModals';
 export { ServiceNavigation } from './ServiceNavigation';
-export { ServicePageContainer } from './ServicePageContainer';
 export { default as SurveyButton } from './SurveyButton';
+export { default as UnauthorizeCard } from './UnauthorizeCard';
+

@@ -13,7 +13,7 @@ export default {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./assets/icons/adaptive-icon.png",
+        foregroundImage: "./assets/icons/adaptive-icon-box.png",
         backgroundColor: "#ffffff",
       },
       edgeToEdgeEnabled: true,
