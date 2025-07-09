@@ -7,7 +7,7 @@ import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
-export default function Unauthorize() {
+export default function UnauthorizeScreen() {
   const [registerDevice, { isLoading }] = useRegisteredDeviceMutation();
 
   const handleVerification = () => {
