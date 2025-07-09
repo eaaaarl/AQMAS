@@ -1,18 +1,32 @@
+import { useCheckDeviceQuery } from '@/features/device/api/deviceApi';
+import { DeviceType } from '@/features/device/constants';
 import { ServiceLayout } from '@/features/service/components/ServiceLayout';
 import { ServiceModals } from '@/features/service/components/ServiceModals';
 import { useServicePage } from '@/features/service/hooks/useServicePage';
 import { RenderError } from '@/features/service/utils/errorUtils';
 import { RenderLoading } from '@/features/service/utils/loadingUtils';
 import { RenderNoServices } from '@/features/service/utils/RenderNoServices';
-import React from 'react';
+import { useAppSelector } from '@/libs/redux/hooks';
+import * as Application from 'expo-application';
+import { router } from 'expo-router';
+import React, { useEffect } from 'react';
+import { Platform } from 'react-native';
 
-export default function ServiceScreen() {
+const ServiceScreen: React.FC = () => {
+  // Config and device check logic
+  const config = useAppSelector((state) => state.config);
+  const deviceId = Platform.OS === 'android'
+    ? Application.getAndroidId()
+    : Application.applicationId || '';
+  const { data: deviceStatus, isLoading: isLoadingDevice } = useCheckDeviceQuery({
+    id: deviceId,
+    type: DeviceType.KIOSK,
+  });
+
+  // Service page logic
   const {
-    // Layout
     cardWidth,
     isLandscape,
-
-    // Service data
     services,
     mainServices,
     additionalServices,
@@ -20,18 +34,12 @@ export default function ServiceScreen() {
     selectedTransactions,
     showMore,
     shouldShowAllServices,
-
-    // Loading and error states
     isLoadingPage,
     hasError,
     refreshing,
     isLoadingMutation,
-
-    // Pagination
     currentPage,
     totalPages,
-
-    // Queue state
     showCustomerType,
     customerType,
     showCustomerName,
@@ -42,8 +50,6 @@ export default function ServiceScreen() {
     currentTicket,
     customerNameError,
     customerTypeData,
-
-    // Event handlers
     onRefresh,
     onServicePress,
     onShowMore,
@@ -51,8 +57,6 @@ export default function ServiceScreen() {
     onPrintReceipt,
     onPrevPage,
     onNextPage,
-
-    // Modal handlers
     onCustomerNameChange,
     onCancelName,
     onCustomerNameConfirm,
@@ -61,17 +65,31 @@ export default function ServiceScreen() {
     onCustomerTypeConfirm,
     onCloseConfirmationToast,
     onCloseTicketModal,
-
-    // Configuration
     enabledSurvey,
   } = useServicePage();
 
-  // Loading state
+  // Derived state for navigation/redirects
+  const needsConfig = !config.ipAddress || !config.port;
+  const needsAuthorization = !isLoadingDevice && !deviceStatus?.registered;
+
+  useEffect(() => {
+    if (needsConfig) {
+      router.replace('/(developer)/setting');
+      return;
+    }
+    if (needsAuthorization) {
+      router.replace('/(service)/unauthorize');
+    }
+  }, [needsConfig, needsAuthorization]);
+
+  if (needsConfig || isLoadingDevice) {
+    return <RenderLoading />;
+  }
+
   if (isLoadingPage) {
     return <RenderLoading />;
   }
 
-  // Error state
   if (hasError) {
     return (
       <RenderError
@@ -134,4 +152,6 @@ export default function ServiceScreen() {
       {services.length === 0 && <RenderNoServices onRefresh={onRefresh} />}
     </>
   );
-}; 
+};
+
+export default ServiceScreen; 
