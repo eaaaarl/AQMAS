@@ -24,7 +24,7 @@ export default function RootLayout() {
       ScreenOrientation.unlockAsync();
     };
   }, []);
-  
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Provider store={reduxStore}>

@@ -5,7 +5,7 @@
   "scripts": {
     "start": "cross-env REACT_NATIVE_PACKAGER_HOSTNAME=192.168.1.8 expo start -c --lan --port=8082",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo run:android",
+    "android": "expo run:android --port=8082",
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",

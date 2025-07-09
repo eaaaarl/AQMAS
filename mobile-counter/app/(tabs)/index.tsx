@@ -63,7 +63,7 @@ export default function CounterScreen() {
         refetchOnFocus: true,
       }
     );
-    
+
   const { data: queueSkippedData, refetch: refetchQueueSkippedData } =
     useGetQueueSkippedQuery(
       {
