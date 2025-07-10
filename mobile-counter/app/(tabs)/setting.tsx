@@ -7,6 +7,7 @@ import { QueueSettingsSummarySection } from '@/features/settings/components/Queu
 import { ServiceSettingsSection } from '@/features/settings/components/ServiceSettingsSection';
 import { useSettingsScreenLogic } from '@/features/settings/hooks/useSettingsScreen';
 import React from 'react';
+
 import {
   KeyboardAvoidingView,
   Platform,

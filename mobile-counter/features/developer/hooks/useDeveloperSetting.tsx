@@ -52,12 +52,7 @@ export const useDeveloperSetting = () => {
         id: androidId
       }).unwrap();
 
-
-      if (!checkResponse.registered) {
-        router.push('/auth/not-registered');
-      } else {
-        router.push('/auth/login');
-      }
+      return checkResponse.registered;
     } catch (error) {
       console.error('Device check failed:', error);
       Toast.show({
@@ -65,6 +60,7 @@ export const useDeveloperSetting = () => {
         text1: 'Connection Error',
         text2: 'Failed to check device registration',
       });
+      return false;
     } finally {
       setIsCheckingDevice(false);
     }
@@ -118,8 +114,13 @@ export const useDeveloperSetting = () => {
         text2: 'The new configuration has been applied.',
       });
 
-      // Then check device registration
-      await checkDeviceRegistration();
+      // Check device registration and redirect accordingly
+      const isRegistered = await checkDeviceRegistration();
+      if (isRegistered) {
+        router.push('/(tabs)');
+      } else {
+        router.push('/auth/not-registered');
+      }
 
     } catch (error) {
       console.error('Error saving settings:', error);

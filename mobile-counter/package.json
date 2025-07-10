@@ -3,7 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "cross-env REACT_NATIVE_PACKAGER_HOSTNAME=192.168.1.8 expo start -c --lan --port=8082",
+    "start": " expo start -c --lan --port=8082",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android --port=8082",
     "ios": "expo run:ios",
@@ -52,7 +52,8 @@
     "redux-persist": "^6.0.0",
     "tailwindcss": "^3.4.17",
     "expo-application": "~6.1.4",
-    "expo-device": "~7.1.4"
+    "expo-device": "~7.1.4",
+    "expo-updates": "~0.28.17"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
