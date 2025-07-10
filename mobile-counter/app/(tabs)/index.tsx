@@ -13,6 +13,7 @@ import React from 'react';
 import { RefreshControl, ScrollView, StatusBar, View } from 'react-native';
 
 export default function CounterScreen() {
+
   const {
     refreshing,
     hasActiveTicket,
@@ -35,6 +36,7 @@ export default function CounterScreen() {
     queueSkippedData,
     counters,
     timeStats,
+    handleRecall,
   } = useCounterScreen();
 
   return (
@@ -52,6 +54,7 @@ export default function CounterScreen() {
           />
         }
       >
+
         <View className="overflow-hidden rounded-2xl bg-white shadow-lg my-2">
           <CounterHeader
             config={config ?? []}
@@ -77,7 +80,7 @@ export default function CounterScreen() {
             isSkippingQueue={isSkippingQueue}
             hasQueuedData={hasQueueData}
             onNext={onHandleNext}
-            onRecall={() => { }}
+            onRecall={handleRecall}
             onFinish={onFinish}
             onSkip={onSkip}
           />
@@ -101,6 +104,7 @@ export default function CounterScreen() {
             bestTime={timeStats.bestTime}
             worstTime={timeStats.worstTime}
           />
+
         </View>
       </ScrollView>
     </View>
