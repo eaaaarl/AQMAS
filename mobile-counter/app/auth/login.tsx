@@ -1,59 +1,28 @@
 import { LoginForm } from '@/features/auth/components';
-import { useAuth } from '@/features/auth/hooks';
-import { useDeveloperSetting } from '@/features/developer/hooks/useDeveloperSetting';
-import * as Application from 'expo-application';
-import * as Device from 'expo-device';
+import { DeviceNotRegisteredMessage } from '@/features/auth/components/DeviceNotRegisteredMessage';
+import { LoginHeader } from '@/features/auth/components/LoginHeader';
+import { useLoginScreen } from '@/features/auth/hooks/useLoginScreen';
+import { useAppSelector } from '@/libs/redux/hooks';
 import { router } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Platform, Text, View } from 'react-native';
-import Toast from 'react-native-toast-message';
+import React, { useEffect } from 'react';
+import { KeyboardAvoidingView, Platform, View } from 'react-native';
 
 export default function Login() {
-  const { login, isLoading } = useAuth();
-  const { checkDevice } = useDeveloperSetting();
-  const [isDeviceRegistered, setIsDeviceRegistered] = useState(false);
+  const {
+    isDeviceRegistered,
+    isLoading,
+    handleLogin,
+    errorMessage,
+  } = useLoginScreen();
 
-  const checkDeviceRegistration = useCallback(async () => {
-    try {
-      const androidId = Application.getAndroidId();
-      const deviceType = Device.osName === 'Android' ? 1 : 2;
-      const deviceCheck = await checkDevice({
-        type: deviceType,
-        id: androidId,
-      }).unwrap();
-
-      setIsDeviceRegistered(deviceCheck.registered);
-
-      if (!deviceCheck.registered) {
-        router.push('/auth/unauthorize');
-      }
-    } catch (error) {
-      console.error('Device check error:', error);
-      setIsDeviceRegistered(false);
-      Toast.show({
-        type: 'error',
-        text1: 'Device Check Failed',
-        text2: 'Please try again or contact administrator',
-      });
-    }
-  }, [checkDevice]);
-
+  const config = useAppSelector((state) => state.config)
+  const needsConfig = !config.ipAddress || !config.port;
   useEffect(() => {
-    checkDeviceRegistration();
-  }, [checkDeviceRegistration]);
-
-  const handleLogin = async (formData: any) => {
-    try {
-      await login(formData);
-    } catch (error) {
-      console.error('Login error:', error);
-      Toast.show({
-        type: 'error',
-        text1: 'Login Failed',
-        text2: 'Please check your credentials and try again',
-      });
+    if (needsConfig) {
+      router.replace('/(developer)/setting');
+      return;
     }
-  };
+  }, [needsConfig]);
 
   return (
     <KeyboardAvoidingView
@@ -61,17 +30,15 @@ export default function Login() {
       className="flex-1 bg-gray-50"
     >
       <View className="flex-1 justify-center px-8">
-        <View className="mb-12 items-center">
-          <Text className="text-4xl font-bold text-gray-800 mt-4">
-            Counter Portal
-          </Text>
-        </View>
-
+        <LoginHeader />
         <LoginForm
           onSubmit={handleLogin}
           isLoading={isLoading}
           isDeviceRegistered={isDeviceRegistered}
         />
+        {errorMessage && (
+          <DeviceNotRegisteredMessage message={errorMessage} />
+        )}
       </View>
     </KeyboardAvoidingView>
   );

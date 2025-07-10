@@ -22,7 +22,7 @@ const DeveloperLayout = () => {
           headerLeft: () => null,
           headerRight: () => (
             <TouchableOpacity
-              onPress={() => router.back()}
+              onPress={() => router.push('/(tabs)')}
               style={{
                 paddingHorizontal: 12,
                 paddingVertical: 8,

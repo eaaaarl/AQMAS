@@ -8,10 +8,11 @@ import { PersistGate } from 'redux-persist/integration/react';
 import '../global.css';
 import { store as reduxStore } from '../libs/redux/store';
 
+
 const persistor = persistStore(reduxStore);
 
 function AppContent() {
-  const { hasConnectionError, isRetrying, handleRetry, handleDismiss } =
+  const { hasConnectionError, handleRetry, handleDismiss } =
     useGlobalError();
 
   return (
