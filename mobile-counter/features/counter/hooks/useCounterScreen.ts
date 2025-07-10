@@ -50,6 +50,7 @@ export interface UseCounterScreenResult {
   onFinish: () => Promise<void>;
   onSkip: () => Promise<void>;
   onReturnSkippedTicket: (ticket: TickitSkipped) => Promise<void>;
+  handleRecall: () => Promise<void>;
 }
 
 export function useCounterScreen(): UseCounterScreenResult {
@@ -359,6 +360,7 @@ export function useCounterScreen(): UseCounterScreenResult {
     onRefresh,
     onHandleNext,
     onFinish,
+    handleRecall,
     onSkip,
     onReturnSkippedTicket,
   };

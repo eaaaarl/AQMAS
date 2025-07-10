@@ -22,13 +22,17 @@ export const useLoginScreen = () => {
       }).unwrap();
       setIsDeviceRegistered(deviceCheck.registered);
       if (!deviceCheck.registered) {
-        setErrorMessage('This device is not registered. Please contact your administrator.');
+        setErrorMessage(
+          'This device is not registered. Please contact your administrator.'
+        );
       } else {
         setErrorMessage(null);
       }
     } catch (error) {
       setIsDeviceRegistered(false);
-      setErrorMessage('Device check failed. Please try again or contact administrator.');
+      setErrorMessage(
+        'Device check failed. Please try again or contact administrator.'
+      );
       Toast.show({
         type: 'error',
         text1: 'Device Check Failed',
@@ -59,4 +63,4 @@ export const useLoginScreen = () => {
     handleLogin,
     errorMessage,
   };
-}; 
+};
