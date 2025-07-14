@@ -17,12 +17,21 @@ export default function Login() {
 
   const config = useAppSelector((state) => state.config)
   const needsConfig = !config.ipAddress || !config.port;
+  const needAuthorizationDevice = !isDeviceRegistered;
   useEffect(() => {
     if (needsConfig) {
       router.replace('/(developer)/setting');
       return;
     }
-  }, [needsConfig]);
+
+    if (needAuthorizationDevice) {
+      router.replace('/auth/unauthorize');
+      return;
+    }
+
+  }, [needsConfig, needAuthorizationDevice]);
+
+
 
   return (
     <KeyboardAvoidingView

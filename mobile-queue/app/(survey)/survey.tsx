@@ -68,6 +68,7 @@ export default function SurveyResultsScreen() {
                     onConfirm={handleCustomerFormConfirm}
                     isLoading={isLoadingSurvey || isLoadingSurveyDetail}
                 />
+
             </SurveyLayout>
         </DismissKeyboard>
     );
