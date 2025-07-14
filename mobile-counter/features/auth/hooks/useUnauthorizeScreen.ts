@@ -13,8 +13,11 @@ export function useUnauthorizeScreen() {
   }, []);
 
   const handleContactAdmin = useCallback(() => {
-    // You can expand this to open email, chat, etc.
-    console.log('Contact administrator');
+    Toast.show({
+      type: 'info',
+      text1: 'Contact Administrator',
+      text2: 'Please reach out to your administrator for assistance.',
+    });
   }, []);
 
   const handleTryAgain = useCallback(async () => {
@@ -40,7 +43,7 @@ export function useUnauthorizeScreen() {
         text1: 'Registration failed',
         text2: 'Please try again or contact administrator',
       });
-      router.back();
+      // router.back();
     }
   }, [registerDevice]);
 
@@ -50,4 +53,4 @@ export function useUnauthorizeScreen() {
     handleContactAdmin,
     handleTryAgain,
   };
-} 
+}

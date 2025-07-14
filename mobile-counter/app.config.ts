@@ -2,7 +2,7 @@ export default {
   expo: {
     name: 'Queue Counter',
     slug: 'queue-counter',
-    version: '1.0.0',
+    version: '1.0.3',
     orientation: 'portrait',
     icon: './assets/images/icon.png',
     scheme: 'queue-counter',
@@ -40,6 +40,14 @@ export default {
         },
       ],
       'expo-web-browser',
+      [
+        'expo-build-properties',
+        {
+          android: {
+            usesCleartextTraffic: true,
+          },
+        },
+      ],
     ],
     experiments: {
       typedRoutes: true,
