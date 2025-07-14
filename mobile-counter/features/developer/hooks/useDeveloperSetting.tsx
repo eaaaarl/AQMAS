@@ -3,7 +3,6 @@ import { useAppDispatch, useAppSelector } from '@/libs/redux/hooks';
 import { setConfig } from '@/libs/redux/state/configSlice';
 import * as Application from 'expo-application';
 import * as Device from 'expo-device';
-import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import Toast from 'react-native-toast-message';
 
@@ -115,12 +114,12 @@ export const useDeveloperSetting = () => {
       });
 
       // Check device registration and redirect accordingly
-      const isRegistered = await checkDeviceRegistration();
-      if (isRegistered) {
-        router.push('/(tabs)');
-      } else {
-        router.push('/auth/not-registered');
-      }
+      // const isRegistered = await checkDeviceRegistration();
+      // if (isRegistered) {
+      //   router.push('/(tabs)');
+      // } else {
+      //   router.push('/auth/not-registered');
+      // }
 
     } catch (error) {
       console.error('Error saving settings:', error);
