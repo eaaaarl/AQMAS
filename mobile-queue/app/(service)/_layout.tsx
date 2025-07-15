@@ -1,5 +1,5 @@
 import TapDetector from '@/components/TapsDetector';
-import { Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import React from 'react';
 
 export default function LayoutService() {
@@ -9,8 +9,7 @@ export default function LayoutService() {
             alertTitle="🚀 Developer Mode"
             alertMessage="You've unlocked developer settings! Want to continue?"
             onThresholdReached={() => {
-                console.log("Dev mode activated!");
-                // Navigation handled in index.tsx now
+                router.push('/(developer)/setting');
             }}
         >
             <Stack screenOptions={{ headerShown: false }} />
