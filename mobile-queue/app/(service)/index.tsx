@@ -77,10 +77,10 @@ const ServiceScreen: React.FC = () => {
       router.replace('/(developer)/setting');
       return;
     }
-    if (needsAuthorization) {
+    /* if (needsAuthorization) {
       router.replace('/(service)/unauthorize');
-    }
-  }, [needsConfig, needsAuthorization]);
+    } */
+  }, [needsConfig, /* needsAuthorization */]);
 
   if (needsConfig || isLoadingDevice) {
     return <RenderLoading />;
