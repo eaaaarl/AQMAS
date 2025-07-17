@@ -19,7 +19,7 @@ AQMAS consists of two specialized mobile applications:
 
 ### Latest Release
 
-- **Version:** 1.0.0
+- **Version:** 1.0.2
 - **Release Date:** 7/17/2025
 - **Build Numbers:**
   - mobile-counter: 1.0.2
