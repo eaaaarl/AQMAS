@@ -20,7 +20,7 @@ AQMAS consists of two specialized mobile applications:
 ### Latest Release
 
 - **Version:** 1.0.0
-- **Release Date:** [RELEASE_DATE]
+- **Release Date:** 7/17/2025
 - **Build Numbers:**
   - mobile-counter: 1.0.2
   - mobile-queue: 1.0.0
@@ -29,18 +29,20 @@ AQMAS consists of two specialized mobile applications:
 
 #### New Features
 
-- [Feature 1]
-- [Feature 2]
+- Initial release of mobile-queue kiosk application
+- Initial release of mobile-counter staff interface
+- Bluetooth receipt printing integration
+- Real-time queue synchronization
+- Staff authentication system
 
 #### Bug Fixes
 
-- [Bug fix 1]
-- [Bug fix 2]
+- N/A (Initial Release)
 
 #### Known Issues
 
-- [Issue 1]
-- [Issue 2]
+- Bluetooth connectivity may require manual reconnection on some Android devices
+- Legacy API integration requires HTTP cleartext traffic to be enabled
 
 ## Installation
 
