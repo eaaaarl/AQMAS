@@ -99,8 +99,6 @@ Both applications require proper configuration before deployment:
 - Device-specific settings
 - Bluetooth printer settings (mobile-queue only)
 
-Refer to the internal deployment documentation for detailed configuration instructions.
-
 ## Technical Support
 
 For technical issues or deployment assistance, contact:
@@ -126,7 +124,3 @@ AQMAS/
 - **NativeWind** 4.1+
 - **Expo Router** for navigation
 - **React Native Bluetooth Classic** (mobile-queue only)
-
----
-
-**For Internal Use Only**
