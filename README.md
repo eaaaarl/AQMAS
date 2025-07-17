@@ -20,7 +20,7 @@ AQMAS consists of two specialized mobile applications:
 ### Latest Release
 
 - **Version:** 1.0.0
-- **Release Date:** [RELEASE_DATE]
+- **Release Date:** 17/07/2025
 - **Build Numbers:**
   - mobile-counter: 1.0.2
   - mobile-queue: 1.0.0
@@ -96,13 +96,6 @@ Both applications require proper configuration before deployment:
 - Authentication credentials
 - Device-specific settings
 - Bluetooth printer settings (mobile-queue only)
-
-## Technical Support
-
-For technical issues or deployment assistance, contact:
-
-- **Internal Support:** [SUPPORT_EMAIL]
-- **Documentation:** [LINK_TO_INTERNAL_DOCS]
 
 ## Project Structure
 
