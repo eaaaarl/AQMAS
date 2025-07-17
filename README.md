@@ -288,7 +288,7 @@ This project was developed during my **On-the-Job Training (OJT)** period and se
 
 **Developer:** Earl Dominic V. Ado  
 **Email:** dev.earl00@gmail.com   
-**GitHub:** github.com/eaaaarl  
+**GitHub:** https://github.com/eaaaarl  
 
 **Project Repository:** https://github.com/eaaaarl/AQMAS  
 **Portfolio:** https://eaaaarl.vercel.app  
