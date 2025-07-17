@@ -2,7 +2,7 @@ export default {
   expo: {
     name: "mobile-queue-app",
     slug: "mobile-queue-app",
-    version: "1.0.3",
+    version: "1.0.4",
     orientation: "default",
     icon: "./assets/images/icon.png",
     scheme: "mobilequeueapp",

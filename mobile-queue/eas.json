@@ -15,6 +15,7 @@
       "environment": "preview"
     },
     "production": {
+      "autoIncrement": true,
       "distribution": "internal",
       "environment": "production",
       "android": {
