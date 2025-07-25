@@ -9,6 +9,7 @@ import { RenderNoServices } from '@/features/service/utils/RenderNoServices';
 import { useAppSelector } from '@/libs/redux/hooks';
 import * as Application from 'expo-application';
 import { router } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import React, { useEffect } from 'react';
 import { Platform } from 'react-native';
 
@@ -89,6 +90,10 @@ const ServiceScreen: React.FC = () => {
     }
   }, [needsConfig, needsAuthorization]);
 
+  const handleHelpPress = async () => {
+    await WebBrowser.openBrowserAsync('https://youtu.be/HVMF0rEltqA');
+  };
+
   if (needsConfig || isLoadingDevice) {
     return <RenderLoading />;
   }
@@ -133,6 +138,7 @@ const ServiceScreen: React.FC = () => {
         onPrevPage={onPrevPage}
         onNextPage={onNextPage}
         enabledSurvey={enabledSurvey}
+        onHelpPress={handleHelpPress}
       />
 
       <ServiceModals

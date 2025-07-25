@@ -1,5 +1,6 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import React from 'react';
-import { RefreshControl, ScrollView, Text, View } from 'react-native';
+import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Service } from '../api/interface';
 import { PaginationControls } from './PaginationControl';
@@ -34,6 +35,7 @@ interface ServiceLayoutProps {
   onPrintReceipt: () => void;
   onPrevPage: () => void;
   onNextPage: () => void;
+  onHelpPress: () => void;
   // Configuration
   enabledSurvey: boolean;
 }
@@ -59,6 +61,7 @@ export const ServiceLayout: React.FC<ServiceLayoutProps> = ({
   onPrintReceipt,
   onPrevPage,
   onNextPage,
+  onHelpPress,
   enabledSurvey,
 }) => {
   const getDisplayServices = () => {
@@ -75,6 +78,27 @@ export const ServiceLayout: React.FC<ServiceLayoutProps> = ({
 
   return (
     <SafeAreaView className='flex-1 bg-white'>
+      {/* <View className="flex-row justify-between items-center px-4 py-2 border-b border-gray-200">
+        <View className="flex-1" />
+        <TouchableOpacity
+          onPress={onHelpPress}
+          className="flex-row items-center bg-blue-500 rounded-full px-4 py-2 shadow-md"
+          style={{
+            shadowColor: '#000',
+            shadowOffset: {
+              width: 0,
+              height: 2,
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+            elevation: 5,
+          }}
+        >
+          <Ionicons name="help-circle-outline" size={20} color="white" style={{ marginRight: 6 }} />
+          <Text className="text-white font-medium text-sm">Need Help?</Text>
+        </TouchableOpacity>
+      </View> */}
+
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
@@ -153,6 +177,69 @@ export const ServiceLayout: React.FC<ServiceLayoutProps> = ({
                 onPrintReceipt={onPrintReceipt}
               />
             </View>
+
+            {/* Help Button Alternative - Bottom Section */}
+            <View style={{ width: '100%', alignItems: 'center', marginTop: 24 }}>
+              <TouchableOpacity
+                onPress={onHelpPress}
+                className="flex-row items-center bg-blue-50 border-2 border-blue-200 rounded-xl px-8 py-4 shadow-sm"
+                style={{
+                  shadowColor: '#3B82F6',
+                  shadowOffset: {
+                    width: 0,
+                    height: 2,
+                  },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 4,
+                  elevation: 3,
+                  transform: [{ scale: 1 }],
+                }}
+                activeOpacity={0.8}
+                onPressIn={(e) => {
+                  // Add subtle scale animation on press
+                  e.currentTarget.setNativeProps({
+                    style: {
+                      transform: [{ scale: 0.98 }],
+                    }
+                  });
+                }}
+                onPressOut={(e) => {
+                  e.currentTarget.setNativeProps({
+                    style: {
+                      transform: [{ scale: 1 }],
+                    }
+                  });
+                }}
+              >
+                {/* Icon with subtle animation container */}
+                <View className="mr-3 p-1 bg-blue-100 rounded-full">
+                  <Ionicons
+                    name="help-circle"
+                    size={24}
+                    color="#3B82F6"
+                  />
+                </View>
+
+                {/* Text with better typography */}
+                <Text className="text-blue-700 font-semibold text-base tracking-wide">
+                  Need Help?
+                </Text>
+
+                {/* Optional subtle arrow indicator */}
+                <View className="ml-2">
+                  <Ionicons
+                    name="chevron-forward"
+                    size={18}
+                    color="#3B82F6"
+                  />
+                </View>
+              </TouchableOpacity>
+
+              {/* Optional subtitle */}
+              <Text className="text-gray-500 text-sm mt-2 text-center">
+                Get assistance with your services
+              </Text>
+            </View>
           </View>
 
           {/* Selected transactions text */}
@@ -161,6 +248,7 @@ export const ServiceLayout: React.FC<ServiceLayoutProps> = ({
           </Text>
         </View>
       </ScrollView>
+
       {enabledSurvey && <SurveyButton />}
     </SafeAreaView>
   );
