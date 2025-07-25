@@ -1,5 +1,5 @@
 import { TickitSkipped } from '@/features/queue/api/interface';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { memo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
