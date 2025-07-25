@@ -1,28 +1,19 @@
-import { Dimensions, SafeAreaView, View } from 'react-native';
+import { Image, SafeAreaView, View, useColorScheme } from 'react-native';
 
 export const RenderLoading = () => {
-    const { width, height } = Dimensions.get('window');
-    const isLandscape = width > height;
-    const cardWidth = isLandscape ? (width - 60) / 3 : (width - 40) / 2;
-
-    const SkeletonBox = () => (
-        <View
-            style={{ width: cardWidth }}
-            className="h-32 m-1 rounded-full items-center justify-center shadow-lg border border-gray-300"
-        >
-            {/* <View className="w-20 h-8 bg-gray-300 rounded-md animate-pulse" /> */}
-        </View>
-    );
+    const colorScheme = useColorScheme();
+    const splashIcon = colorScheme === 'dark'
+        ? require('../../../assets/icons/splash-icon-dark.png')
+        : require('../../../assets/icons/splash-icon-light.png');
 
     return (
-        <SafeAreaView className="flex-1 bg-white justify-center items-center">
-            <View className="flex-row flex-wrap justify-center px-4">
-                <SkeletonBox />
-                <SkeletonBox />
-                <SkeletonBox />
-                <SkeletonBox />
-                <SkeletonBox />
-                <SkeletonBox />
+        <SafeAreaView className="flex-1 bg-white dark:bg-black justify-center items-center">
+            <View className="animate-pulse">
+                <Image
+                    source={splashIcon}
+                    style={{ width: 200, height: 200 }}
+                    resizeMode="contain"
+                />
             </View>
         </SafeAreaView>
     );

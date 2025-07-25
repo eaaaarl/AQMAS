@@ -1,4 +1,4 @@
-import { useCheckDeviceQuery } from '@/features/device/api/deviceApi';
+import { useLazyCheckDeviceQuery } from '@/features/device/api/deviceApi';
 import { DeviceType } from '@/features/device/constants';
 import { ServiceLayout } from '@/features/service/components/ServiceLayout';
 import { ServiceModals } from '@/features/service/components/ServiceModals';
@@ -18,10 +18,17 @@ const ServiceScreen: React.FC = () => {
   const deviceId = Platform.OS === 'android'
     ? Application.getAndroidId()
     : Application.applicationId || '';
-  const { data: deviceStatus, isLoading: isLoadingDevice } = useCheckDeviceQuery({
-    id: deviceId,
-    type: DeviceType.KIOSK,
-  });
+
+  const [checkDevice, { data: deviceStatus, isLoading: isLoadingDevice }] = useLazyCheckDeviceQuery();
+
+  useEffect(() => {
+    if (config.ipAddress && config.port) {
+      checkDevice({
+        id: deviceId,
+        type: DeviceType.KIOSK,
+      });
+    }
+  }, [config.ipAddress, config.port, deviceId]);
 
   // Service page logic
   const {
@@ -70,7 +77,7 @@ const ServiceScreen: React.FC = () => {
 
   // Derived state for navigation/redirects
   const needsConfig = !config.ipAddress || !config.port;
-  const needsAuthorization = !isLoadingDevice && !deviceStatus?.registered;
+  const needsAuthorization = !isLoadingDevice && deviceStatus !== undefined && !deviceStatus.registered;
 
   useEffect(() => {
     if (needsConfig) {

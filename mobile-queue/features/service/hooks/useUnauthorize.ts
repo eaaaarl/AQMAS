@@ -1,4 +1,7 @@
-import { useRegisteredDeviceMutation } from "@/features/device/api/deviceApi";
+import {
+  useLazyCheckDeviceQuery,
+  useRegisteredDeviceMutation,
+} from "@/features/device/api/deviceApi";
 import { DeviceType } from "@/features/device/constants";
 import * as Application from "expo-application";
 import * as Device from "expo-device";
@@ -14,6 +17,8 @@ interface UseUnauthorize {
 
 export const useUnauthorize = (): UseUnauthorize => {
   const [registerDevice, { isLoading }] = useRegisteredDeviceMutation();
+  const [checkDevice, { isLoading: isCheckingDevice }] =
+    useLazyCheckDeviceQuery();
 
   const handleVerification = () => {
     router.push("/(service)/verification");
@@ -32,6 +37,18 @@ export const useUnauthorize = (): UseUnauthorize => {
     try {
       const deviceId = Application.getAndroidId();
       const osType = Device.osName === "Android" ? 1 : 2;
+
+      const { registered } = await checkDevice({
+        id: deviceId,
+        type: DeviceType.KIOSK,
+      }).unwrap();
+
+      console.log("registered", registered);
+
+      if (registered) {
+        router.replace("/(service)");
+        return;
+      }
 
       await registerDevice({
         id: deviceId,
@@ -55,7 +72,7 @@ export const useUnauthorize = (): UseUnauthorize => {
   };
 
   return {
-    isLoading,
+    isLoading: isLoading || isCheckingDevice,
     handleVerification,
     handleContactAdmin,
     handleTryAgain,
