@@ -1,5 +1,5 @@
 import { useAppSelector } from '@/libs/redux/hooks';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { Redirect } from 'expo-router';
 import { StatusBar, Text, View } from 'react-native';
