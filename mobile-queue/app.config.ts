@@ -1,7 +1,7 @@
 export default {
   expo: {
-    name: "mobile-queue-app",
-    slug: "mobile-queue-app",
+    name: "AQMAS-QUEUE-KIOSK",
+    slug: "aqmas-queue-kiosk",
     version: "1.0.4",
     orientation: "default",
     icon: "./assets/images/icon.png",
@@ -74,9 +74,9 @@ export default {
     extra: {
       router: {},
       eas: {
-        projectId: "150d4e3b-b54a-4361-ae4f-d168dd0fc008",
+        projectId: "27cb71ab-24a6-4259-801b-bc6b1e14d490",
       },
     },
-    owner: "eaa-aarl",
+    owner: "eaaaarl",
   },
 };
