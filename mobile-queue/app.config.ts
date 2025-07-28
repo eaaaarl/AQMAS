@@ -2,7 +2,7 @@ export default {
   expo: {
     name: "AQMAS-QUEUE-KIOSK",
     slug: "aqmas-queue-kiosk",
-    version: "1.0.4",
+    version: "1.0.0",
     orientation: "default",
     icon: "./assets/images/icon.png",
     scheme: "mobilequeueapp",
