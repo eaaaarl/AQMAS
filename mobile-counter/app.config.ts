@@ -2,7 +2,7 @@ export default {
   expo: {
     name: 'Queue Counter',
     slug: 'queue-counter',
-    version: '1.0.3',
+    version: '1.0.0',
     orientation: 'portrait',
     icon: './assets/images/icon.png',
     scheme: 'queue-counter',
