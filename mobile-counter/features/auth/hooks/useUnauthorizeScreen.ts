@@ -3,10 +3,14 @@ import * as Device from 'expo-device';
 import { router } from 'expo-router';
 import { useCallback } from 'react';
 import Toast from 'react-native-toast-message';
-import { useRegisteredDeviceMutation } from '../api/deviceApi';
+import {
+  useLazyCheckDeviceQuery,
+  useRegisteredDeviceMutation,
+} from '../api/deviceApi';
 
 export function useUnauthorizeScreen() {
   const [registerDevice, { isLoading }] = useRegisteredDeviceMutation();
+  const [checkDevice, { isLoading: isChecking }] = useLazyCheckDeviceQuery();
 
   const handleVerification = useCallback(() => {
     router.push('/auth/verification');
@@ -24,6 +28,18 @@ export function useUnauthorizeScreen() {
     try {
       const deviceId = Application.getAndroidId();
       const osType = Device.osName === 'Android' ? 1 : 2;
+
+      const { registered } = await checkDevice({
+        id: deviceId,
+        type: 1,
+      }).unwrap();
+
+      console.log('registered', registered);
+
+      if (registered) {
+        router.replace('/auth/login');
+        return;
+      }
 
       await registerDevice({
         id: deviceId,
@@ -45,10 +61,10 @@ export function useUnauthorizeScreen() {
       });
       // router.back();
     }
-  }, [registerDevice]);
+  }, [checkDevice, registerDevice]);
 
   return {
-    isLoading,
+    isLoading: isChecking || isLoading,
     handleVerification,
     handleContactAdmin,
     handleTryAgain,
