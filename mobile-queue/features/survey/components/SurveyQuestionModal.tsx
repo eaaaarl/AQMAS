@@ -1,6 +1,6 @@
 import { SurveyQuestion } from '@/features/survey/interface/surveyQuestion.interface';
 import { SurveyQuestionDetailPayload, SurveyResult } from '@/features/survey/interface/surveyQuestionDetail.interface';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useEffect, useState } from 'react';
 import { Modal, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
