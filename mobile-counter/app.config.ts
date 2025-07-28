@@ -1,11 +1,11 @@
 export default {
   expo: {
-    name: 'Queue Counter',
-    slug: 'queue-counter',
+    name: 'Aqmas Counter',
+    slug: 'aqmas-counter',
     version: '1.0.0',
     orientation: 'portrait',
     icon: './assets/images/icon.png',
-    scheme: 'queue-counter',
+    scheme: 'aqmas-counter',
     userInterfaceStyle: 'automatic',
     newArchEnabled: true,
     ios: {
@@ -17,7 +17,7 @@ export default {
         backgroundColor: '#ffffff',
       },
       edgeToEdgeEnabled: true,
-      package: 'com.eaaaarl.queuecounter',
+      package: 'com.eaaaarl.aqmascounter',
     },
     web: {
       bundler: 'metro',
@@ -55,9 +55,9 @@ export default {
     extra: {
       router: {},
       eas: {
-        projectId: '1f12542f-0d20-4e17-8812-697a1275bf42',
+        projectId: 'ac559121-58ca-468d-9400-5fa1125f0025',
       },
     },
-    owner: 'eaa-aarl',
+    owner: 'eaaaarl',
   },
 };
