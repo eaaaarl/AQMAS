@@ -7,7 +7,7 @@ interface DevelopmentTipsProps {
 
 export default function DevelopmentTips({ className = '' }: DevelopmentTipsProps) {
     return (
-        <View className={`mt-6 rounded-lg border border-blue-100 bg-blue-50 p-4 ${className}`}>
+        <View className={`rounded-lg border border-blue-100 bg-blue-50 p-4 ${className}`}>
             <View className="flex-row items-start">
                 <View className="mr-3 mt-0.5 h-4 w-4 rounded-full bg-blue-400 flex items-center justify-center">
                     <Text className="text-xs font-bold text-white">i</Text>
