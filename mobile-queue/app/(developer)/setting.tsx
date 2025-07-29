@@ -4,11 +4,13 @@ import BluetoothSettings from '@/features/developer/components/BluetoothSettings
 import ConfigDisplay from '@/features/developer/components/ConfigDisplay';
 import { useDeveloperSetting } from '@/features/developer/hooks/useDeveloperSetting';
 import React from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Dimensions, ScrollView, Text, View } from 'react-native';
 
 export default function Setting() {
     const { currentConfig } = useDeveloperSetting();
-
+    const { width, height } = Dimensions.get('window');
+    const isLandscape = width > height;
+    const isTablet = width >= 768;
     return (
         <ScrollView
             className="flex-1"
@@ -24,17 +26,43 @@ export default function Setting() {
                 </Text>
             </View>
 
-            {/* Configuration Display */}
-            <ConfigDisplay currentConfig={currentConfig} className="mb-6" />
+            {isLandscape && isTablet ? (
+                // Landscape Layout - Two Columns
+                <View className="flex-row gap-4">
+                    {/* Left Column */}
+                    <View className="flex-1">
+                        {/* Configuration Display */}
+                        <ConfigDisplay currentConfig={currentConfig} className="mb-4" />
 
-            {/* API Configuration Form */}
-            <ApiConfigForm />
+                        {/* API Configuration Form */}
+                        <ApiConfigForm />
+                    </View>
 
-            {/* Bluetooth Configuration */}
-            <BluetoothSettings />
+                    {/* Right Column */}
+                    <View className="flex-1">
+                        {/* Development Tips */}
+                        <DevelopmentTips />
 
-            {/* Development Tips */}
-            <DevelopmentTips />
+                        {/* Bluetooth Configuration */}
+                        <BluetoothSettings />
+                    </View>
+                </View>
+            ) : (
+                // Portrait Layout - Single Column
+                <View>
+                    {/* Configuration Display */}
+                    <ConfigDisplay currentConfig={currentConfig} className="mb-4" />
+
+                    {/* API Configuration Form */}
+                    <ApiConfigForm />
+
+                    {/* Bluetooth Configuration */}
+                    <BluetoothSettings />
+
+                    {/* Development Tips */}
+                    <DevelopmentTips />
+                </View>
+            )}
 
             <View className="h-6" />
         </ScrollView>

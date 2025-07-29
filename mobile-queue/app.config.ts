@@ -1,11 +1,11 @@
 export default {
   expo: {
-    name: "AQMAS-QUEUE-KIOSK",
+    name: "Aqmas Kiosk",
     slug: "aqmas-queue-kiosk",
     version: "1.0.0",
     orientation: "default",
     icon: "./assets/images/icon.png",
-    scheme: "mobilequeueapp",
+    scheme: "aqmaskiosk",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
     ios: {
@@ -17,7 +17,7 @@ export default {
         backgroundColor: "#ffffff",
       },
       edgeToEdgeEnabled: true,
-      package: "com.eaaaarl.mobilequeueapp",
+      package: "com.eaaaarl.aqmaskiosk",
       permissions: [
         "android.permission.BLUETOOTH",
         "android.permission.BLUETOOTH_ADMIN",

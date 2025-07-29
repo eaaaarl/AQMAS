@@ -7,7 +7,6 @@ import { useAppDispatch, useAppSelector } from "@/libs/redux/hooks";
 import { setConfig } from "@/libs/redux/state/configSlice";
 import * as Application from "expo-application";
 import * as Device from "expo-device";
-import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import Toast from "react-native-toast-message";
 
@@ -44,34 +43,6 @@ export const useDeveloperSetting = () => {
       setPort(currentConfig.port);
     }
   }, [currentConfig]);
-
-  const checkDeviceRegistration = async () => {
-    setIsCheckingDevice(true);
-    try {
-      const androidId = Application.getAndroidId();
-      const deviceType = Device.osName === "Android" ? 1 : 2;
-
-      const checkResponse = await checkDevice({
-        type: deviceType,
-        id: androidId,
-      }).unwrap();
-
-      if (!checkResponse.registered) {
-        router.push("/(service)/not-registered");
-      } else {
-        router.push("/(service)");
-      }
-    } catch (error) {
-      console.error("Device check failed:", error);
-      Toast.show({
-        type: "error",
-        text1: "Connection Error",
-        text2: "Failed to check device registration",
-      });
-    } finally {
-      setIsCheckingDevice(false);
-    }
-  };
 
   const registerDeviceSilently = async () => {
     try {

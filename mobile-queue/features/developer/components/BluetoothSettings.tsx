@@ -1,5 +1,6 @@
+import AntDesign from '@expo/vector-icons/AntDesign';
 import React from 'react';
-import { FlatList, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useBluetooth } from '../hooks/useBluetooth';
 
 export default function BluetoothSettings() {
@@ -22,7 +23,8 @@ export default function BluetoothSettings() {
         testThermalPrinter,
         testSimplePrint,
     } = useBluetooth();
-
+    const { width, height } = Dimensions.get('window');
+    const isLandscape = width > height;
     const renderDevice = ({ item, isPaired = false }: { item: any, isPaired: boolean }) => (
         <View className="flex-row items-center justify-between border-b border-gray-100 py-3">
             <View className="flex-1 ml-4">
@@ -69,7 +71,7 @@ export default function BluetoothSettings() {
     );
 
     return (
-        <View className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm mb-6">
+        <View className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm mt-4">
             <View className="mb-4">
                 <Text className="text-lg font-semibold text-gray-900 mb-1">
                     Bluetooth Configuration
@@ -145,22 +147,28 @@ export default function BluetoothSettings() {
             )}
 
             {/* Discovery Button */}
-            <TouchableOpacity
-                onPress={startDiscovery}
-                disabled={isDiscovering || !bluetoothEnabled || !bluetoothPermissions}
-                className={`rounded-lg py-3 px-4 mb-4 ${isDiscovering || !bluetoothEnabled || !bluetoothPermissions
-                    ? 'bg-gray-100'
-                    : 'bg-purple-600 active:bg-purple-700'
-                    }`}
-                activeOpacity={0.8}
-            >
-                <Text className={`text-center text-base font-semibold ${isDiscovering || !bluetoothEnabled || !bluetoothPermissions
-                    ? 'text-gray-500'
-                    : 'text-white'
-                    }`}>
-                    {isDiscovering ? 'Discovering...' : 'Start Discovery'}
-                </Text>
-            </TouchableOpacity>
+            <View className={`${isLandscape ? 'items-center' : 'flex-1'}`}>
+                <TouchableOpacity
+                    onPress={startDiscovery}
+                    disabled={isDiscovering || !bluetoothEnabled || !bluetoothPermissions}
+                    className={`rounded-lg py-3 px-4 mb-4 ${isDiscovering || !bluetoothEnabled || !bluetoothPermissions
+                        ? 'bg-gray-100'
+                        : 'bg-purple-600 active:bg-purple-700'
+                        }`}
+                    activeOpacity={0.8}
+                >
+                    <View className="flex-row items-center justify-center gap-2">
+                        <AntDesign name="search1" size={24} color="white" />
+                        <Text className={`text-center text-base font-semibold ${isDiscovering || !bluetoothEnabled || !bluetoothPermissions
+                            ? 'text-gray-500'
+                            : 'text-white'
+                            }`}>
+                            {isDiscovering ? 'Discovering...' : 'Start Discovery'}
+                        </Text>
+                    </View>
+                </TouchableOpacity>
+
+            </View>
 
             {/* Paired Devices */}
             {pairedDevices.length > 0 && (

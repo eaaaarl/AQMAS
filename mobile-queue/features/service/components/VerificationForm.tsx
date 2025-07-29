@@ -29,7 +29,6 @@ export const VerificationForm: React.FC<VerificationFormProps> = ({
         onChangeText={setPasscode}
         placeholder="Enter verification code"
         className="border text-black border-gray-300 rounded-lg px-4 py-3 text-center text-lg font-bold bg-gray-50"
-        secureTextEntry
         maxLength={10}
         keyboardType="numeric"
         autoFocus
