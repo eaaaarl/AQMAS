@@ -210,54 +210,74 @@ export const useQueue = () => {
     }
   };
 
-  const thermalTicket = async (data: {
+  // Add these interfaces at the top of your file or in a separate types file
+  interface TicketData {
     ticketNumber: string;
     customerName: string;
     service: string[];
-    customerType?: string;
+    customerType?: {
+      priority_level?: string | number;
+    };
     dateTime?: string;
-  }) => {
+  }
+
+  interface ThermalTicketConfig {
+    enabledPrintCustomerName: boolean;
+    enabledPriority: boolean;
+    printPriority?: string | number;
+  }
+
+  // Fixed thermalTicket function - should return Uint8Array, not EscPosEncoder
+  const thermalTicket = async (
+    data: TicketData,
+    config: ThermalTicketConfig
+  ): Promise<Uint8Array> => {
     const encoder = new EscPosEncoder();
-    //  const currentDateTime = new Date().toLocaleString();
     const serviceName = data.service.length > 0 ? data.service.join(" | ") : "";
 
-    const result = encoder
+    let result = encoder
       .initialize()
       .codepage("cp437")
       .align("left")
       // Header with timestamp
       .size(0)
-      .line(`${data.dateTime}`)
+      .line(`${data.dateTime || new Date().toLocaleString()}`)
       .newline()
       .align("center")
-      .raw([0x1d, 0x21, 0x66])
+      .raw([0x1d, 0x21, 0x66]) // Large text
       .bold(true)
       .line(data.ticketNumber)
       .raw([0x1d, 0x21, 0x00]) // Reset size after big text
       .newline()
       .align("center")
-      .size(0)
-      .line(`${enabledPrintCustomerName ? data.customerName : ""}`) // Fixed template literal
+      .size(0);
+
+    // Conditionally add customer name line
+    if (config.enabledPrintCustomerName) {
+      result = result.line(`${data.customerName}`);
+    }
+
+    // Check if customer has priority status
+    const isPriority =
+      config.enabledPriority &&
+      data.customerType?.priority_level === config.printPriority;
+
+    // Return the encoded Uint8Array, not the encoder instance
+    return result
       .line(`${serviceName}`)
       .newline()
       .size(0)
-      .line(
-        `${
-          printPriority === customerType?.priority_level && enabledPriority
-            ? "PRIORITY"
-            : ""
-        }`
-      ) // Fixed template literal
+      .line(isPriority ? "PRIORITY" : "")
       .cut()
-      .encode();
-    return result;
+      .encode(); // This returns Uint8Array
   };
 
+  // Updated printThermalTicket function with proper typing
   const printThermalTicket = async (data: {
     ticketNumber: string;
     customerName: string;
     service: string[];
-    customerType?: string;
+    customerType?: string; // This should probably be an object, but keeping your current structure
     dateTime?: string;
   }) => {
     try {
@@ -279,8 +299,23 @@ export const useQueue = () => {
 
       console.log("🖨️ Printing thermal ticket...");
 
-      // Generate thermal ticket data
-      const thermalData = await thermalTicket(data);
+      // Generate thermal ticket data - fix the data structure
+      const ticketData: TicketData = {
+        ticketNumber: data.ticketNumber,
+        customerName: data.customerName,
+        service: data.service,
+        customerType: customerType
+          ? { priority_level: customerType.priority_level }
+          : undefined,
+        dateTime: data.dateTime,
+      };
+
+      const thermalData = await thermalTicket(ticketData, {
+        enabledPriority,
+        enabledPrintCustomerName,
+        printPriority,
+      });
+
       const base64Data = btoa(
         String.fromCharCode(...new Uint8Array(thermalData))
       );

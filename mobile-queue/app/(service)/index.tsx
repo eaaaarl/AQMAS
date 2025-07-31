@@ -1,6 +1,5 @@
 import { useBluetooth } from '@/features/developer/hooks/useBluetooth';
 import { useLazyCheckDeviceQuery } from '@/features/device/api/deviceApi';
-import { DeviceType } from '@/features/device/constants';
 import { ServiceLayout } from '@/features/service/components/ServiceLayout';
 import { ServiceModals } from '@/features/service/components/ServiceModals';
 import { useServicePage } from '@/features/service/hooks/useServicePage';
@@ -104,12 +103,12 @@ const ServiceScreen: React.FC = () => {
       }
 
       // Then check device registration if config is available
-      if (config.ipAddress && config.port) {
+      /* if (config.ipAddress && config.port) {
         checkDevice({
           id: deviceId,
           type: DeviceType.KIOSK,
         });
-      }
+      } */
     }
 
     initialize();
@@ -120,10 +119,10 @@ const ServiceScreen: React.FC = () => {
       router.replace('/(developer)/setting');
       return;
     }
-    if (needsAuthorization) {
-      router.replace('/(service)/unauthorize');
-    }
-  }, [needsConfig, needsAuthorization]);
+    // if (needsAuthorization) {
+    //   router.replace('/(service)/unauthorize');
+    // }
+  }, [needsConfig]); // needsAuthorization]);
 
   const handleHelpPress = async () => {
     await WebBrowser.openBrowserAsync('https://youtu.be/HVMF0rEltqA');

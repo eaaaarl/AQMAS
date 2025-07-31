@@ -94,6 +94,7 @@ export const ServiceLayout: React.FC<ServiceLayoutProps> = ({
 
   return (
     <SafeAreaView className='flex-1 bg-white'>
+
       {/* Background Logo with Transparency */}
       <View className="absolute inset-0 justify-center items-center pointer-events-none" style={{ zIndex: 0 }}>
         <Image
