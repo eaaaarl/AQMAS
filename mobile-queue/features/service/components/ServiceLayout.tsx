@@ -274,22 +274,28 @@ export const ServiceLayout: React.FC<ServiceLayoutProps> = ({
         </View>
       </ScrollView>
 
-      {enabledSurvey && <View style={{ zIndex: 1 }}><SurveyButton /></View>}
+      {/* Bottom Section with Survey Button and Powered By Text */}
+      <View className="absolute bottom-16 left-4 right-4 flex-row justify-between items-center" style={{ zIndex: 1 }}>
+        {/* Survey Button on the left */}
+        <View style={{ flex: 1 }}>
+          {enabledSurvey && <SurveyButton />}
+        </View>
 
-      {/* Powered By Text - Bottom Right */}
-      <View className="absolute bottom-16 right-4" style={{ zIndex: 1 }}>
-        <TouchableOpacity
-          onPress={() => {
-            // You can add any action here when clicked
-            Linking.openURL('https://g-hoven.com');
-          }}
-          className="bg-gray-100 rounded-lg px-3 py-2 border border-gray-200"
-          activeOpacity={0.7}
-        >
-          <Text className="text-gray-600 text-xs font-medium">
-            Powered By: <Text className="text-blue-600 font-semibold">GHOVEN APP WORLD</Text>
-          </Text>
-        </TouchableOpacity>
+        {/* Powered By Text on the right */}
+        <View style={{ flex: 1, alignItems: 'flex-end' }}>
+          <TouchableOpacity
+            onPress={() => {
+              // You can add any action here when clicked
+              Linking.openURL('https://g-hoven.com');
+            }}
+            className="bg-gray-100 rounded-lg px-3 py-2 border border-gray-200"
+            activeOpacity={0.7}
+          >
+            <Text className="text-gray-600 text-xs font-medium">
+              Powered By: <Text className="text-blue-600 font-semibold">GHOVEN APP WORLD</Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
