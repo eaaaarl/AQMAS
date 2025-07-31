@@ -1,12 +1,10 @@
 import AntDesign from '@expo/vector-icons/AntDesign';
 import React from 'react';
-import { Dimensions, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useDeveloperSetting } from '../hooks/useDeveloperSetting';
 
 export default function ApiConfigForm() {
     const { ipAddress, port, setIpAddress, setPort, handleSave } = useDeveloperSetting();
-    const { width, height } = Dimensions.get('window');
-    const isLandscape = width > height;
     return (
         <View className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm mb-6">
             <View className="mb-4">

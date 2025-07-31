@@ -1,14 +1,14 @@
 import { useConfig } from "@/features/config/hooks/useConfig";
 import { useGetCustomerTypeQuery } from "@/features/customer/api/customerApi";
 import { CustomerTypeResponse } from "@/features/customer/api/interface";
+import { useBluetooth } from "@/features/developer/hooks/useBluetooth";
 import { Service } from "@/features/service/api/interface";
-import { useAppDispatch } from "@/libs/redux/hooks";
 import EscPosEncoder from "@manhnd/esc-pos-encoder";
+import { format } from "date-fns";
 import { useState } from "react";
 import RNBluetoothClassic from "react-native-bluetooth-classic";
 import Toast from "react-native-toast-message";
 import {
-  queueApi,
   useCreateQueueDetailsMutation,
   useCreateQueueMutation,
   useGetCustomerNameCountQuery,
@@ -18,7 +18,6 @@ import {
 } from "../api/queueApi";
 
 export const useQueue = () => {
-  const dispatch = useAppDispatch();
   const [customerType, setCustomerType] = useState<CustomerTypeResponse | null>(
     null
   );
@@ -46,6 +45,8 @@ export const useQueue = () => {
     enabledPrintCustomerName,
   } = useConfig();
 
+  const { reconnectToPersistedDevice, connectedDevice } = useBluetooth();
+
   const [createQueue, { isLoading: isLoadingQueue }] = useCreateQueueMutation();
   const [createQueueDetails, { isLoading: isLoadingDetails }] =
     useCreateQueueDetailsMutation();
@@ -53,6 +54,10 @@ export const useQueue = () => {
     useGetCustomerTypeQuery({
       is_show: "1",
     });
+
+  const printPriority = customerTypeData?.find((ctd) => {
+    return ctd.type_name;
+  })?.priority_level;
 
   const customerTypeDefaultData = customerTypeData?.find(
     (ctd) => ctd.default.data?.[0] === 1
@@ -173,10 +178,34 @@ export const useQueue = () => {
 
   const getConnectedDevice = async () => {
     try {
+      // First try to get currently connected devices
       const devices = await RNBluetoothClassic.getConnectedDevices();
-      return devices.length > 0 ? devices[0] : null;
+      if (devices.length > 0) {
+        console.log("✅ Found connected device:", devices[0].name);
+        return devices[0];
+      }
+
+      // If no connected devices, try to reconnect to persisted device
+      console.log("⚠️ No connected devices found, attempting reconnection...");
+      const reconnected = await reconnectToPersistedDevice();
+
+      if (reconnected && connectedDevice) {
+        console.log(
+          "✅ Successfully reconnected to printer:",
+          connectedDevice.name
+        );
+        // Try to get the reconnected device
+        const reconnectedDevices =
+          await RNBluetoothClassic.getConnectedDevices();
+        if (reconnectedDevices.length > 0) {
+          return reconnectedDevices[0];
+        }
+      }
+
+      console.log("❌ No printer connected after reconnection attempt");
+      return null;
     } catch (error) {
-      console.error("Error getting connected device:", error);
+      console.error("❌ Error getting connected device:", error);
       return null;
     }
   };
@@ -212,8 +241,13 @@ export const useQueue = () => {
       .line(`${serviceName}`)
       .newline()
       .size(0)
-      .line(`${enabledPriority ? "PRIORITY" : ""}`) // Fixed template literal
-      .line("- - - - - - - - - - - - - - - - - - - - - - - -")
+      .line(
+        `${
+          printPriority === customerType?.priority_level && enabledPriority
+            ? "PRIORITY"
+            : ""
+        }`
+      ) // Fixed template literal
       .cut()
       .encode();
     return result;
@@ -332,13 +366,7 @@ export const useQueue = () => {
         ticketNumber: ticket,
         customerName: customerName || "",
         service: selectedTransactions.map((sv) => sv.service_name),
-        dateTime: new Date().toLocaleDateString("en-US", {
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
+        dateTime: format(new Date(), "MMMM d yyyy HH:mm:ss"),
       });
     } catch (error) {
       console.error("❌ Queue creation process failed:", error);
@@ -441,8 +469,6 @@ export const useQueue = () => {
       }
 
       resetFormState();
-
-      dispatch(queueApi.util.invalidateTags(["Queue"]));
     } catch (error) {
       console.error("❌ Error in success flow:", error);
     }

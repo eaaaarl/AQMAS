@@ -76,6 +76,17 @@ export const ServiceLayout: React.FC<ServiceLayoutProps> = ({
 
   const displayServices = getDisplayServices();
 
+  // Debug logging
+  // console.log('=== ServiceLayout Debug ===');
+  // console.log('shouldShowAllServices:', shouldShowAllServices);
+  // console.log('showMore:', showMore);
+  // console.log('mainServices length:', mainServices.length);
+  // console.log('additionalServices length:', additionalServices.length);
+  // console.log('paginatedServices length:', paginatedServices.length);
+  // console.log('displayServices length:', displayServices.length);
+  // console.log('displayServices:', displayServices);
+  // console.log('==========================');
+
   return (
     <SafeAreaView className='flex-1 bg-white'>
       {/* <View className="flex-row justify-between items-center px-4 py-2 border-b border-gray-200">
@@ -182,16 +193,16 @@ export const ServiceLayout: React.FC<ServiceLayoutProps> = ({
             <View style={{ width: '100%', alignItems: 'center', marginTop: 24 }}>
               <TouchableOpacity
                 onPress={onHelpPress}
-                className="flex-row items-center bg-blue-50 border-2 border-blue-200 rounded-xl px-8 py-4 shadow-sm"
+                className="flex-row items-center bg-blue-50 border-2 border-blue-200 rounded-lg px-4 py-2 shadow-sm"
                 style={{
                   shadowColor: '#3B82F6',
                   shadowOffset: {
                     width: 0,
-                    height: 2,
+                    height: 1,
                   },
                   shadowOpacity: 0.1,
-                  shadowRadius: 4,
-                  elevation: 3,
+                  shadowRadius: 2,
+                  elevation: 2,
                   transform: [{ scale: 1 }],
                 }}
                 activeOpacity={0.8}
@@ -212,31 +223,31 @@ export const ServiceLayout: React.FC<ServiceLayoutProps> = ({
                 }}
               >
                 {/* Icon with subtle animation container */}
-                <View className="mr-3 p-1 bg-blue-100 rounded-full">
+                <View className="mr-2 p-0.5 bg-blue-100 rounded-full">
                   <Ionicons
                     name="help-circle"
-                    size={24}
+                    size={18}
                     color="#3B82F6"
                   />
                 </View>
 
                 {/* Text with better typography */}
-                <Text className="text-blue-700 font-semibold text-base tracking-wide">
+                <Text className="text-blue-700 font-medium text-sm tracking-wide">
                   Need Help?
                 </Text>
 
                 {/* Optional subtle arrow indicator */}
-                <View className="ml-2">
+                <View className="ml-1">
                   <Ionicons
                     name="chevron-forward"
-                    size={18}
+                    size={14}
                     color="#3B82F6"
                   />
                 </View>
               </TouchableOpacity>
 
               {/* Optional subtitle */}
-              <Text className="text-gray-500 text-sm mt-2 text-center">
+              <Text className="text-gray-500 text-xs mt-1 text-center">
                 Get assistance with your services
               </Text>
             </View>

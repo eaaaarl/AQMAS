@@ -18,6 +18,19 @@ export const useService = () => {
   const [currentPage, setCurrentPage] = useState(0);
 
   const services = response?.results || [];
+
+  // Debug logging to understand the data structure
+  // console.log("=== useService Debug ===");
+  // console.log("All services:", services);
+  // console.log(
+  //   "Services header_ids:",
+  //   services.map((s) => s.header_id)
+  // );
+  // console.log("Unique header_ids:", [
+  //   ...new Set(services.map((s) => s.header_id)),
+  // ]);
+  // console.log("========================");
+
   const onRefresh = async () => {
     setRefreshing(true);
     try {
@@ -32,10 +45,36 @@ export const useService = () => {
     }
   };
 
+  // Updated filtering logic to handle various header_id values
+  // Main services: header_id === 0 or the first group of services
   const mainServices = services.filter((service) => service.header_id === 0);
+
+  // If no main services found, use the first group of services by header_id
+  const firstHeaderId = services.length > 0 ? services[0].header_id : 0;
+  const fallbackMainServices =
+    mainServices.length === 0
+      ? services.filter((service) => service.header_id === firstHeaderId)
+      : [];
+
+  // Additional services: header_id === 1 or other header_ids
   const additionalServices = services.filter(
     (service) => service.header_id === 1
   );
+
+  // If no additional services found, use all other services
+  const fallbackAdditionalServices =
+    additionalServices.length === 0
+      ? services.filter((service) => service.header_id !== firstHeaderId)
+      : [];
+
+  // Use fallback services if the original filters return empty arrays
+  const finalMainServices =
+    mainServices.length > 0 ? mainServices : fallbackMainServices;
+  const finalAdditionalServices =
+    additionalServices.length > 0
+      ? additionalServices
+      : fallbackAdditionalServices;
+
   const SERVICES_PER_PAGE = 4;
   const totalPages = Math.ceil(services.length / SERVICES_PER_PAGE);
   const paginatedServices = services.slice(
@@ -49,8 +88,8 @@ export const useService = () => {
     refreshing,
     onRefresh,
     showMore,
-    mainServices,
-    additionalServices,
+    mainServices: finalMainServices,
+    additionalServices: finalAdditionalServices,
     setShowMore,
     totalPages,
     paginatedServices,

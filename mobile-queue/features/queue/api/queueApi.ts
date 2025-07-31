@@ -9,7 +9,6 @@ import {
 
 export const queueApi = createApi({
   reducerPath: "queueApi",
-  tagTypes: ["Queue"],
   baseQuery: async (args, api, extraOptions) => {
     const state = api.getState() as RootState;
 
@@ -38,6 +37,7 @@ export const queueApi = createApi({
     const baseQuery = fetchBaseQuery({ baseUrl });
     return baseQuery(adjustedArgs, api, extraOptions);
   },
+  tagTypes: ["CustomerNameCount", "ByServiceCount", "AllServiceCount"],
   endpoints: (builder) => ({
     getCustomerNameCount: builder.query<
       { count: number },
@@ -47,7 +47,7 @@ export const queueApi = createApi({
         url: `/queue/customer-name-count/${customerName}`,
         method: "GET",
       }),
-      providesTags: ["Queue"],
+      providesTags: ["CustomerNameCount"],
     }),
 
     createQueue: builder.mutation<QueueApiResponse, createQueuePayload>({
@@ -56,7 +56,11 @@ export const queueApi = createApi({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["Queue"],
+      invalidatesTags: [
+        "AllServiceCount",
+        "ByServiceCount",
+        "CustomerNameCount",
+      ],
     }),
 
     createQueueDetails: builder.mutation<void, createQueueDetailsPayload[]>({
@@ -65,7 +69,11 @@ export const queueApi = createApi({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["Queue"],
+      invalidatesTags: [
+        "AllServiceCount",
+        "ByServiceCount",
+        "CustomerNameCount",
+      ],
     }),
 
     countQueue: builder.query<{ count: string }[], QueueQueryParams>({
@@ -73,7 +81,7 @@ export const queueApi = createApi({
         url: `/queue/count?DATE(queue.trans_date)=DATE(NOW())&type_id=${customer_type}`,
         method: "GET",
       }),
-      providesTags: ["Queue"],
+      providesTags: ["AllServiceCount"],
     }),
 
     allServiceCount: builder.query<{ count: string }[], void>({
@@ -81,7 +89,7 @@ export const queueApi = createApi({
         url: "/queue/allservicecount",
         method: "GET",
       }),
-      providesTags: ["Queue"],
+      providesTags: ["AllServiceCount"],
     }),
 
     byServiceCount: builder.query<{ count: string }[], number>({
@@ -89,7 +97,7 @@ export const queueApi = createApi({
         url: `/queue/byservicecount/${service_id}`,
         method: "GET",
       }),
-      providesTags: ["Queue"],
+      providesTags: ["ByServiceCount"],
     }),
   }),
 });
