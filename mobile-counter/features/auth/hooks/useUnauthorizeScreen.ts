@@ -1,7 +1,7 @@
 import * as Application from 'expo-application';
 import * as Device from 'expo-device';
 import { router } from 'expo-router';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import Toast from 'react-native-toast-message';
 import {
   useLazyCheckDeviceQuery,
@@ -11,6 +11,7 @@ import {
 export function useUnauthorizeScreen() {
   const [registerDevice, { isLoading }] = useRegisteredDeviceMutation();
   const [checkDevice, { isLoading: isChecking }] = useLazyCheckDeviceQuery();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleVerification = useCallback(() => {
     router.push('/auth/verification');
@@ -25,6 +26,8 @@ export function useUnauthorizeScreen() {
   }, []);
 
   const handleTryAgain = useCallback(async () => {
+    if (isProcessing) return;
+    setIsProcessing(true);
     try {
       const deviceId = Application.getAndroidId();
       const osType = Device.osName === 'Android' ? 1 : 2;
@@ -45,6 +48,7 @@ export function useUnauthorizeScreen() {
         id: deviceId,
         os: osType,
         type: 1,
+        deviceName: Device.deviceName ?? '',
       }).unwrap();
 
       Toast.show({
@@ -52,6 +56,8 @@ export function useUnauthorizeScreen() {
         text1: 'Device registered.',
         text2: 'Please contact your administrator to verify your device.',
       });
+
+      router.replace('/auth/login');
     } catch (error) {
       console.error('Device registration error:', error);
       Toast.show({
@@ -60,8 +66,10 @@ export function useUnauthorizeScreen() {
         text2: 'Please try again or contact administrator',
       });
       // router.back();
+    } finally {
+      setIsProcessing(false);
     }
-  }, [checkDevice, registerDevice]);
+  }, [checkDevice, registerDevice, isProcessing]);
 
   return {
     isLoading: isChecking || isLoading,

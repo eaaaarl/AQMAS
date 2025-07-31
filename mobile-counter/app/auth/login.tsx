@@ -18,6 +18,7 @@ export default function Login() {
   const config = useAppSelector((state) => state.config)
   const needsConfig = !config.ipAddress || !config.port;
   const needAuthorizationDevice = !isDeviceRegistered;
+
   useEffect(() => {
     if (needsConfig) {
       router.replace('/(developer)/setting');
@@ -30,8 +31,6 @@ export default function Login() {
     }
 
   }, [needsConfig, needAuthorizationDevice]);
-
-
 
   return (
     <KeyboardAvoidingView

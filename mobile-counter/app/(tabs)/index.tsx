@@ -10,7 +10,7 @@ import {
 } from '@/features/counter/components';
 import { useCounterScreen } from '@/features/counter/hooks/useCounterScreen';
 import React from 'react';
-import { RefreshControl, ScrollView, StatusBar, View } from 'react-native';
+import { Linking, RefreshControl, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 
 export default function CounterScreen() {
 
@@ -38,6 +38,10 @@ export default function CounterScreen() {
     timeStats,
     handleRecall,
   } = useCounterScreen();
+
+  const handlePoweredByPress = () => {
+    Linking.openURL('https://g-hoven.com');
+  };
 
   return (
     <View className="flex-1 bg-gray-50">
@@ -106,6 +110,17 @@ export default function CounterScreen() {
           />
 
         </View>
+
+        {/* Powered By Footer */}
+        <TouchableOpacity
+          className="items-center justify-center py-4 mb-2"
+          onPress={handlePoweredByPress}
+          activeOpacity={0.7}
+        >
+          <Text className="text-gray-500 text-sm font-medium">
+            Powered By: GHOVEN APP WORLD
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
