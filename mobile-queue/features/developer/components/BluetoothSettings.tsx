@@ -23,6 +23,7 @@ export default function BluetoothSettings() {
         testThermalPrinter,
         testSimplePrint,
     } = useBluetooth();
+
     const { width, height } = Dimensions.get('window');
     const isLandscape = width > height;
     const renderDevice = ({ item, isPaired = false }: { item: any, isPaired: boolean }) => (

@@ -1,11 +1,21 @@
+import { useAppDispatch, useAppSelector } from "@/libs/redux/hooks";
+import {
+  resetConnectedDevice,
+  setConnectedDevice,
+} from "@/libs/redux/state/bluetoothSlice";
 import EscPosEncoder from "@manhnd/esc-pos-encoder";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Alert, PermissionsAndroid, Platform } from "react-native";
 import RNBluetoothClassic, {
-    BluetoothDevice,
+  BluetoothDevice,
 } from "react-native-bluetooth-classic";
 
 export function useBluetooth() {
+  const dispatch = useAppDispatch();
+  const connectedDevice = useAppSelector(
+    (state) => state.bluetooth.connectedDevice
+  );
+
   // Bluetooth states
   const [bluetoothEnabled, setBluetoothEnabled] = useState(false);
   const [bluetoothPermissions, setBluetoothPermissions] = useState(false);
@@ -13,24 +23,114 @@ export function useBluetooth() {
   const [availableDevices, setAvailableDevices] = useState<BluetoothDevice[]>(
     []
   );
-  const [connectedDevice, setConnectedDevice] =
-    useState<BluetoothDevice | null>(null);
   const [isDiscovering, setIsDiscovering] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
   const [debugInfo, setDebugInfo] = useState("");
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  useEffect(() => {
-    requestBluetoothPermissions();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const connectedDeviceRef = useRef<BluetoothDevice | null>(null);
 
-  const addDebugInfo = (info: string) => {
+  const addDebugInfo = useCallback((info: string) => {
     const timestamp = new Date().toLocaleTimeString();
     setDebugInfo((prev) => `[${timestamp}] ${info}\n${prev}`);
-  };
+  }, []);
 
-  const requestBluetoothPermissions = async () => {
+  // Improved reconnection function with proper validation
+  const reconnectToPersistedDevice = useCallback(async () => {
+    console.log("🔄 Starting printer reconnection process...");
+    
+    // Check all prerequisites before attempting reconnection
+    if (!connectedDevice) {
+      console.log("❌ No persisted device to reconnect to");
+      addDebugInfo("No persisted device to reconnect to");
+      return false;
+    }
+
+    console.log("📱 Persisted device found:", connectedDevice.name, "at", connectedDevice.address);
+
+    if (!bluetoothEnabled) {
+      console.log("❌ Bluetooth is disabled, cannot reconnect");
+      addDebugInfo("Bluetooth is disabled, cannot reconnect");
+      return false;
+    }
+
+    if (!bluetoothPermissions) {
+      console.log("❌ Bluetooth permissions not granted, cannot reconnect");
+      addDebugInfo("Bluetooth permissions not granted, cannot reconnect");
+      return false;
+    }
+
+    if (connectedDeviceRef.current) {
+      console.log("✅ Device already connected, skipping reconnection");
+      addDebugInfo("Device already connected, skipping reconnection");
+      return true;
+    }
+
+    try {
+      console.log("🔍 Checking if device is still paired...");
+      addDebugInfo(
+        `Attempting to reconnect to ${connectedDevice.name} (${connectedDevice.address})...`
+      );
+
+      // Check if device is still paired/bonded
+      const bondedDevices = await RNBluetoothClassic.getBondedDevices();
+      console.log("📋 Found", bondedDevices.length, "bonded devices");
+      
+      const deviceStillPaired = bondedDevices.find(
+        (device) =>
+          device.address === connectedDevice.address ||
+          device.id === connectedDevice.id
+      );
+
+      if (!deviceStillPaired) {
+        console.log("❌ Device is no longer paired:", connectedDevice.name);
+        addDebugInfo(`Device ${connectedDevice.name} is no longer paired`);
+        dispatch(resetConnectedDevice());
+        return false;
+      }
+
+      console.log("✅ Device is still paired, attempting connection...");
+
+      // Attempt connection with timeout
+      const connection = (await Promise.race([
+        RNBluetoothClassic.connectToDevice(
+          connectedDevice.id || connectedDevice.address
+        ),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Connection timeout")), 10000)
+        ),
+      ])) as BluetoothDevice;
+
+      connectedDeviceRef.current = connection;
+      console.log("✅ Successfully reconnected to", connectedDevice.name);
+      addDebugInfo(`Successfully reconnected to ${connectedDevice.name}`);
+      return true;
+    } catch (error: any) {
+      console.log("❌ Failed to reconnect:", error.message);
+      addDebugInfo(`Failed to reconnect: ${error.message}`);
+
+      // Only clear persisted device on certain errors
+      if (
+        error.message.includes("Device not found") ||
+        error.message.includes("not paired") ||
+        error.message.includes("timeout")
+      ) {
+        console.log("🗑️ Clearing persisted device due to reconnection failure");
+        addDebugInfo("Clearing persisted device due to reconnection failure");
+        dispatch(resetConnectedDevice());
+      }
+      return false;
+    }
+  }, [
+    connectedDevice,
+    bluetoothEnabled,
+    bluetoothPermissions,
+    addDebugInfo,
+    dispatch,
+  ]);
+
+  const requestBluetoothPermissions = useCallback(async () => {
     addDebugInfo("Requesting Bluetooth permissions...");
     try {
       if (Platform.OS === "android") {
@@ -41,15 +141,15 @@ export function useBluetooth() {
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
           PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
         ]);
+
         const allPermissionsGranted = Object.values(granted).every(
           (permission) => permission === PermissionsAndroid.RESULTS.GRANTED
         );
+
         if (allPermissionsGranted) {
           setBluetoothPermissions(true);
           addDebugInfo("All Bluetooth permissions granted");
-          await checkBluetoothStatus();
-          await loadPairedDevices();
-          await checkConnectedDevices();
+          return true;
         } else {
           setBluetoothPermissions(false);
           addDebugInfo("Some Bluetooth permissions denied");
@@ -61,13 +161,12 @@ export function useBluetooth() {
               { text: "Retry", onPress: requestBluetoothPermissions },
             ]
           );
+          return false;
         }
       } else {
         setBluetoothPermissions(true);
         addDebugInfo("iOS - Bluetooth permissions assumed");
-        await checkBluetoothStatus();
-        await loadPairedDevices();
-        await checkConnectedDevices();
+        return true;
       }
     } catch (error: any) {
       addDebugInfo(`Permission request error: ${error.message}`);
@@ -76,74 +175,149 @@ export function useBluetooth() {
         "Permission Error",
         `Error requesting Bluetooth permissions: ${error.message}`
       );
+      return false;
     }
-  };
+  }, [addDebugInfo]);
 
-  const checkBluetoothStatus = async () => {
+  const checkBluetoothStatus = useCallback(async () => {
     try {
       const enabled = await RNBluetoothClassic.isBluetoothEnabled();
       setBluetoothEnabled(enabled);
       addDebugInfo(`Bluetooth enabled: ${enabled}`);
+      return enabled;
     } catch (error: any) {
       addDebugInfo(`Error checking Bluetooth status: ${error.message}`);
+      setBluetoothEnabled(false);
+      return false;
     }
-  };
+  }, [addDebugInfo]);
 
-  const loadPairedDevices = async () => {
+  const loadPairedDevices = useCallback(async () => {
     try {
       const devices = await RNBluetoothClassic.getBondedDevices();
       setPairedDevices(devices);
       addDebugInfo(`Found ${devices.length} paired devices`);
+      return devices;
     } catch (error: any) {
       addDebugInfo(`Error loading paired devices: ${error.message}`);
+      return [];
     }
-  };
+  }, [addDebugInfo]);
 
-  const checkConnectedDevices = async () => {
-    try {
-      const devices = await RNBluetoothClassic.getConnectedDevices();
-      if (devices.length > 0) {
-        setConnectedDevice(devices[0]);
-        addDebugInfo(`Already connected to: ${devices[0].name}`);
-      } else {
-        setConnectedDevice(null);
-        addDebugInfo("No devices currently connected");
+  // Separate initialization effect
+  useEffect(() => {
+    const initializeBluetooth = async () => {
+      try {
+        console.log("🚀 Starting Bluetooth initialization...");
+        addDebugInfo("Starting Bluetooth initialization...");
+
+        // Step 1: Request permissions
+        console.log("🔐 Requesting Bluetooth permissions...");
+        const hasPermissions = await requestBluetoothPermissions();
+        if (!hasPermissions) {
+          console.log("❌ Bluetooth initialization failed: No permissions");
+          addDebugInfo("Bluetooth initialization failed: No permissions");
+          return;
+        }
+
+        // Step 2: Check Bluetooth status
+        console.log("📡 Checking Bluetooth status...");
+        const enabled = await checkBluetoothStatus();
+        if (!enabled) {
+          console.log("❌ Bluetooth initialization failed: Bluetooth disabled");
+          addDebugInfo("Bluetooth initialization failed: Bluetooth disabled");
+          return;
+        }
+
+        // Step 3: Load paired devices
+        console.log("📋 Loading paired devices...");
+        await loadPairedDevices();
+
+        // Step 4: Mark as initialized
+        setIsInitialized(true);
+        console.log("✅ Bluetooth initialized successfully");
+        addDebugInfo("Bluetooth initialized successfully");
+      } catch (error: any) {
+        console.log("❌ Initialization error:", error.message);
+        addDebugInfo(`Initialization error: ${error.message}`);
       }
-    } catch (error: any) {
-      addDebugInfo(`Error checking connected devices: ${error.message}`);
-    }
-  };
+    };
 
-  const startDiscovery = async () => {
-    if (!bluetoothEnabled) {
-      Alert.alert("Bluetooth Disabled", "Please enable Bluetooth first");
-      return;
+    if (!isInitialized) {
+      initializeBluetooth();
     }
-    if (!bluetoothPermissions) {
-      Alert.alert(
-        "Permissions Required",
-        "Bluetooth permissions are required for device discovery",
-        [
-          { text: "Cancel", style: "cancel" },
-          { text: "Grant Permissions", onPress: requestBluetoothPermissions },
-        ]
-      );
-      return;
-    }
-    setIsDiscovering(true);
-    setAvailableDevices([]);
-    addDebugInfo("Starting device discovery...");
+  }, [
+    isInitialized,
+    requestBluetoothPermissions,
+    checkBluetoothStatus,
+    loadPairedDevices,
+    addDebugInfo,
+  ]);
+
+  // Separate reconnection effect that runs after initialization
+  useEffect(() => {
+    const attemptReconnection = async () => {
+      console.log("🔄 Automatic reconnection effect triggered");
+      console.log("📊 Reconnection conditions:");
+      console.log("  - isInitialized:", isInitialized);
+      console.log("  - bluetoothEnabled:", bluetoothEnabled);
+      console.log("  - bluetoothPermissions:", bluetoothPermissions);
+      console.log("  - connectedDevice exists:", !!connectedDevice);
+      console.log("  - connectedDeviceRef.current exists:", !!connectedDeviceRef.current);
+      
+      if (
+        isInitialized &&
+        bluetoothEnabled &&
+        bluetoothPermissions &&
+        connectedDevice &&
+        !connectedDeviceRef.current
+      ) {
+        console.log("✅ All conditions met, attempting automatic reconnection...");
+        addDebugInfo("Attempting automatic reconnection...");
+        const success = await reconnectToPersistedDevice();
+        if (success) {
+          console.log("✅ Automatic reconnection successful");
+          addDebugInfo("Automatic reconnection successful");
+        } else {
+          console.log("❌ Automatic reconnection failed");
+          addDebugInfo("Automatic reconnection failed");
+        }
+      } else {
+        console.log("❌ Automatic reconnection skipped - conditions not met");
+        if (!isInitialized) console.log("  - Bluetooth not initialized");
+        if (!bluetoothEnabled) console.log("  - Bluetooth disabled");
+        if (!bluetoothPermissions) console.log("  - No permissions");
+        if (!connectedDevice) console.log("  - No persisted device");
+        if (connectedDeviceRef.current) console.log("  - Device already connected");
+      }
+    };
+
+    // Add a small delay to ensure everything is properly initialized
+    const timeoutId = setTimeout(attemptReconnection, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [
+    isInitialized,
+    bluetoothEnabled,
+    bluetoothPermissions,
+    connectedDevice,
+    reconnectToPersistedDevice,
+    addDebugInfo,
+  ]);
+
+  const startDiscovery = useCallback(async () => {
     try {
-      const devices = await RNBluetoothClassic.startDiscovery();
-      setAvailableDevices(devices);
-      addDebugInfo(`Discovery completed. Found ${devices.length} devices`);
-    } catch (error: any) {
-      addDebugInfo(`Discovery error: ${error.message}`);
-      Alert.alert("Discovery Error", error.message);
-    } finally {
+      setIsDiscovering(true);
+      addDebugInfo("Starting device discovery...");
+      setAvailableDevices([]);
+      const discoveredDevices = await RNBluetoothClassic.startDiscovery();
+      setAvailableDevices(discoveredDevices);
+      addDebugInfo(`Found ${discoveredDevices.length} devices`);
       setIsDiscovering(false);
+    } catch (error: any) {
+      setIsDiscovering(false);
+      addDebugInfo(`Discovery error: ${error.message}`);
     }
-  };
+  }, [addDebugInfo]);
 
   const pairDevice = async (device: BluetoothDevice) => {
     addDebugInfo(`Attempting to pair with: ${device.name}`);
@@ -163,53 +337,73 @@ export function useBluetooth() {
     }
   };
 
-  const connectToDevice = async (device: BluetoothDevice) => {
-    if (connectedDevice) {
-      Alert.alert(
-        "Already Connected",
-        `Disconnect from ${connectedDevice.name} first`
-      );
-      return;
-    }
-    setIsConnecting(true);
-    addDebugInfo(`Connecting to: ${device.name}`);
+  const connectToDevice = useCallback(
+    async (device: BluetoothDevice) => {
+      try {
+        setIsConnecting(true);
+        addDebugInfo(`Connecting to ${device.name}...`);
+
+        const connection = await RNBluetoothClassic.connectToDevice(device.id);
+        connectedDeviceRef.current = connection;
+
+        // Extract only serializable properties before dispatching
+        const serializableDevice = {
+          address: connection.address,
+          name: connection.name,
+          bonded: Boolean(connection.bonded),
+          id: connection.id,
+          type: connection.type,
+        };
+
+        dispatch(setConnectedDevice(serializableDevice));
+        addDebugInfo(`Successfully connected to ${device.name}`);
+        setIsConnecting(false);
+      } catch (error: any) {
+        setIsConnecting(false);
+        addDebugInfo(`Connection error: ${error.message}`);
+        Alert.alert("Connection Error", error.message);
+      }
+    },
+    [addDebugInfo, dispatch]
+  );
+
+  const disconnectDevice = useCallback(async () => {
     try {
-      const connected = await RNBluetoothClassic.connectToDevice(
-        device.address
-      );
-      if (connected) {
-        setConnectedDevice(device);
-        addDebugInfo(`Successfully connected to: ${device.name}`);
-        Alert.alert("Connected", `Connected to ${device.name}`);
-      } else {
-        addDebugInfo(`Failed to connect to: ${device.name}`);
-        Alert.alert("Connection Failed", `Could not connect to ${device.name}`);
+      if (connectedDeviceRef.current) {
+        await connectedDeviceRef.current.disconnect();
+        connectedDeviceRef.current = null;
+        dispatch(resetConnectedDevice());
+        addDebugInfo("Device disconnected");
       }
     } catch (error: any) {
-      addDebugInfo(`Connection error: ${error.message}`);
-      Alert.alert("Connection Error", error.message);
-    } finally {
-      setIsConnecting(false);
-    }
-  };
-
-  const disconnectDevice = async () => {
-    if (!connectedDevice) return;
-    addDebugInfo(`Disconnecting from: ${connectedDevice.name}`);
-    try {
-      await RNBluetoothClassic.disconnectFromDevice(connectedDevice.address);
-      setConnectedDevice(null);
-      addDebugInfo("Successfully disconnected");
-      Alert.alert("Disconnected", "Device disconnected");
-    } catch (error: any) {
       addDebugInfo(`Disconnect error: ${error.message}`);
-      Alert.alert("Disconnect Error", error.message);
     }
-  };
+  }, [addDebugInfo, dispatch]);
 
   const clearDebugInfo = () => {
     setDebugInfo("");
   };
+
+  // Manual reconnection function for user-triggered reconnection
+  const manualReconnect = useCallback(async () => {
+    if (!connectedDevice) {
+      Alert.alert("No Device", "No device to reconnect to");
+      return;
+    }
+
+    setIsConnecting(true);
+    addDebugInfo("Manual reconnection requested...");
+
+    const success = await reconnectToPersistedDevice();
+
+    if (success) {
+      Alert.alert("Success", "Successfully reconnected to device");
+    } else {
+      Alert.alert("Failed", "Could not reconnect to device");
+    }
+
+    setIsConnecting(false);
+  }, [connectedDevice, reconnectToPersistedDevice, addDebugInfo]);
 
   const testThermalPrinter = async () => {
     if (!connectedDevice) {
@@ -219,8 +413,10 @@ export function useBluetooth() {
       );
       return;
     }
+
     setIsTesting(true);
     addDebugInfo("Starting thermal printer test...");
+
     try {
       const encoder = new EscPosEncoder();
       const testData = encoder
@@ -305,15 +501,18 @@ export function useBluetooth() {
         .newline()
         .cut()
         .encode();
+
       const base64Data = btoa(String.fromCharCode(...new Uint8Array(testData)));
       addDebugInfo(
         `Sending test data (${testData.length} bytes) to printer...`
       );
+
       const result = await RNBluetoothClassic.writeToDevice(
         connectedDevice.address,
         base64Data,
         "base64"
       );
+
       if (result) {
         addDebugInfo("Test print sent successfully!");
         Alert.alert(
@@ -344,8 +543,10 @@ export function useBluetooth() {
       );
       return;
     }
+
     setIsTesting(true);
     addDebugInfo("Starting simple print test...");
+
     try {
       const encoder = new EscPosEncoder();
       const simpleData = encoder
@@ -361,15 +562,18 @@ export function useBluetooth() {
         .newline()
         .cut()
         .encode();
+
       const base64Data = btoa(
         String.fromCharCode(...new Uint8Array(simpleData))
       );
       addDebugInfo(`Sending simple test (${simpleData.length} bytes)...`);
+
       const result = await RNBluetoothClassic.writeToDevice(
         connectedDevice.address,
         base64Data,
         "base64"
       );
+
       if (result) {
         addDebugInfo("Simple test sent successfully!");
         Alert.alert(
@@ -397,11 +601,13 @@ export function useBluetooth() {
     isDiscovering,
     isConnecting,
     isTesting,
+    isInitialized,
     debugInfo,
+    reconnectToPersistedDevice,
+    manualReconnect, // New manual reconnection function
     requestBluetoothPermissions,
     checkBluetoothStatus,
     loadPairedDevices,
-    checkConnectedDevices,
     startDiscovery,
     pairDevice,
     connectToDevice,

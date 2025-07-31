@@ -16,10 +16,10 @@ interface SurveyQuestionProps {
 
 export function SurveyQuestion(props: SurveyQuestionProps) {
     const { item, displayIndex, onPress, isAnswered, isRandomized, currentAnswer, questionType } = props;
-    
+
     return (
         <TouchableOpacity onPress={onPress} className="mb-4">
-            <View className={`p-6 rounded-lg bg-white border shadow-sm ${isAnswered ? 'border-yellow-200 bg-yellow-50' : 'border-gray-200'
+            <View className={`p-6 rounded-lg bg-white border shadow-sm ${isAnswered ? 'border-gray-200 bg-gray-50' : 'border-gray-200'
                 }`}>
                 <View className="flex-row justify-between items-start mb-2">
                     <View className="flex-1 mr-2">
@@ -78,13 +78,13 @@ export function SurveyQuestion(props: SurveyQuestionProps) {
 
                 {/* Show indicator for text questions that they have been answered */}
                 {isAnswered && currentAnswer && questionType === 'text' && (
-                    <View className="mt-3 p-3 bg-blue-100 rounded-lg border border-blue-200">
+                    <View className="mt-3 p-3 bg-yellow-100 rounded-lg border border-yellow-200">
                         <View className="flex-row items-center">
-                            <Ionicons name="document-text" size={14} color="#2563eb" />
-                            <Text className="text-blue-700 text-xs font-medium ml-1 uppercase tracking-wide">
+                            <Ionicons name="document-text" size={14} color="#CA8A04" />
+                            <Text className="text-yellow-700 text-xs font-medium ml-1 uppercase tracking-wide">
                                 Commentary Provided
                             </Text>
-                            <View className="ml-auto bg-blue-500 rounded-full px-2 py-1">
+                            <View className="ml-auto bg-yellow-500 rounded-full px-2 py-1">
                                 <Text className="text-white text-xs font-medium">
                                     {currentAnswer.survey_answer?.length || 0} chars
                                 </Text>

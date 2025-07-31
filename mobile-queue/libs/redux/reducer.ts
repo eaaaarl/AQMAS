@@ -5,6 +5,7 @@ import { queueApi } from "@/features/queue/api/queueApi";
 import { serviceApi } from "@/features/service/api/serviceApi";
 import { surveyApi } from "@/features/survey/api/surveyApi";
 import { combineReducers } from "@reduxjs/toolkit";
+import { bluetoothReducer } from "./state/bluetoothSlice";
 import { configReducer } from "./state/configSlice";
 import { customerSurveyReducer } from "./state/customerSurveySlice";
 import { surveyReducer } from "./state/surveySlice";
@@ -14,6 +15,7 @@ const rootReducer = combineReducers({
   config: configReducer,
   survey: surveyReducer,
   customerSurvey: customerSurveyReducer,
+  bluetooth: bluetoothReducer,
 
   // RTK QUERY
   [serviceApi.reducerPath]: serviceApi.reducer,

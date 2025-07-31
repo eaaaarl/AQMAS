@@ -1,3 +1,4 @@
+import { useBluetooth } from '@/features/developer/hooks/useBluetooth';
 import { useLazyCheckDeviceQuery } from '@/features/device/api/deviceApi';
 import { DeviceType } from '@/features/device/constants';
 import { ServiceLayout } from '@/features/service/components/ServiceLayout';
@@ -21,15 +22,6 @@ const ServiceScreen: React.FC = () => {
     : Application.applicationId || '';
 
   const [checkDevice, { data: deviceStatus, isLoading: isLoadingDevice }] = useLazyCheckDeviceQuery();
-
-  useEffect(() => {
-    if (config.ipAddress && config.port) {
-      checkDevice({
-        id: deviceId,
-        type: DeviceType.KIOSK,
-      });
-    }
-  }, [config.ipAddress, config.port, deviceId]);
 
   // Service page logic
   const {
@@ -76,9 +68,49 @@ const ServiceScreen: React.FC = () => {
     enabledSurvey,
   } = useServicePage();
 
+  // Debug logging
+  // console.log('=== DEBUG INFO ===');
+  // console.log('Config:', config);
+  // console.log('Services length:', services.length);
+  // console.log('Main services length:', mainServices.length);
+  // console.log('Additional services length:', additionalServices.length);
+  // console.log('Paginated services length:', paginatedServices.length);
+  // console.log('Should show all services:', shouldShowAllServices);
+  // console.log('Show more:', showMore);
+  // console.log('Is loading page:', isLoadingPage);
+  // console.log('Has error:', hasError);
+  // console.log('Services data:', services);
+  // console.log('Main services:', mainServices);
+  // console.log('Additional services:', additionalServices);
+  // console.log('==================');
+
   // Derived state for navigation/redirects
   const needsConfig = !config.ipAddress || !config.port;
   const needsAuthorization = !isLoadingDevice && deviceStatus !== undefined && !deviceStatus.registered;
+  const { reconnectToPersistedDevice } = useBluetooth();
+  useEffect(() => {
+
+    const initialize = async () => {
+      // Always attempt printer reconnection first
+      try {
+        await reconnectToPersistedDevice();
+        console.log('Reconnected to printer');
+      } catch (error) {
+        console.log('Failed to reconnect to printer:', error);
+        // Continue initialization even if printer reconnection fails
+      }
+
+      // Then check device registration if config is available
+      if (config.ipAddress && config.port) {
+        checkDevice({
+          id: deviceId,
+          type: DeviceType.KIOSK,
+        });
+      }
+    }
+
+    initialize();
+  }, [config.ipAddress, config.port, deviceId, checkDevice, reconnectToPersistedDevice]);
 
   useEffect(() => {
     if (needsConfig) {

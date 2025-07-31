@@ -1,12 +1,10 @@
 import AntDesign from '@expo/vector-icons/AntDesign';
 import React from 'react';
-import { Dimensions, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useDeveloperSetting } from '../hooks/useDeveloperSetting';
 
 export default function ApiConfigForm() {
     const { ipAddress, port, setIpAddress, setPort, handleSave } = useDeveloperSetting();
-    const { width, height } = Dimensions.get('window');
-    const isLandscape = width > height;
     return (
         <View className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm mb-6">
             <View className="mb-4">
@@ -49,7 +47,7 @@ export default function ApiConfigForm() {
                     />
                 </View>
                 {/* Save Button */}
-                <View className={`${isLandscape ? 'items-center' : 'flex-1'}`}>
+                <View className='flex-1'>
                     <TouchableOpacity
                         onPress={handleSave}
                         className="mt-6 rounded-lg bg-blue-600 py-3 px-4 shadow-sm active:bg-blue-700"
