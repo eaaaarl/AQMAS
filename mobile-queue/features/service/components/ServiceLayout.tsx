@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import React from 'react';
-import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Linking, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Service } from '../api/interface';
 import { PaginationControls } from './PaginationControl';
@@ -38,6 +38,8 @@ interface ServiceLayoutProps {
   onHelpPress: () => void;
   // Configuration
   enabledSurvey: boolean;
+  // Image URL
+  imageUrl: string;
 }
 
 export const ServiceLayout: React.FC<ServiceLayoutProps> = ({
@@ -63,6 +65,7 @@ export const ServiceLayout: React.FC<ServiceLayoutProps> = ({
   onNextPage,
   onHelpPress,
   enabledSurvey,
+  imageUrl,
 }) => {
   const getDisplayServices = () => {
     if (shouldShowAllServices) {
@@ -87,8 +90,18 @@ export const ServiceLayout: React.FC<ServiceLayoutProps> = ({
   // console.log('displayServices:', displayServices);
   // console.log('==========================');
 
+
+
   return (
     <SafeAreaView className='flex-1 bg-white'>
+      {/* Background Logo with Transparency */}
+      <View className="absolute inset-0 justify-center items-center pointer-events-none" style={{ zIndex: 0 }}>
+        <Image
+          source={{ uri: imageUrl }}
+          className='h-full w-full opacity-10'
+          resizeMode='contain'
+        />
+      </View>
       {/* <View className="flex-row justify-between items-center px-4 py-2 border-b border-gray-200">
         <View className="flex-1" />
         <TouchableOpacity
@@ -116,6 +129,7 @@ export const ServiceLayout: React.FC<ServiceLayoutProps> = ({
           paddingHorizontal: 10,
           paddingVertical: 20,
         }}
+        style={{ zIndex: 1 }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -260,7 +274,23 @@ export const ServiceLayout: React.FC<ServiceLayoutProps> = ({
         </View>
       </ScrollView>
 
-      {enabledSurvey && <SurveyButton />}
+      {enabledSurvey && <View style={{ zIndex: 1 }}><SurveyButton /></View>}
+
+      {/* Powered By Text - Bottom Right */}
+      <View className="absolute bottom-16 right-4" style={{ zIndex: 1 }}>
+        <TouchableOpacity
+          onPress={() => {
+            // You can add any action here when clicked
+            Linking.openURL('https://g-hoven.com');
+          }}
+          className="bg-gray-100 rounded-lg px-3 py-2 border border-gray-200"
+          activeOpacity={0.7}
+        >
+          <Text className="text-gray-600 text-xs font-medium">
+            Powered By: <Text className="text-blue-600 font-semibold">GHOVEN APP WORLD</Text>
+          </Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };

@@ -20,6 +20,9 @@ const ServiceScreen: React.FC = () => {
   const deviceId = Platform.OS === 'android'
     ? Application.getAndroidId()
     : Application.applicationId || '';
+  const { ipAddress, port } = useAppSelector(state => state.config)
+
+  const imageUrl = `http://${ipAddress}:${port}/uploads/company/bg_logo.png`
 
   const [checkDevice, { data: deviceStatus, isLoading: isLoadingDevice }] = useLazyCheckDeviceQuery();
 
@@ -171,6 +174,7 @@ const ServiceScreen: React.FC = () => {
         onNextPage={onNextPage}
         enabledSurvey={enabledSurvey}
         onHelpPress={handleHelpPress}
+        imageUrl={imageUrl}
       />
 
       <ServiceModals
