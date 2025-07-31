@@ -49,7 +49,7 @@ export default function ApiConfigForm() {
                     />
                 </View>
                 {/* Save Button */}
-                <View className={`${isLandscape ? 'items-center' : 'flex-1'}`}>
+                <View className='flex-1'>
                     <TouchableOpacity
                         onPress={handleSave}
                         className="mt-6 rounded-lg bg-blue-600 py-3 px-4 shadow-sm active:bg-blue-700"
