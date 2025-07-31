@@ -19,7 +19,7 @@ export function SurveyQuestion(props: SurveyQuestionProps) {
     
     return (
         <TouchableOpacity onPress={onPress} className="mb-4">
-            <View className={`p-6 rounded-lg bg-white border shadow-sm ${isAnswered ? 'border-green-200 bg-green-50' : 'border-gray-200'
+            <View className={`p-6 rounded-lg bg-white border shadow-sm ${isAnswered ? 'border-yellow-200 bg-yellow-50' : 'border-gray-200'
                 }`}>
                 <View className="flex-row justify-between items-start mb-2">
                     <View className="flex-1 mr-2">
@@ -45,7 +45,7 @@ export function SurveyQuestion(props: SurveyQuestionProps) {
                     </View>
 
                     {isAnswered && (
-                        <View className="bg-green-500 rounded-full p-1">
+                        <View className="bg-yellow-500 rounded-full p-1">
                             <Ionicons name="checkmark" size={16} color="white" />
                         </View>
                     )}
@@ -63,14 +63,14 @@ export function SurveyQuestion(props: SurveyQuestionProps) {
 
                 {/* Display Answer Preview (except for text/commentary questions) */}
                 {isAnswered && currentAnswer && questionType !== 'text' && (
-                    <View className="mt-3 p-3 bg-green-100 rounded-lg border border-green-200">
+                    <View className="mt-3 p-3 bg-yellow-100 rounded-lg border border-yellow-200">
                         <View className="flex-row items-center mb-1">
-                            <Ionicons name="chatbubble-ellipses" size={14} color="#059669" />
-                            <Text className="text-green-700 text-xs font-medium ml-1 uppercase tracking-wide">
+                            <Ionicons name="chatbubble-ellipses" size={14} color="#CA8A04" />
+                            <Text className="text-yellow-700 text-xs font-medium ml-1 uppercase tracking-wide">
                                 Your Answer
                             </Text>
                         </View>
-                        <Text className="text-green-800 font-medium">
+                        <Text className="text-yellow-800 font-medium">
                             {currentAnswer.survey_answer}
                         </Text>
                     </View>
