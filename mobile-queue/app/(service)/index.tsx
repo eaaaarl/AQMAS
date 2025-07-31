@@ -22,7 +22,7 @@ const ServiceScreen: React.FC = () => {
     : Application.applicationId || '';
   const { ipAddress, port } = useAppSelector(state => state.config)
 
-  const imageUrl = `http://${ipAddress}:${port}/uploads/company/bg_logo.png`
+  const imageUrl = `http://${ipAddress}:${port}/uploads/company/bg_logo_transparent.png`
 
   const [checkDevice, { data: deviceStatus, isLoading: isLoadingDevice }] = useLazyCheckDeviceQuery();
 

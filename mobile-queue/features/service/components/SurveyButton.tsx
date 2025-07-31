@@ -8,7 +8,7 @@ export default function SurveyButton() {
     };
     return (
         <TouchableOpacity
-            className="absolute bottom-16 left-5 rounded-full"
+            className="absolute bottom-1 left-5 rounded-full"
             onPress={handlePress}
             activeOpacity={0.7}
             accessibilityLabel="Take survey"
