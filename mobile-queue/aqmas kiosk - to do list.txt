@@ -1,0 +1,4 @@
+aqmas kiosk
+
+1. print priority
+2. survey change to yellow color of answered - CHECK

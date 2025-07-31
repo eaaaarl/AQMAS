@@ -8,6 +8,7 @@ export default {
     scheme: "aqmaskiosk",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
+    jsEngine: "hermes",
     ios: {
       supportsTablet: true,
     },
@@ -27,6 +28,7 @@ export default {
         "android.permission.BLUETOOTH_SCAN",
         "android.permission.BLUETOOTH_ADVERTISE",
       ],
+      jsEngine: "hermes",
     },
     web: {
       bundler: "metro",

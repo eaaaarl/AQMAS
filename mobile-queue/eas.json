@@ -19,7 +19,16 @@
       "distribution": "internal",
       "environment": "production",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease"
+      }
+    },
+    "local-production": {
+      "autoIncrement": true,
+      "environment": "production",
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease"
       }
     }
   },
