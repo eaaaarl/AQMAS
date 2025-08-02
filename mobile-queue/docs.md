@@ -208,54 +208,67 @@ const rootReducer = combineReducers({
 The application follows a comprehensive API flow for managing queue operations, service selection, and customer interactions:
 
 ```mermaid
-flowchart TD
-    A[App Startup] --> B[Load Configuration]
-    B --> C{Config Loaded?}
-    C -->|Yes| D[Initialize APIs]
-    C -->|No| E[Show Developer Settings]
+sequenceDiagram
+    participant U as User
+    participant C as Component
+    participant H as Hook
+    participant A as API
+    participant S as Store
+    participant AS as AsyncStorage
+    participant B as Bluetooth
     
-    D --> F[Service Selection Screen]
-    F --> G[Load Available Services]
-    G --> H{Services Available?}
-    H -->|Yes| I[Display Service Grid]
-    H -->|No| J[Show No Services Message]
+    U->>C: App Startup
+    C->>H: Load Configuration
+    H->>A: Fetch Config
+    A-->>H: Config Response
+    H->>S: Update Config State
+    S->>AS: Persist Config
+    S-->>C: Config Loaded
     
-    I --> K[Customer Selects Service]
-    K --> L[Show Customer Type Modal]
-    L --> M[Customer Type Selected]
-    M --> N[Show Customer Name Modal]
-    N --> O[Customer Name Entered]
-    O --> P[Create Queue Entry]
-    
-    P --> Q[Submit Queue Request]
-    Q --> R{Queue Created?}
-    R -->|Success| S[Generate Ticket]
-    R -->|Error| T[Show Error Message]
-    
-    S --> U[Print Receipt via Bluetooth]
-    U --> V[Show Survey Button]
-    V --> W{Customer Takes Survey?}
-    W -->|Yes| X[Load Survey Questions]
-    W -->|No| Y[End Flow]
-    
-    X --> Z[Display Survey Questions]
-    Z --> AA[Customer Answers Questions]
-    AA --> BB[Submit Survey Responses]
-    BB --> CC{Survey Submitted?}
-    CC -->|Success| DD[Show Thank You Message]
-    CC -->|Error| EE[Show Error Message]
-    
-    DD --> Y
-    EE --> Y
-    T --> Y
-    J --> Y
-    
-    style A fill:#e1f5fe
-    style S fill:#c8e6c9
-    style DD fill:#c8e6c9
-    style T fill:#ffcdd2
-    style EE fill:#ffcdd2
-    style J fill:#ffcdd2
+    alt Config Available
+        C->>H: Load Services
+        H->>A: Fetch Services
+        A-->>H: Services Response
+        H->>S: Update Services State
+        S-->>C: Display Service Grid
+        
+        U->>C: Select Service
+        C->>H: Show Customer Type Modal
+        U->>C: Select Customer Type
+        C->>H: Show Customer Name Modal
+        U->>C: Enter Customer Name
+        C->>H: Create Queue Entry
+        H->>A: Submit Queue Request
+        A-->>H: Queue Response
+        H->>S: Update Queue State
+        S-->>C: Generate Ticket
+        
+        C->>B: Print Receipt
+        B-->>C: Print Success
+        C->>H: Show Survey Button
+        
+        alt Customer Takes Survey
+            U->>C: Start Survey
+            C->>H: Load Survey Questions
+            H->>A: Fetch Survey
+            A-->>H: Survey Response
+            H->>S: Update Survey State
+            S-->>C: Display Questions
+            
+            U->>C: Answer Questions
+            C->>H: Submit Survey
+            H->>A: Submit Survey Data
+            A-->>H: Survey Confirmation
+            H->>S: Update Survey State
+            S-->>C: Show Thank You
+        else Customer Skips Survey
+            C->>H: End Flow
+        end
+    else Config Not Available
+        C->>H: Show Developer Settings
+        H->>S: Update Error State
+        S-->>C: Display Error
+    end
 ```
 
 ### RTK Query Implementation
@@ -294,57 +307,78 @@ The application uses RTK Query for efficient API management:
 The application integrates with Bluetooth thermal printers for receipt generation and printing:
 
 ```mermaid
-flowchart TD
-    A[App Startup] --> B[Initialize Bluetooth]
-    B --> C[Request Bluetooth Permissions]
-    C --> D{Permissions Granted?}
-    D -->|Yes| E[Scan for Bluetooth Devices]
-    D -->|No| F[Show Permission Error]
+sequenceDiagram
+    participant U as User
+    participant C as Component
+    participant H as Hook
+    participant B as Bluetooth
+    participant S as Store
+    participant AS as AsyncStorage
+    participant P as Printer
     
-    E --> G[Filter Thermal Printers]
-    G --> H{Devices Found?}
-    H -->|Yes| I[Display Available Printers]
-    H -->|No| J[Show No Devices Message]
+    U->>C: App Startup
+    C->>H: Initialize Bluetooth
+    H->>B: Request Permissions
+    B-->>H: Permission Status
     
-    I --> K[User Selects Printer]
-    K --> L[Attempt Connection]
-    L --> M{Connection Successful?}
-    M -->|Yes| N[Store Printer Configuration]
-    M -->|No| O[Show Connection Error]
-    
-    N --> P[Monitor Connection Status]
-    P --> Q{Printer Connected?}
-    Q -->|Yes| R[Ready for Printing]
-    Q -->|No| S[Attempt Reconnection]
-    
-    R --> T[Queue Ticket Generated]
-    T --> U[Format Receipt Data]
-    U --> V[Encode ESC/POS Commands]
-    V --> W[Send to Printer Buffer]
-    W --> X{Print Successful?}
-    X -->|Yes| Y[Show Print Success]
-    X -->|No| Z[Retry Print]
-    
-    Z --> AA{Retry Count < 3?}
-    AA -->|Yes| W
-    AA -->|No| BB[Show Print Error]
-    
-    S --> CC[Wait 5 Seconds]
-    CC --> L
-    
-    F --> DD[End Flow]
-    J --> DD
-    O --> DD
-    BB --> DD
-    Y --> DD
-    
-    style A fill:#e1f5fe
-    style R fill:#c8e6c9
-    style Y fill:#c8e6c9
-    style F fill:#ffcdd2
-    style J fill:#ffcdd2
-    style O fill:#ffcdd2
-    style BB fill:#ffcdd2
+    alt Permissions Granted
+        H->>B: Scan for Devices
+        B-->>H: Device List
+        H->>S: Update Device State
+        S->>AS: Persist Device List
+        S-->>C: Display Printers
+        
+        U->>C: Select Printer
+        C->>H: Connect to Printer
+        H->>B: Attempt Connection
+        B->>P: Connect Request
+        P-->>B: Connection Response
+        B-->>H: Connection Status
+        
+        alt Connection Successful
+            H->>S: Update Printer State
+            S->>AS: Store Printer Config
+            S-->>C: Printer Connected
+            
+            loop Monitor Connection
+                H->>B: Check Connection
+                B-->>H: Connection Status
+                H->>S: Update Status
+            end
+            
+            C->>H: Generate Receipt
+            H->>S: Get Ticket Data
+            S-->>H: Ticket Information
+            H->>B: Format Receipt
+            B->>P: Send ESC/POS Commands
+            P-->>B: Print Status
+            B-->>H: Print Result
+            
+            alt Print Successful
+                H->>S: Update Print State
+                S-->>C: Show Success
+            else Print Failed
+                H->>S: Update Error State
+                S-->>C: Show Error
+                C->>H: Retry Print
+                H->>B: Retry Command
+                B->>P: Send Commands
+                P-->>B: Print Status
+                B-->>H: Retry Result
+            end
+        else Connection Failed
+            H->>S: Update Error State
+            S-->>C: Show Connection Error
+            C->>H: Attempt Reconnection
+            H->>B: Retry Connection
+            B->>P: Connect Request
+            P-->>B: Connection Response
+            B-->>H: Connection Status
+        end
+    else Permissions Denied
+        H->>S: Update Error State
+        S-->>C: Show Permission Error
+    end
 ```
 
 ### Bluetooth Features
