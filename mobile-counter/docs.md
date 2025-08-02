@@ -1,4 +1,4 @@
-# Mobile Counter Application - Technical Documentation
+# Mobile Counter Application
 
 ## Table of Contents
 
