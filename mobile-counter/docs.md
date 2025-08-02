@@ -27,78 +27,51 @@ The Mobile Counter Application is a React Native/Expo-based mobile application d
 
 ## Architecture Overview
 
-```mermaid
-graph TB
-    subgraph "Mobile App"
-        UI[UI Layer]
-        BL[Business Logic]
-        SM[State Management]
-        API[API Layer]
-    end
-    
-    subgraph "External Services"
-        AS[Async Storage]
-        EX[Expo Services]
-        WB[Web Browser]
-    end
-    
-    UI --> BL
-    BL --> SM
-    BL --> API
-    API --> AS
-    API --> EX
-    API --> WB
-    
-    style UI fill:#e1f5fe
-    style BL fill:#f3e5f5
-    style SM fill:#e8f5e8
-    style API fill:#fff3e0
-```
+The Mobile Counter Application follows a layered architecture pattern with clear separation of concerns:
+
+### Application Layers
+
+**UI Layer**: React Native components and screens that handle user interactions and display
+**Business Logic Layer**: Custom hooks and utility functions that contain application logic
+**State Management Layer**: Redux store and slices that manage application state
+**API Layer**: Network requests and external service integrations
+
+### External Services
+
+**Async Storage**: Local data persistence for user preferences and cached data
+**Expo Services**: Platform-specific services like notifications, device info, and updates
+**Web Browser**: External web content and authentication flows
+
+### Data Flow
+
+User interactions flow from the UI Layer through Business Logic to State Management, with the API Layer handling external communications. State changes flow back up through the layers to update the UI.
 
 ## Technology Stack
 
 ### Core Technologies
 
-```mermaid
-graph LR
-    subgraph "Frontend"
-        RN[React Native]
-        EX[Expo]
-        TS[TypeScript]
-        TW[TailwindCSS]
-    end
-    
-    subgraph "State Management"
-        RTK[Redux Toolkit]
-        RP[Redux Persist]
-        RR[React Redux]
-    end
-    
-    subgraph "Navigation"
-        ER[Expo Router]
-        RNB[React Navigation]
-        RNT[React Native Tab View]
-    end
-    
-    subgraph "UI/UX"
-        RNG[React Native Gesture Handler]
-        RNR[React Native Reanimated]
-        RNTM[React Native Toast Message]
-    end
-    
-    RN --> EX
-    EX --> TS
-    TS --> TW
-    RN --> RTK
-    RTK --> RP
-    RP --> RR
-    RN --> ER
-    ER --> RNB
-    RNB --> RNT
-    RN --> RNG
-    RNG --> RNR
-    RNR --> RNTM
-```
+The application is built using a modern React Native stack with the following key technologies:
+
+**Frontend Framework**
+- **React Native**: Cross-platform mobile development framework
+- **Expo**: Development platform and toolchain
+- **TypeScript**: Type-safe JavaScript development
+- **TailwindCSS**: Utility-first CSS framework via NativeWind
+
+**State Management**
+- **Redux Toolkit**: Modern Redux with simplified boilerplate
+- **Redux Persist**: State persistence across app sessions
+- **React Redux**: React bindings for Redux
+
+**Navigation**
+- **Expo Router**: File-based routing system
+- **React Navigation**: Navigation library for React Native
+- **React Native Tab View**: Tab navigation components
+
+**UI/UX Libraries**
+- **React Native Gesture Handler**: Touch and gesture handling
+- **React Native Reanimated**: Smooth animations and interactions
+- **React Native Toast Message**: User notification system
 
 ### Development Tools
 
@@ -110,39 +83,49 @@ graph LR
 
 ## Project Structure
 
-```mermaid
-graph TD
-    A[mobile-counter] --> B[app/]
-    A --> C[features/]
-    A --> D[assets/]
-    A --> E[libs/]
-    A --> F[android/]
-    A --> G[Configuration Files]
-    
-    B --> B1[_layout.tsx]
-    B --> B2[auth/]
-    B --> B3[(tabs)/]
-    B --> B4[(developer)/]
-    
-    C --> C1[auth/]
-    C --> C2[counter/]
-    C --> C3[customer/]
-    C --> C4[developer/]
-    C --> C5[error/]
-    C --> C6[navigation/]
-    C --> C7[queue/]
-    C --> C8[settings/]
-    C --> C9[config/]
-    
-    G --> G1[package.json]
-    G --> G2[app.config.ts]
-    G --> G3[tsconfig.json]
-    G --> G4[tailwind.config.js]
-    G --> G5[metro.config.js]
-    G --> G6[babel.config.js]
-    G --> G7[eslint.config.js]
-    G --> G8[.prettierrc]
+The project follows a feature-based architecture with clear separation of concerns:
+
+### Root Directory Structure
+
 ```
+mobile-counter/
+├── app/                    # Expo Router app directory
+├── features/              # Feature-based modules
+├── assets/                # Static assets (images, fonts)
+├── libs/                  # Shared libraries and utilities
+├── android/               # Android-specific configurations
+└── Configuration Files    # Build and development configs
+```
+
+### App Directory (`app/`)
+
+- **_layout.tsx**: Root layout component
+- **auth/**: Authentication routes and screens
+- **(tabs)/**: Tab-based navigation screens
+- **(developer)/**: Developer tools and debugging screens
+
+### Features Directory (`features/`)
+
+- **auth/**: Authentication logic and components
+- **counter/**: Core counter functionality
+- **customer/**: Customer management features
+- **developer/**: Developer tools and utilities
+- **error/**: Error handling and error boundaries
+- **navigation/**: Navigation components and logic
+- **queue/**: Queue management functionality
+- **settings/**: User settings and preferences
+- **config/**: Application configuration
+
+### Configuration Files
+
+- **package.json**: Dependencies and scripts
+- **app.config.ts**: Expo application configuration
+- **tsconfig.json**: TypeScript configuration
+- **tailwind.config.js**: TailwindCSS configuration
+- **metro.config.js**: Metro bundler configuration
+- **babel.config.js**: Babel transpiler configuration
+- **eslint.config.js**: ESLint linting rules
+- **.prettierrc**: Prettier formatting configuration
 
 ## Feature Architecture
 
@@ -150,446 +133,423 @@ graph TD
 
 Each feature follows a consistent structure for maintainability and scalability:
 
-```mermaid
-graph LR
-    subgraph "Feature Structure"
-        COMP[components/]
-        HOOKS[hooks/]
-        TYPES[types/]
-        API[api/]
-        UTILS[utils/]
-        INDEX[index.ts]
-    end
-    
-    COMP --> INDEX
-    HOOKS --> INDEX
-    TYPES --> INDEX
-    API --> INDEX
-    UTILS --> INDEX
-    
-    style COMP fill:#e3f2fd
-    style HOOKS fill:#f3e5f5
-    style TYPES fill:#e8f5e8
-    style API fill:#fff3e0
-    style UTILS fill:#fce4ec
-    style INDEX fill:#f1f8e9
+**Standard Feature Structure**
 ```
+feature-name/
+├── components/     # React components
+├── hooks/          # Custom hooks
+├── types/          # TypeScript interfaces/types
+├── api/            # API calls (if applicable)
+├── utils/          # Utility functions (if applicable)
+└── index.ts        # Main exports
+```
+
+**Component Organization**
+- **components/**: Reusable UI components specific to the feature
+- **hooks/**: Custom React hooks for business logic
+- **types/**: TypeScript type definitions and interfaces
+- **api/**: API integration and data fetching logic
+- **utils/**: Helper functions and utilities
+- **index.ts**: Central export point for the feature
 
 ### Feature Dependencies
 
-```mermaid
-graph TD
-    subgraph "Core Features"
-        AUTH[auth]
-        COUNTER[counter]
-        SETTINGS[settings]
-        NAV[navigation]
-    end
-    
-    subgraph "Supporting Features"
-        CONFIG[config]
-        ERROR[error]
-        DEV[developer]
-        CUST[customer]
-        QUEUE[queue]
-    end
-    
-    AUTH --> COUNTER
-    AUTH --> SETTINGS
-    NAV --> COUNTER
-    NAV --> SETTINGS
-    CONFIG --> AUTH
-    CONFIG --> COUNTER
-    ERROR --> AUTH
-    ERROR --> COUNTER
-    DEV --> COUNTER
-    CUST --> COUNTER
-    QUEUE --> COUNTER
-    
-    style AUTH fill:#ffebee
-    style COUNTER fill:#e8f5e8
-    style SETTINGS fill:#e3f2fd
-    style NAV fill:#fff3e0
-```
+The application features are organized with clear dependencies and relationships:
+
+**Core Features**
+- **auth**: Authentication and user management (required by counter and settings)
+- **counter**: Main counter functionality (depends on auth and config)
+- **settings**: User preferences and configuration (depends on auth)
+- **navigation**: Tab navigation and routing (used by counter and settings)
+
+**Supporting Features**
+- **config**: Application configuration (used by auth and counter)
+- **error**: Error handling and boundaries (used by auth and counter)
+- **developer**: Developer tools and debugging (used by counter)
+- **customer**: Customer management (used by counter)
+- **queue**: Queue management (used by counter)
+
+**Dependency Flow**
+- Authentication is required before accessing counter and settings
+- Navigation provides the tab structure for main features
+- Configuration and error handling support core features
+- Developer tools enhance counter functionality
+- Customer and queue management extend counter capabilities
 
 ## Data Flow
 
 ### Application State Flow
 
-```mermaid
-graph TD
-    subgraph "User Actions"
-        UA1[User Login]
-        UA2[Counter Operations]
-        UA3[Settings Changes]
-        UA4[Navigation]
-    end
-    
-    subgraph "State Management"
-        SM1[Redux Store]
-        SM2[Redux Persist]
-        SM3[Async Storage]
-    end
-    
-    subgraph "UI Updates"
-        UI1[Component Re-render]
-        UI2[Toast Messages]
-        UI3[Navigation Updates]
-    end
-    
-    UA1 --> SM1
-    UA2 --> SM1
-    UA3 --> SM1
-    UA4 --> SM1
-    
-    SM1 --> SM2
-    SM2 --> SM3
-    
-    SM1 --> UI1
-    SM1 --> UI2
-    SM1 --> UI3
-    
-    style SM1 fill:#e8f5e8
-    style SM2 fill:#fff3e0
-    style SM3 fill:#f3e5f5
-```
+The application follows a unidirectional data flow pattern with Redux as the central state management solution:
+
+**User Actions**
+- **User Login**: Authentication state changes trigger UI updates
+- **Counter Operations**: Ticket processing and counter state management
+- **Settings Changes**: User preference updates and configuration changes
+- **Navigation**: Route changes and tab switching
+
+**State Management**
+- **Redux Store**: Centralized state container with multiple slices
+- **Redux Persist**: State persistence across app sessions
+- **Async Storage**: Local data storage for offline functionality
+
+**UI Updates**
+- **Component Re-render**: React components update based on state changes
+- **Toast Messages**: User notifications for actions and errors
+- **Navigation Updates**: Route changes and tab state updates
+
+**Data Flow Pattern**
+1. User performs an action (login, counter operation, etc.)
+2. Action is dispatched to Redux store
+3. Reducer updates the state
+4. State changes trigger component re-renders
+5. UI updates reflect the new state
+6. State is persisted to Async Storage for offline access
 
 ### API Data Flow
 
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant C as Component
-    participant H as Hook
-    participant A as API
-    participant S as Store
-    participant AS as AsyncStorage
-    
-    U->>C: User Action
-    C->>H: Call Hook
-    H->>A: API Request
-    A-->>H: Response
-    H->>S: Update Store
-    S->>AS: Persist Data
-    S-->>C: State Update
-    C-->>U: UI Update
-```
+The application uses a structured approach for API interactions and data management:
+
+**API Interaction Pattern**
+1. **User Action**: User interacts with a component (login, counter operation, etc.)
+2. **Component Handler**: Component calls a custom hook to handle the action
+3. **Hook Processing**: Custom hook makes API request and manages loading states
+4. **API Request**: Network request is made to backend services
+5. **Response Handling**: API response is processed and validated
+6. **Store Update**: Redux store is updated with new data
+7. **Data Persistence**: Important data is saved to Async Storage
+8. **UI Update**: Components re-render with updated state
+9. **User Feedback**: User sees updated interface and any notifications
+
+**Error Handling**
+- Network errors are caught and displayed to users
+- Loading states are managed during API calls
+- Offline functionality is supported through cached data
+- Retry mechanisms are implemented for failed requests
 
 ## State Management
 
 ### Redux Store Structure
 
-```mermaid
-graph TD
-    subgraph "Redux Store"
-        ROOT[Root State]
-        
-        subgraph "Slices"
-            AUTH_SLICE[authSlice]
-            COUNTER_SLICE[counterSlice]
-            SETTINGS_SLICE[settingsSlice]
-            CONFIG_SLICE[configSlice]
-        end
-        
-        subgraph "Middleware"
-            PERSIST[Redux Persist]
-            LOGGER[Logger]
-        end
-    end
-    
-    ROOT --> AUTH_SLICE
-    ROOT --> COUNTER_SLICE
-    ROOT --> SETTINGS_SLICE
-    ROOT --> CONFIG_SLICE
-    
-    AUTH_SLICE --> PERSIST
-    COUNTER_SLICE --> PERSIST
-    SETTINGS_SLICE --> PERSIST
-    CONFIG_SLICE --> PERSIST
-    
-    style ROOT fill:#e8f5e8
-    style AUTH_SLICE fill:#ffebee
-    style COUNTER_SLICE fill:#e3f2fd
-    style SETTINGS_SLICE fill:#fff3e0
-    style CONFIG_SLICE fill:#f3e5f5
+The application uses Redux Toolkit for centralized state management with a modular slice-based architecture:
+
+**Root State Structure**
 ```
+Root State
+├── authSlice          # Authentication and user state
+├── counterSlice       # Counter operations and ticket state
+├── settingsSlice      # User preferences and app settings
+└── configSlice        # Application configuration
+```
+
+**State Slices**
+
+**authSlice**
+- User authentication status
+- User profile information
+- Login/logout state
+- Session management
+
+**counterSlice**
+- Current ticket information
+- Counter status and operations
+- Queue management state
+- Ticket history
+
+**settingsSlice**
+- User preferences
+- App configuration
+- Theme and display settings
+- Notification preferences
+
+**configSlice**
+- Application configuration
+- Feature flags
+- Environment settings
+- API endpoints
+
+**Middleware**
+- **Redux Persist**: Automatically saves and restores state
+- **Logger**: Development logging for debugging
 
 ### State Persistence Flow
 
-```mermaid
-graph LR
-    subgraph "Persistence Layer"
-        RP[Redux Persist]
-        AS[Async Storage]
-        ENC[Encryption]
-    end
-    
-    subgraph "Data Flow"
-        STORE[Redux Store]
-        PERSIST[Persist Config]
-        RESTORE[Restore Data]
-    end
-    
-    STORE --> RP
-    RP --> PERSIST
-    PERSIST --> AS
-    AS --> ENC
-    
-    RESTORE --> AS
-    AS --> RP
-    RP --> STORE
-    
-    style RP fill:#e8f5e8
-    style AS fill:#fff3e0
-    style ENC fill:#f3e5f5
-```
+The application implements robust state persistence to maintain user data across sessions:
+
+**Persistence Architecture**
+
+**Redux Persist**
+- Automatically saves Redux state to Async Storage
+- Handles state serialization and deserialization
+- Manages state restoration on app startup
+- Configurable persistence strategies
+
+**Async Storage**
+- Local storage for sensitive user data
+- Offline data caching
+- User preferences and settings
+- Session information
+
+**Data Flow Process**
+1. **State Changes**: Redux store updates trigger persistence
+2. **Serialization**: State is serialized to JSON format
+3. **Storage**: Data is saved to Async Storage
+4. **Encryption**: Sensitive data is encrypted before storage
+5. **Restoration**: On app startup, data is restored from storage
+6. **State Update**: Restored data populates Redux store
+
+**Persistence Configuration**
+- Selective state persistence (not all state is persisted)
+- Encryption for sensitive data
+- Automatic cleanup of old data
+- Error handling for storage failures
 
 ## Navigation Flow
 
 ### App Navigation Structure
 
-```mermaid
-graph TD
-    subgraph "App Router"
-        ROOT[_layout.tsx]
-        
-        subgraph "Main Routes"
-            AUTH[auth/]
-            TABS[(tabs)/]
-            DEV[(developer)/]
-        end
-        
-        subgraph "Tab Routes"
-            HOME[index.tsx]
-            SETTINGS[setting.tsx]
-        end
-        
-        subgraph "Auth Routes"
-            LOGIN[login.tsx]
-            REGISTER[register.tsx]
-        end
-        
-        subgraph "Developer Routes"
-            DEV_TOOLS[dev-tools.tsx]
-            DEBUG[debug.tsx]
-        end
-    end
-    
-    ROOT --> AUTH
-    ROOT --> TABS
-    ROOT --> DEV
-    
-    TABS --> HOME
-    TABS --> SETTINGS
-    
-    AUTH --> LOGIN
-    AUTH --> REGISTER
-    
-    DEV --> DEV_TOOLS
-    DEV --> DEBUG
-    
-    style ROOT fill:#e8f5e8
-    style AUTH fill:#ffebee
-    style TABS fill:#e3f2fd
-    style DEV fill:#fff3e0
-```
+The application uses Expo Router for file-based navigation with a hierarchical structure:
+
+**Root Layout (`_layout.tsx`)**
+- Main app container and navigation provider
+- Handles authentication state and routing logic
+- Manages global app state and providers
+
+**Main Route Groups**
+
+**Authentication Routes (`auth/`)**
+- `login.tsx`: User login screen
+- `register.tsx`: User registration screen
+- Handles authentication flow and user onboarding
+
+**Tab Navigation (`(tabs)/`)**
+- `index.tsx`: Main counter/home screen
+- `setting.tsx`: User settings and preferences
+- Provides tab-based navigation for core features
+
+**Developer Routes (`(developer)/`)**
+- `dev-tools.tsx`: Developer utilities and debugging tools
+- `debug.tsx`: Debug information and logs
+- Available only in development builds
+
+**Navigation Flow**
+- App starts with root layout
+- Authentication state determines initial route
+- Authenticated users see tab navigation
+- Developer routes are conditionally available
 
 ### Navigation State Management
 
-```mermaid
-stateDiagram-v2
-    [*] --> Splash
-    Splash --> Auth
-    Splash --> Main
-    
-    Auth --> Login
-    Auth --> Register
-    Login --> Main
-    Register --> Main
-    
-    Main --> Counter
-    Main --> Settings
-    Main --> Developer
-    
-    Counter --> Settings
-    Settings --> Counter
-    Developer --> Counter
-    
-    Counter --> [*]
-    Settings --> [*]
-    Developer --> [*]
-```
+The application implements a state-driven navigation system with clear user flow:
+
+**Application States**
+
+**Initial State**
+- **Splash Screen**: App startup and initialization
+- **Authentication Check**: Determines if user is logged in
+- **Route Decision**: Directs to auth or main app
+
+**Authentication Flow**
+- **Login Screen**: User authentication interface
+- **Register Screen**: New user registration
+- **Authentication Success**: Redirects to main application
+
+**Main Application States**
+- **Counter Screen**: Primary counter functionality
+- **Settings Screen**: User preferences and configuration
+- **Developer Tools**: Debug and development utilities
+
+**Navigation Patterns**
+- **Tab Navigation**: Seamless switching between counter and settings
+- **Modal Navigation**: Overlay screens for detailed views
+- **Stack Navigation**: Hierarchical navigation within features
+- **Conditional Navigation**: Developer routes only in development
+
+**State Transitions**
+- Authentication state changes trigger navigation updates
+- Tab switching maintains state across screens
+- Deep linking supports direct navigation to specific screens
+- Back navigation preserves user context
 
 ## Development Workflow
 
 ### Development Environment Setup
 
-```mermaid
-graph TD
-    subgraph "Development Setup"
-        NODE[Node.js]
-        NPM[npm install]
-        EXPO[Expo CLI]
-        DEV[Development Build]
-    end
-    
-    subgraph "Development Commands"
-        START[npm start]
-        ANDROID[npm run android]
-        IOS[npm run ios]
-        WEB[npm run web]
-        LINT[npm run lint]
-        FORMAT[npm run format]
-    end
-    
-    NODE --> NPM
-    NPM --> EXPO
-    EXPO --> DEV
-    
-    DEV --> START
-    START --> ANDROID
-    START --> IOS
-    START --> WEB
-    
-    DEV --> LINT
-    DEV --> FORMAT
-    
-    style NODE fill:#e8f5e8
-    style EXPO fill:#fff3e0
-    style DEV fill:#f3e5f5
-```
+The development workflow is streamlined with modern tools and automation:
+
+**Development Prerequisites**
+- **Node.js**: JavaScript runtime environment
+- **npm**: Package manager for dependencies
+- **Expo CLI**: Development tools and build system
+- **Development Build**: Custom build for native features
+
+**Development Commands**
+
+**Core Development**
+- `npm start`: Starts Expo development server
+- `npm run android`: Runs app on Android emulator/device
+- `npm run ios`: Runs app on iOS simulator/device
+- `npm run web`: Runs app in web browser
+
+**Code Quality**
+- `npm run lint`: Runs ESLint for code quality checks
+- `npm run format`: Formats code with Prettier
+- `npm run format:check`: Checks code formatting without changes
+
+**Build and Deployment**
+- `npm run reset-project`: Resets project to clean state
+- EAS Build: Cloud-based build system for production builds
+
+**Development Workflow**
+1. Install dependencies with `npm install`
+2. Start development server with `npm start`
+3. Choose target platform (Android/iOS/Web)
+4. Make code changes with live reload
+5. Run quality checks before committing
+6. Build for production when ready
 
 ### Code Quality Pipeline
 
-```mermaid
-graph LR
-    subgraph "Code Quality"
-        ESLINT[ESLint]
-        PRETTIER[Prettier]
-        TS[TypeScript]
-        FORMAT[Format Check]
-    end
-    
-    subgraph "Development"
-        EDIT[Code Editor]
-        SAVE[Save File]
-        CHECK[Quality Check]
-        FIX[Auto Fix]
-    end
-    
-    EDIT --> SAVE
-    SAVE --> ESLINT
-    SAVE --> PRETTIER
-    SAVE --> TS
-    
-    ESLINT --> CHECK
-    PRETTIER --> CHECK
-    TS --> CHECK
-    
-    CHECK --> FIX
-    FIX --> EDIT
-    
-    style ESLINT fill:#ffebee
-    style PRETTIER fill:#e3f2fd
-    style TS fill:#e8f5e8
-```
+The application implements a comprehensive code quality pipeline to ensure maintainable and consistent code:
+
+**Code Quality Tools**
+
+**ESLint**
+- Static code analysis and linting
+- Enforces coding standards and best practices
+- Catches potential errors and code smells
+- Configurable rules for project-specific requirements
+
+**Prettier**
+- Automatic code formatting
+- Consistent code style across the project
+- Integration with ESLint for seamless workflow
+- Configurable formatting rules
+
+**TypeScript**
+- Static type checking
+- Enhanced IDE support and IntelliSense
+- Catches type-related errors at compile time
+- Improves code maintainability and documentation
+
+**Quality Assurance Process**
+1. **Code Editor**: Developer writes code in IDE
+2. **Save Trigger**: File save triggers quality checks
+3. **Linting**: ESLint analyzes code for issues
+4. **Formatting**: Prettier ensures consistent formatting
+5. **Type Checking**: TypeScript validates types
+6. **Quality Check**: All tools report issues
+7. **Auto Fix**: Automatic fixes are applied where possible
+8. **Manual Review**: Developer addresses remaining issues
+
+**Quality Standards**
+- Zero ESLint errors in production code
+- Consistent formatting across all files
+- TypeScript strict mode compliance
+- Regular code reviews and quality checks
 
 ## Deployment
 
 ### Build and Deployment Process
 
-```mermaid
-graph TD
-    subgraph "Build Process"
-        SOURCE[Source Code]
-        BUILD[EAS Build]
-        CONFIG[app.config.ts]
-        ASSETS[Assets]
-    end
-    
-    subgraph "Platforms"
-        ANDROID[Android APK/AAB]
-        IOS[iOS IPA]
-        WEB[Web Build]
-    end
-    
-    subgraph "Distribution"
-        STORE[App Stores]
-        INTERNAL[Internal Testing]
-        OTA[Over-the-Air Updates]
-    end
-    
-    SOURCE --> BUILD
-    CONFIG --> BUILD
-    ASSETS --> BUILD
-    
-    BUILD --> ANDROID
-    BUILD --> IOS
-    BUILD --> WEB
-    
-    ANDROID --> STORE
-    IOS --> STORE
-    WEB --> STORE
-    
-    ANDROID --> INTERNAL
-    IOS --> INTERNAL
-    
-    ANDROID --> OTA
-    IOS --> OTA
-    
-    style BUILD fill:#e8f5e8
-    style ANDROID fill:#e3f2fd
-    style IOS fill:#fff3e0
-    style STORE fill:#f3e5f5
-```
+The application uses EAS (Expo Application Services) for streamlined build and deployment:
+
+**Build Process**
+
+**Source Management**
+- **Source Code**: React Native/Expo application code
+- **Configuration**: `app.config.ts` defines build settings
+- **Assets**: Images, fonts, and static resources
+- **Dependencies**: Managed through `package.json`
+
+**EAS Build System**
+- **Cloud Builds**: Automated builds in Expo's cloud infrastructure
+- **Multi-Platform**: Simultaneous builds for Android, iOS, and Web
+- **Environment Management**: Different configurations for dev/staging/prod
+- **Build Profiles**: Optimized settings for each platform
+
+**Platform Outputs**
+
+**Android**
+- **APK**: Direct installation package for testing
+- **AAB**: App Bundle for Google Play Store distribution
+- **Optimized**: Size-optimized builds with code splitting
+
+**iOS**
+- **IPA**: iOS application package
+- **App Store**: Optimized for App Store distribution
+- **Enterprise**: Internal distribution builds
+
+**Web**
+- **Static Build**: Optimized web application
+- **PWA Support**: Progressive Web App capabilities
+- **CDN Ready**: Optimized for content delivery networks
+
+**Distribution Channels**
+
+**App Stores**
+- **Google Play Store**: Android app distribution
+- **Apple App Store**: iOS app distribution
+- **Web Deployment**: Hosted web application
+
+**Internal Distribution**
+- **TestFlight**: iOS beta testing platform
+- **Internal Testing**: Direct APK distribution
+- **Enterprise Distribution**: Internal company distribution
+
+**Over-the-Air Updates**
+- **Expo Updates**: Instant updates without app store approval
+- **Code Push**: JavaScript bundle updates
+- **Configuration Updates**: Remote configuration changes
 
 ### Configuration Management
 
-```mermaid
-graph TD
-    subgraph "Configuration Files"
-        APP_CONFIG[app.config.ts]
-        PACKAGE[package.json]
-        TS_CONFIG[tsconfig.json]
-        TAILWIND[tailwind.config.js]
-        METRO[metro.config.js]
-        BABEL[babel.config.js]
-        ESLINT[eslint.config.js]
-        PRETTIER[.prettierrc]
-    end
-    
-    subgraph "Environment"
-        DEV[Development]
-        STAGING[Staging]
-        PROD[Production]
-    end
-    
-    subgraph "Build Properties"
-        EAS[eas.json]
-        EXPO[expo-env.d.ts]
-        NATIVEWIND[nativewind-env.d.ts]
-    end
-    
-    APP_CONFIG --> DEV
-    APP_CONFIG --> STAGING
-    APP_CONFIG --> PROD
-    
-    PACKAGE --> DEV
-    TS_CONFIG --> DEV
-    TAILWIND --> DEV
-    METRO --> DEV
-    BABEL --> DEV
-    ESLINT --> DEV
-    PRETTIER --> DEV
-    
-    EAS --> DEV
-    EXPO --> DEV
-    NATIVEWIND --> DEV
-    
-    style APP_CONFIG fill:#e8f5e8
-    style PACKAGE fill:#fff3e0
-    style EAS fill:#f3e5f5
-```
+The application uses a comprehensive configuration management system to handle different environments and build requirements:
+
+**Configuration Files**
+
+**Core Configuration**
+- **app.config.ts**: Expo application configuration and metadata
+- **package.json**: Dependencies, scripts, and project metadata
+- **tsconfig.json**: TypeScript compiler configuration
+- **tailwind.config.js**: TailwindCSS styling configuration
+
+**Build Configuration**
+- **metro.config.js**: Metro bundler configuration
+- **babel.config.js**: Babel transpiler settings
+- **eslint.config.js**: Code linting rules and standards
+- **.prettierrc**: Code formatting configuration
+
+**Environment Management**
+
+**Development Environment**
+- Local development with hot reload
+- Debug tools and development features
+- Detailed error messages and logging
+- Development-specific API endpoints
+
+**Staging Environment**
+- Pre-production testing environment
+- Production-like configuration
+- Testing with real data
+- Performance monitoring
+
+**Production Environment**
+- Optimized builds for app stores
+- Minimal logging and debugging
+- Production API endpoints
+- Performance optimizations
+
+**Build Properties**
+- **eas.json**: EAS build configuration and profiles
+- **expo-env.d.ts**: Expo environment type definitions
+- **nativewind-env.d.ts**: NativeWind environment types
+
+**Configuration Strategy**
+- Environment-specific configuration files
+- Conditional compilation for different environments
+- Secure handling of sensitive configuration
+- Automated configuration validation
 
 ## Key Features Documentation
 
