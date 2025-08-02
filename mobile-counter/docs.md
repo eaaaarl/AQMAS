@@ -210,6 +210,134 @@ The application follows a unidirectional data flow pattern with Redux as the cen
 
 The application uses a structured approach for API interactions and data management:
 
+#### General API Interaction Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant C as Component
+    participant H as Hook
+    participant A as API
+    participant S as Store
+    participant AS as AsyncStorage
+    
+    U->>C: User Action
+    C->>H: Call Hook
+    H->>A: API Request
+    A-->>H: Response
+    H->>S: Update Store
+    S->>AS: Persist Data
+    S-->>C: State Update
+    C-->>U: UI Update
+```
+
+#### Authentication API Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant L as LoginScreen
+    participant A as AuthHook
+    participant API as AuthAPI
+    participant S as ReduxStore
+    participant AS as AsyncStorage
+    
+    U->>L: Enter Credentials
+    L->>A: Login Request
+    A->>API: POST /auth/login
+    API-->>A: Token + User Data
+    A->>S: Update Auth State
+    S->>AS: Persist Session
+    S-->>L: Auth Success
+    L-->>U: Navigate to Main App
+```
+
+#### Counter Operations API Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant C as CounterScreen
+    participant H as CounterHook
+    participant API as CounterAPI
+    participant S as ReduxStore
+    participant AS as AsyncStorage
+    
+    U->>C: Counter Action
+    C->>H: Process Operation
+    H->>API: POST /counter/operation
+    API-->>H: Updated Ticket Data
+    H->>S: Update Counter State
+    S->>AS: Cache Ticket Data
+    S-->>C: State Update
+    C-->>U: UI Refresh
+```
+
+#### Settings API Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant S as SettingsScreen
+    participant H as SettingsHook
+    participant API as SettingsAPI
+    participant Store as ReduxStore
+    participant AS as AsyncStorage
+    
+    U->>S: Change Setting
+    S->>H: Update Setting
+    H->>API: PUT /settings/update
+    API-->>H: Confirmation
+    H->>Store: Update Settings State
+    Store->>AS: Persist Settings
+    Store-->>S: Settings Updated
+    S-->>U: Show Success Message
+```
+
+#### Error Handling Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant C as Component
+    participant H as Hook
+    participant API as API
+    participant E as ErrorHandler
+    participant S as Store
+    
+    U->>C: User Action
+    C->>H: API Call
+    H->>API: Request
+    API-->>H: Error Response
+    H->>E: Handle Error
+    E->>S: Update Error State
+    S-->>C: Error State
+    C-->>U: Show Error Message
+```
+
+#### Offline Data Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant C as Component
+    participant H as Hook
+    participant AS as AsyncStorage
+    participant S as Store
+    participant API as API
+    
+    U->>C: User Action
+    C->>H: Get Data
+    H->>AS: Check Cache
+    AS-->>H: Cached Data
+    H->>S: Update State
+    S-->>C: Show Cached Data
+    H->>API: Background Sync
+    API-->>H: Fresh Data
+    H->>S: Update State
+    S-->>C: Update UI
+```
+
 **API Interaction Pattern**
 1. **User Action**: User interacts with a component (login, counter operation, etc.)
 2. **Component Handler**: Component calls a custom hook to handle the action
