@@ -1,4 +1,4 @@
-# AQMAS Mobile Queue Kiosk - Technical Documentation
+# AQMAS Mobile Queue Kiosk 
 
 ## Table of Contents
 
