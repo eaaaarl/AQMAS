@@ -203,6 +203,61 @@ const rootReducer = combineReducers({
 
 ## API Integration
 
+### API Flow Overview
+
+The application follows a comprehensive API flow for managing queue operations, service selection, and customer interactions:
+
+```mermaid
+flowchart TD
+    A[App Startup] --> B[Load Configuration]
+    B --> C{Config Loaded?}
+    C -->|Yes| D[Initialize APIs]
+    C -->|No| E[Show Developer Settings]
+    
+    D --> F[Service Selection Screen]
+    F --> G[Load Available Services]
+    G --> H{Services Available?}
+    H -->|Yes| I[Display Service Grid]
+    H -->|No| J[Show No Services Message]
+    
+    I --> K[Customer Selects Service]
+    K --> L[Show Customer Type Modal]
+    L --> M[Customer Type Selected]
+    M --> N[Show Customer Name Modal]
+    N --> O[Customer Name Entered]
+    O --> P[Create Queue Entry]
+    
+    P --> Q[Submit Queue Request]
+    Q --> R{Queue Created?}
+    R -->|Success| S[Generate Ticket]
+    R -->|Error| T[Show Error Message]
+    
+    S --> U[Print Receipt via Bluetooth]
+    U --> V[Show Survey Button]
+    V --> W{Customer Takes Survey?}
+    W -->|Yes| X[Load Survey Questions]
+    W -->|No| Y[End Flow]
+    
+    X --> Z[Display Survey Questions]
+    Z --> AA[Customer Answers Questions]
+    AA --> BB[Submit Survey Responses]
+    BB --> CC{Survey Submitted?}
+    CC -->|Success| DD[Show Thank You Message]
+    CC -->|Error| EE[Show Error Message]
+    
+    DD --> Y
+    EE --> Y
+    T --> Y
+    J --> Y
+    
+    style A fill:#e1f5fe
+    style S fill:#c8e6c9
+    style DD fill:#c8e6c9
+    style T fill:#ffcdd2
+    style EE fill:#ffcdd2
+    style J fill:#ffcdd2
+```
+
 ### RTK Query Implementation
 
 The application uses RTK Query for efficient API management:
@@ -233,6 +288,64 @@ The application uses RTK Query for efficient API management:
 - **Error Retry Logic** - Automatic retry mechanisms
 
 ## Bluetooth Integration
+
+### Bluetooth & Thermal Printer Flow
+
+The application integrates with Bluetooth thermal printers for receipt generation and printing:
+
+```mermaid
+flowchart TD
+    A[App Startup] --> B[Initialize Bluetooth]
+    B --> C[Request Bluetooth Permissions]
+    C --> D{Permissions Granted?}
+    D -->|Yes| E[Scan for Bluetooth Devices]
+    D -->|No| F[Show Permission Error]
+    
+    E --> G[Filter Thermal Printers]
+    G --> H{Devices Found?}
+    H -->|Yes| I[Display Available Printers]
+    H -->|No| J[Show No Devices Message]
+    
+    I --> K[User Selects Printer]
+    K --> L[Attempt Connection]
+    L --> M{Connection Successful?}
+    M -->|Yes| N[Store Printer Configuration]
+    M -->|No| O[Show Connection Error]
+    
+    N --> P[Monitor Connection Status]
+    P --> Q{Printer Connected?}
+    Q -->|Yes| R[Ready for Printing]
+    Q -->|No| S[Attempt Reconnection]
+    
+    R --> T[Queue Ticket Generated]
+    T --> U[Format Receipt Data]
+    U --> V[Encode ESC/POS Commands]
+    V --> W[Send to Printer Buffer]
+    W --> X{Print Successful?}
+    X -->|Yes| Y[Show Print Success]
+    X -->|No| Z[Retry Print]
+    
+    Z --> AA{Retry Count < 3?}
+    AA -->|Yes| W
+    AA -->|No| BB[Show Print Error]
+    
+    S --> CC[Wait 5 Seconds]
+    CC --> L
+    
+    F --> DD[End Flow]
+    J --> DD
+    O --> DD
+    BB --> DD
+    Y --> DD
+    
+    style A fill:#e1f5fe
+    style R fill:#c8e6c9
+    style Y fill:#c8e6c9
+    style F fill:#ffcdd2
+    style J fill:#ffcdd2
+    style O fill:#ffcdd2
+    style BB fill:#ffcdd2
+```
 
 ### Bluetooth Features
 
